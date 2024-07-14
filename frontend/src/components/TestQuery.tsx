@@ -1,10 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
+const baseImgUrl = 'https://image.tmdb.org/t/p/w500'
+
 const fetchUsers = async (): Promise<User[]> => {
   const response = await axios.get("https://666962592e964a6dfed4e7ce.mockapi.io/users")
   const data = await response.data as User[]
   return data
+}
+
+const fetchFastapi = async () => {
+  const response = await axios.get("http://localhost:8000/test", {
+  })
+  const data = await response.data
+  return data
+
 }
 
 interface User {
@@ -12,19 +22,37 @@ interface User {
   id: number
   age: number
 }
+
 const TestQuery = () => {
   const userData = useQuery({ queryKey: ["users"], queryFn: fetchUsers })
-  console.log(userData)
+  const fastapi = useQuery({ queryKey: ["fastapi"], queryFn: fetchFastapi })
+  console.log(fastapi.data)
+  // console.log(userData)
 
+  // {
+  //   userData.data?.map(user => (
+  //     <div key={user.id}>
+  //       <h1>Name: {user.name}</h1>
+  //       <p>Age: {user.age}</p>
+  //       <p>ID: {user.id}</p>
+  //     </div>
+  //   ))
+  // }
   return (
     <div>
-      {userData.data?.map(user => (
-        <div key={user.id}>
-          <h1>Name: {user.name}</h1>
-          <p>Age: {user.age}</p>
-          <p>ID: {user.id}</p>
-        </div>
-      ))}
+      {
+        fastapi.isSuccess && (
+          fastapi.data.results.map(movie => (
+            <div className=''>
+              <p>{movie.title}</p>
+              <img src={`${baseImgUrl}${movie.poster_path}`} />
+            </div>
+
+          )
+          )
+        )
+      }
+
     </div>
   )
 }

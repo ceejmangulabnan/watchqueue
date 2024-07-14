@@ -1,0 +1,39 @@
+@use '../../styles/variables' as *;
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.5rem 2rem;
+  background-color: white;
+
+  font-size: $fs-450;
+  font-family: $ff-fira;
+
+  &__title {
+    font-size: $fs-600;
+    font-weight: $fw-600;
+  }
+
+  &__links {
+
+    ul {
+      display: flex;
+      list-style-type: none;
+      gap: 0.5rem;
+
+      li a {
+        all: unset;
+        cursor: pointer;
+        font-weight: $fw-400;
+      }
+    }
+
+  }
+}
