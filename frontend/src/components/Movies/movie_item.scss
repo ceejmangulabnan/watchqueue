@@ -1,0 +1,16 @@
+@use '../../styles/variables' as *;
+
+.movie-item {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+
+  &__title {
+    font-size: $fs-400;
+  }
+
+  &__poster {
+    width: 10rem;
+  }
+}
