@@ -38,3 +38,9 @@ async def root():
 async def test():
     response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
     return response.json()
+
+
+@app.get("/movie/popular")
+async def get_movie_popular():
+    response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
+    return response.json()
