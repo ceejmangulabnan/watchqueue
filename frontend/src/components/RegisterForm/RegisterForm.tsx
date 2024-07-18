@@ -74,7 +74,7 @@ const RegisterForm = () => {
 
   return (
     <div className='register-form'>
-      Register Form
+      <p className='register-form__title'>Create Account</p>
       <form action="">
         {
           registerFormInputs.map(input => (

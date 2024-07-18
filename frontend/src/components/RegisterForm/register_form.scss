@@ -1,4 +1,33 @@
+@use '../../styles/variables' as *;
+
 .register-form {
-  max-width: 20rem;
+  place-self: center;
+  width: 25rem;
+  padding: 2rem;
   margin-inline: auto;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+
+  &__title {
+    text-align: center;
+    font-weight: $fw-600;
+    font-size: $fs-500;
+    margin-bottom: 0.5rem;
+  }
+
+  button {
+    cursor: pointer;
+    width: 100%;
+
+    background-color: $clr-accent-400;
+    color: $clr-text-100;
+    border: solid 1px;
+    border-radius: 0.6rem;
+
+    padding: 0.6em 0.8em;
+    margin: 1rem 0;
+  }
+
+  button:hover {
+    background-color: rgba($clr-accent-400, 0.8);
+  }
 }
