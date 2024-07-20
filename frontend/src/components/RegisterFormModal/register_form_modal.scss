@@ -14,7 +14,7 @@
     margin-bottom: 0.5rem;
   }
 
-  button {
+  &__submit {
     cursor: pointer;
     width: 100%;
 
@@ -27,7 +27,7 @@
     margin: 1rem 0;
   }
 
-  button:hover {
+  &__submit:hover {
     background-color: rgba($clr-accent-400, 0.8);
   }
 }

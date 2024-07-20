@@ -1,0 +1,55 @@
+@use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
+
+.login-form-modal {
+  @extend %modal-overlay;
+
+
+  &__overlay {
+    @extend %modal-overlay;
+    background: rgba($clr-text-200, 0.5);
+  }
+
+  &__content {
+    @extend %modal;
+  }
+
+  &__title {
+    text-align: center;
+    font-weight: $fw-600;
+    font-size: $fs-500;
+    margin-bottom: 0.5rem;
+  }
+
+  &__submit {
+    cursor: pointer;
+    width: 100%;
+
+    background-color: $clr-accent-400;
+    color: $clr-text-100;
+    border: solid 1px;
+    border-radius: 0.6rem;
+
+    padding: 0.6em 0.8em;
+    margin: 1rem 0;
+  }
+
+  &__button {
+    padding: 0.5em;
+    background-color: $clr-accent-400;
+    color: $clr-text-100;
+    border: none;
+    border-radius: 0.6rem;
+
+  }
+
+  &__submit:hover {
+    background-color: rgba($clr-accent-400, 0.8);
+  }
+
+  &__close {
+    text-align: right;
+    fill: $clr-text-200;
+
+  }
+}

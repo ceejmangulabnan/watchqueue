@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import './navbar.scss'
+import LoginFormModal from '../LoginFormModal/LoginFormModal'
 
 const Navbar = () => {
   return (
@@ -14,7 +15,7 @@ const Navbar = () => {
             <Link to='/profile'>Profile</Link>
           </li>
           <li>
-            <Link to='/register'>Register</Link>
+            <LoginFormModal />
           </li>
         </ul>
       </nav>

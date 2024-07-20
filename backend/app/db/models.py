@@ -1,5 +1,5 @@
 # Models for Database Tables
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, null
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -9,8 +9,6 @@ class Base(DeclarativeBase):
 
 
 # Create Tables
-
-
 # Users Table
 class Users(Base):
     __tablename__ = "users"

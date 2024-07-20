@@ -1,11 +1,11 @@
-import RegisterForm from '../../components/RegisterForm/RegisterForm'
 import './register_page.scss'
+import RegisterFormModal from '../../components/RegisterFormModal/RegisterFormModal'
 
 const RegisterPage = () => {
   return (
 
     <div className="register-page">
-      <RegisterForm />
+      <RegisterFormModal />
     </div>
   )
 }
