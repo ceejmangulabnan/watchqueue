@@ -1,11 +1,17 @@
+@use '../../styles/utils' as *;
 @use '../../styles/variables' as *;
 
-.register-form {
-  place-self: center;
-  width: 25rem;
-  padding: 2rem;
-  margin-inline: auto;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+.register-form-modal {
+  @extend %modal-overlay;
+
+  &__overlay {
+    @extend %modal-overlay;
+    background: rgba($clr-text-200, 0.5);
+  }
+
+  &__content {
+    @extend %modal;
+  }
 
   &__title {
     text-align: center;
@@ -29,5 +35,15 @@
 
   &__submit:hover {
     background-color: rgba($clr-accent-400, 0.8);
+  }
+
+  &__close {
+    text-align: right;
+    fill: $clr-text-200;
+  }
+
+  .toggle-login {
+    cursor: pointer;
+    color: $clr-accent-400;
   }
 }

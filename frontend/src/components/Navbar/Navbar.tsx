@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import './navbar.scss'
-import LoginFormModal from '../LoginFormModal/LoginFormModal'
+import LoginRegisterToggle from '../LoginRegisterToggle/LoginRegisterToggle'
 
 const Navbar = () => {
   return (
@@ -15,7 +15,7 @@ const Navbar = () => {
             <Link to='/profile'>Profile</Link>
           </li>
           <li>
-            <LoginFormModal />
+            <LoginRegisterToggle />
           </li>
         </ul>
       </nav>

@@ -2,11 +2,14 @@ import './register_form_modal.scss'
 import axios, { AxiosError } from 'axios'
 import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
-import { ChangeEvent, ChangeEventHandler, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useState } from 'react'
 
+interface RegisterFormModalProps {
+  toggleForm: MouseEventHandler
+}
 
-const RegisterFormModal = () => {
-  const [registerModalActive, setRegisterModalActive] = useState(false)
+const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
+  const [registerModalActive, setRegisterModalActive] = useState(true)
   const [registerFormData, setRegisterFormData] = useState({
     username: '',
     password: '',
@@ -73,20 +76,36 @@ const RegisterFormModal = () => {
     }
   }
 
-  return (
-    <div className='register-modal__container'>
-      <div className='register-form'>
-        <p className='register-form__title'>Create Account</p>
-        <form action="">
-          {
-            registerFormInputs.map(input => (
-              <FormInput key={input.id} inputData={input} onChange={handleChange} />
-            ))
-          }
-          <button type="submit" onClick={handleSubmit}>Submit</button>
-        </form>
-      </div>
+  const toggleRegisterModal = () => {
+    setRegisterModalActive(!registerModalActive)
+  }
 
+  return (
+    <div>
+      {
+        registerModalActive && (
+          <div className='register-form-modal'>
+            <div className="register-form-modal__overlay" onClick={toggleRegisterModal}></div>
+            <div className="register-form-modal__content">
+              <svg className='register-form-modal__close' onClick={toggleRegisterModal} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
+              <p className='register-form-modal__title'>Create Account</p>
+              <div className="register-form-modal__form-container">
+                <form action="">
+                  {
+                    registerFormInputs.map(input => (
+                      <FormInput key={input.id} inputData={input} onChange={handleChange} />
+                    ))
+                  }
+                  <button className='register-form-modal__submit' type="submit" onClick={handleSubmit}>Submit</button>
+                </form>
+              </div>
+              <p >Already have an account?
+                <span className='toggle-login' onClick={toggleForm}> Login</span>
+              </p>
+            </div>
+          </div>
+        )
+      }
     </div>
   )
 }

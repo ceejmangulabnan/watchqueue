@@ -50,6 +50,10 @@
   &__close {
     text-align: right;
     fill: $clr-text-200;
+  }
 
+  .toggle-signup {
+    cursor: pointer;
+    color: $clr-accent-400;
   }
 }
