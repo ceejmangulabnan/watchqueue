@@ -66,21 +66,21 @@ async def get_movie_popular():
 
 
 class CreateUser(BaseModel):
-    username: str
-    password: str
-    confirmPassword: str
-    email: str
+    registerUsername: str
+    registerPassword: str
+    registerConfirmPassword: str
+    registerEmail: str
 
 
 # Test PostgresDB
-@app.post("/register")
+@app.post("/user/register")
 async def register_user(request_body: CreateUser, db: db_dependency):
     print(request_body)
     try:
         db_user = models.Users(
-            username=request_body.username,
-            password=request_body.password,
-            email=request_body.email,
+            username=request_body.registerUsername,
+            password=request_body.registerPassword,
+            email=request_body.registerEmail,
         )
 
         db.add(db_user)

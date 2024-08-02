@@ -15,6 +15,22 @@
     padding: 0.6rem;
     font-size: $fs-300;
     border-radius: $fs-200;
-    border: solid 1px;
+    border: solid 1px rgba($clr-text-200, .7);
+  }
+
+  span {
+    display: none;
+    color: red;
+    font-size: 0.8rem;
+    padding: 0.2em 0.4em;
+  }
+
+  /* Show errorMessage in span if input is invalid */
+  input:invalid[data-focused="true"]~span {
+    display: block;
+  }
+
+  input:invalid[data-focused="true"] {
+    border: 1px solid red;
   }
 }

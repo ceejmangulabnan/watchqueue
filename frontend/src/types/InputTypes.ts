@@ -5,4 +5,7 @@ export interface FormInputData {
   placeholder: string
   minLength?: number
   label: string
+  required: boolean
+  pattern: string
+  errorMessage?: string
 }

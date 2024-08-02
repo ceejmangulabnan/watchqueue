@@ -42,6 +42,10 @@
     fill: $clr-text-200;
   }
 
+  &__login-toggle {
+    font-size: $fs-400;
+  }
+
   .toggle-login {
     cursor: pointer;
     color: $clr-accent-400;
