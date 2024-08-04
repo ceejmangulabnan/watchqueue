@@ -2,7 +2,7 @@ import './register_form_modal.scss'
 import axios, { AxiosError } from 'axios'
 import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState } from 'react'
 
 interface RegisterFormModalProps {
   toggleForm: MouseEventHandler
@@ -10,12 +10,18 @@ interface RegisterFormModalProps {
 
 const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
   const [registerModalActive, setRegisterModalActive] = useState(true)
+  const [registerFormIsValid, setRegisterFormIsValid] = useState(false)
   const [registerFormData, setRegisterFormData] = useState({
     registerUsername: '',
     registerPassword: '',
     registerConfirmPassword: '',
     registerEmail: ''
   })
+
+  // When registerFormData changes, validate the form for appropriate submit button style
+  useEffect(() => {
+    validateForm()
+  }, [registerFormData])
 
   // FormInput Props
   const registerFormInputs: FormInputData[] = [
@@ -86,25 +92,30 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     return false
   }
 
+  // Validates all inputs in a form, if all true, returns true
   const validateForm = () => {
     const isValid = registerFormInputs.every(input => {
       return validateInput(input)
     })
-    return isValid
+    setRegisterFormIsValid(isValid)
   }
 
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault()
+    const registerForm = document.getElementById('register-form') as HTMLFormElement
     try {
-      if (validateForm()) {
-        //
-        const response = await axios.post('http://localhost:8000/user/register', registerFormData, {
+      validateForm()
+      if (registerFormIsValid) {
+        const response = await axios.post('http://localhost:8000/users/register', registerFormData, {
           headers: {
             "Content-Type": "application/json"
           }
         })
-        console.log("VALIDATED SUBMITTED", registerFormData)
-        console.log(response)
+        if (response.status === 200) {
+          alert("Registration Successful")
+        }
+        registerForm.reset()
+        toggleRegisterModal()
       }
       else {
         console.log("FORM IS INVALID")
@@ -138,13 +149,15 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
               </svg>
               <p className='register-form-modal__title'>Create Account</p>
               <div className="register-form-modal__form-container">
-                <form>
+                <form id='register-form'>
                   {
                     registerFormInputs.map(input => (
                       <FormInput key={input.id} inputData={input} onChange={handleChange} />
                     ))
                   }
-                  <button className='register-form-modal__submit' type="submit" onClick={handleSubmit}>Submit</button>
+                  <button className='register-form-modal__submit' type="submit" onClick={handleSubmit} disabled={!registerFormIsValid}>
+                    Submit
+                  </button>
                 </form>
               </div>
               <p className='register-form-modal__login-toggle'>Already have an account?
