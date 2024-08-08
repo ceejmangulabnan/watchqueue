@@ -6,7 +6,8 @@ import RegisterFormModal from "../RegisterFormModal/RegisterFormModal"
 const LoginRegisterToggle = () => {
 
   const [loginFormModalActive, setLoginFormModalActive] = useState(false)
-  const [isLogin, setIsLogin] = useState(true)
+  const [isLogin, setIsLogin] = useState(false)
+  const [loginButtonClicked, setLoginButtonClicked] = useState(false)
 
   const toggleLoginForm = () => {
     console.log("Login Form Active Toggle", !loginFormModalActive)
@@ -14,14 +15,15 @@ const LoginRegisterToggle = () => {
   }
 
   const toggleForm = () => {
-    console.log(!isLogin)
     setIsLogin(!isLogin)
   }
 
   const loginButtonToggle = () => {
+    setLoginButtonClicked(true)
     setLoginFormModalActive(true)
     setIsLogin(true)
   }
+
 
   return (
     <div>
@@ -29,11 +31,11 @@ const LoginRegisterToggle = () => {
         Login
       </button>
 
-      {
+      {loginButtonClicked && (
         isLogin
           ? <LoginFormModal toggleForm={toggleForm} modalActive={loginFormModalActive} toggleLoginForm={toggleLoginForm} />
           : <RegisterFormModal toggleForm={toggleForm} />
-      }
+      )}
     </div >
   )
 }

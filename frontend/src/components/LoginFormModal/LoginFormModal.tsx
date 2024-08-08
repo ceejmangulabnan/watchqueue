@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler } from 'react'
+import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect } from 'react'
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
@@ -16,6 +16,10 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     username: '',
     password: ''
   })
+
+  useEffect(() => {
+    validateForm()
+  }, [loginFormData])
 
   const loginFormInputData: FormInputData[] = [
     {
@@ -109,7 +113,6 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
                 width="24px"
                 fill="#e8eaed">
                 <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-
               </svg>
               <p className='login-form-modal__title'>Login</p>
               <div className='login-form-modal__form-container'>
@@ -117,7 +120,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
                   {loginFormInputData.map(input => (
                     <FormInput key={input.id} inputData={input} onChange={handleChange} />
                   ))}
-                  <button className='login-form-modal__submit' type='submit' onClick={handleSubmit}>Submit</button>
+                  <button className='login-form-modal__submit' type='submit' onClick={handleSubmit} disabled={!loginFormIsValid}>Submit</button>
                 </form>
               </div>
               <p>Don't have an account?
