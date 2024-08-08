@@ -2,14 +2,16 @@ import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler } from 're
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
+import axios, { AxiosError } from 'axios'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
   modalActive: boolean
-  toggleModalActive: MouseEventHandler
+  toggleLoginForm: () => void
 }
 
-const LoginFormModal = ({ toggleForm, toggleModalActive, modalActive }: LoginFormModalProps) => {
+const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormModalProps) => {
+  const [loginFormIsValid, setLoginFormIsValid] = useState(false)
   const [loginFormData, setLoginFormData] = useState({
     username: '',
     password: ''
@@ -21,14 +23,20 @@ const LoginFormModal = ({ toggleForm, toggleModalActive, modalActive }: LoginFor
       name: 'username',
       type: 'text',
       placeholder: 'Username',
-      label: 'Username'
+      label: 'Username',
+      required: true,
+      pattern: '^[a-zA-Z0-9]{4,}$',
+      errorMessage: 'Username must be at least 4 characters long without special characters'
     },
     {
       id: 2,
       name: 'password',
       type: 'password',
       placeholder: 'Password',
-      label: 'Password'
+      label: 'Password',
+      pattern: '^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$',
+      required: true,
+      errorMessage: 'Password must include at least 1 uppercase and lowercase letter, 1 number, and 1 special character'
     }
   ]
 
@@ -37,21 +45,79 @@ const LoginFormModal = ({ toggleForm, toggleModalActive, modalActive }: LoginFor
     setLoginFormData({ ...loginFormData, [e.target.name]: e.target.value })
   }
 
+  // Validation for each input, returns boolean validity status
+  const validateInput = (input: FormInputData): boolean => {
+    const inputElement = document.getElementsByName(input.name)[0] as HTMLInputElement
+
+    if (!input.required) {
+      return true
+    }
+
+    if (inputElement.checkValidity()) {
+      return true
+    }
+    return false
+  }
+
+  // Validates all inputs in a form, if all true, returns true
+  const validateForm = () => {
+    const isValid = loginFormInputData.every(input => {
+      return validateInput(input)
+    })
+    setLoginFormIsValid(isValid)
+  }
+
+  // Submit Form
+  const handleSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    const loginForm = document.getElementById('login-form') as HTMLFormElement
+    try {
+      validateForm()
+      if (loginFormIsValid) {
+        const response = await axios.post('http://localhost:8000/users/token', loginFormData, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        })
+        if (response.status === 200) {
+          console.log('User authenticated')
+        }
+
+        loginForm.reset()
+        toggleLoginForm()
+      }
+    } catch (e) {
+      const error = e as AxiosError
+      if (error.response) {
+        console.log(error.toJSON())
+      }
+    }
+  }
+
   return (
     <div>
       {
         modalActive && (
           <div className='login-form-modal'>
-            <div className='login-form-modal__overlay' onClick={toggleModalActive}></div>
+            <div className='login-form-modal__overlay' onClick={toggleLoginForm}></div>
             <div className='login-form-modal__content'>
-              <svg className='login-form-modal__close' onClick={toggleModalActive} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
+              <svg className='login-form-modal__close'
+                onClick={toggleLoginForm}
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#e8eaed">
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+
+              </svg>
               <p className='login-form-modal__title'>Login</p>
               <div className='login-form-modal__form-container'>
-                <form action="">
+                <form id='login-form'>
                   {loginFormInputData.map(input => (
                     <FormInput key={input.id} inputData={input} onChange={handleChange} />
                   ))}
-                  <button className='login-form-modal__submit' type='submit'>Submit</button>
+                  <button className='login-form-modal__submit' type='submit' onClick={handleSubmit}>Submit</button>
                 </form>
               </div>
               <p>Don't have an account?

@@ -31,7 +31,7 @@ const LoginRegisterToggle = () => {
 
       {
         isLogin
-          ? <LoginFormModal toggleForm={toggleForm} modalActive={loginFormModalActive} toggleModalActive={toggleLoginForm} />
+          ? <LoginFormModal toggleForm={toggleForm} modalActive={loginFormModalActive} toggleLoginForm={toggleLoginForm} />
           : <RegisterFormModal toggleForm={toggleForm} />
       }
     </div >
