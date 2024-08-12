@@ -1,12 +1,16 @@
+from typing import Annotated
+from fastapi.exceptions import HTTPException
 import requests
 import os
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from starlette.status import HTTP_401_UNAUTHORIZED
 from db.database import engine, db_dependency
 from sqlalchemy.exc import DBAPIError, ProgrammingError
 from db import models
 from routers import users
+from routers.users import get_current_user
 
 
 load_dotenv()
@@ -19,6 +23,8 @@ app = FastAPI()
 app.include_router(users.router)
 # Creates Database Tables from models schema
 models.Base.metadata.create_all(bind=engine)
+
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 # Allows FastAPI to accept requests from localhost frontend
 origins = [
@@ -52,3 +58,13 @@ async def test():
 async def get_movie_popular():
     response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
     return response.json()
+
+
+@app.get("/protected")
+async def protected(user: user_dependency):
+    if user is None:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="Unauthorized User"
+        )
+    else:
+        return {"User": user}
