@@ -1,8 +1,9 @@
 import './register_form_modal.scss'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
 import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
 import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState } from 'react'
+import api from '../ApiInstance'
 
 interface RegisterFormModalProps {
   toggleForm: MouseEventHandler
@@ -106,7 +107,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     try {
       validateForm()
       if (registerFormIsValid) {
-        const response = await axios.post('http://localhost:8000/users/register', registerFormData, {
+        const response = await api.post('/users/register', registerFormData, {
           headers: {
             "Content-Type": "application/json"
           }

@@ -2,7 +2,8 @@ import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
-import axios, { AxiosError } from 'axios'
+import { AxiosError } from 'axios'
+import api from '../ApiInstance'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -78,7 +79,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     try {
       validateForm()
       if (loginFormIsValid) {
-        const response = await axios.post('http://localhost:8000/users/token', loginFormData, {
+        const response = await api.post('/users/token', loginFormData, {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           }
