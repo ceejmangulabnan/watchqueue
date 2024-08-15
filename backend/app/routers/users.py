@@ -1,26 +1,32 @@
 from datetime import timedelta, datetime, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, Response, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from starlette.status import HTTP_400_BAD_REQUEST
 from db.models import Users
 from db.database import db_dependency
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 import os
+import re
 
 # Import env variables
 load_dotenv()
-JWT_SECRET = str(os.getenv("JWT_SECRET"))
+ACCESS_JWT_SECRET = str(os.getenv("ACCESS_JWT_SECRET"))
+REFRESH_JWT_SECRET = str(os.getenv("REFRESH_JWT_SECRET"))
 JWT_ALGORITHM = str(os.getenv("JWT_ALGORITHM"))
+
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
+# 7 days
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+
 
 router = APIRouter(prefix="/users")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
-
-# For hashing and verifying passwords
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 
 @router.get("/")
@@ -28,7 +34,6 @@ async def hello_users():
     return "Hello Users"
 
 
-# Request Body Model for user registration
 class CreateUser(BaseModel):
     registerUsername: str
     registerPassword: str
@@ -41,17 +46,55 @@ class Token(BaseModel):
     token_type: str
 
 
-# Register a new user
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(create_user_request: CreateUser, db: db_dependency):
-    new_user = Users(
-        username=create_user_request.registerUsername,
-        password=get_password_hash(create_user_request.registerPassword),
-        email=create_user_request.registerEmail,
-    )
+    """
+    Adds new user to the database
+    """
 
-    db.add(new_user)
-    db.commit()
+    new_user_is_valid = validate_new_user_credentials(create_user_request)
+
+    if new_user_is_valid:
+        new_user = Users(
+            username=create_user_request.registerUsername,
+            password=get_password_hash(create_user_request.registerPassword),
+            email=create_user_request.registerEmail,
+        )
+
+        db.add(new_user)
+        db.commit()
+    else:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail="Credentials did not match expected format",
+        )
+
+
+def validate_new_user_credentials(credentials: CreateUser):
+    """
+    Uses RegEx to validate if the new user credentials passed adhere to set RegEx patterns
+    """
+    # Min 4 chars alphanumeric
+    username_pattern = re.compile("^[a-zA-Z0-9]{4,}$")
+    username_valid = username_pattern.fullmatch(credentials.registerUsername)
+
+    # Min 8 Chars, 1 uppercase, 1 lowercase, 1 symbol, and 1 number
+    password_pattern = re.compile(
+        "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$"
+    )
+    password_valid = password_pattern.fullmatch(credentials.registerPassword)
+
+    # email pattern is x@x.x where x is any char
+    email_pattern = re.compile("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")
+    email_valid = email_pattern.fullmatch(credentials.registerEmail)
+
+    if credentials.registerPassword != credentials.registerConfirmPassword:
+        return False
+
+    if username_valid is None or password_valid is None or email_valid is None:
+        return False
+
+    return True
 
 
 def get_password_hash(password):
@@ -62,7 +105,6 @@ def verify_password(password, hashed_password):
     return bcrypt_context.verify(password, hashed_password)
 
 
-# Checks if user exists and passwords match
 def authenticate_user(username: str, password: str, db: db_dependency):
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
@@ -75,29 +117,56 @@ def authenticate_user(username: str, password: str, db: db_dependency):
 # Create token for user on login
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: db_dependency,
+    response: Response,
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
-    token = create_access_token(user.username, user.id, timedelta(minutes=1))
+    token = create_access_token(
+        user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    refresh_token = create_refresh_token(
+        user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+    )
 
+    # ISSUE: There might be a problem with setting the cookie
+    # Store refresh_token in httponly cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        # secure=True,
+        httponly=True,
+        # max_age is in seconds so multiply by 60
+        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+    )
+
+    print("Refresh Token" + refresh_token)
+    # Frontend should store access token in memory
     return {"access_token": token, "token_type": "bearer"}
+
+
+def create_refresh_token(username: str, user_id: int, expires_delta: timedelta):
+    encode = {"sub": username, "id": user_id}
+    expires = datetime.now(timezone.utc) + expires_delta
+    encode.update({"exp": expires})
+    return jwt.encode(encode, REFRESH_JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
 def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode = {"sub": username, "id": user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({"exp": expires})
-    return jwt.encode(encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return jwt.encode(encode, ACCESS_JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-# Can be passed as a dependency on routes that need to check if a user is logged in
+# Dependency for routes than need an authenticated user to access
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, ACCESS_JWT_SECRET, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
         user_id = payload.get("id")
         if username is None or user_id is None:
@@ -111,3 +180,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user: Token Expired",
         )
+
+
+@router.get("/refresh")
+async def get_refresh_from_cookie(request: Request):
+    refresh_token = request.cookies.get("refresh_token")
+
+    # ISSUE: Refresh token is null
+    # There must be an issue with SETTING the token in the cookie
+    # or RETRIEVING the token from the cookie
+
+    return {"refresh_token": refresh_token}
