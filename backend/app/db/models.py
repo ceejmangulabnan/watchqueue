@@ -18,6 +18,7 @@ class Users(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    refresh_token: Mapped[str] = mapped_column(String)
 
 
 # Watchlist Table
