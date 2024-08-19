@@ -47,6 +47,12 @@
     background-color: rgba($clr-accent-400, 0.8);
   }
 
+  &__submit:disabled {
+    pointer-events: none;
+    background-color: $clr-text-200;
+    opacity: 0.7;
+  }
+
   &__close {
     text-align: right;
     fill: $clr-text-200;
@@ -55,5 +61,6 @@
   .toggle-signup {
     cursor: pointer;
     color: $clr-accent-400;
+    font-size: $fs-400;
   }
 }
