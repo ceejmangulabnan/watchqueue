@@ -8,6 +8,9 @@ class Base(DeclarativeBase):
     pass
 
 
+metadata = Base.metadata
+
+
 # Create Tables
 # Users Table
 class Users(Base):
@@ -18,7 +21,7 @@ class Users(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    refresh_token: Mapped[str] = mapped_column(String)
+    refresh_token: Mapped[str] = mapped_column(String, nullable=False)
 
 
 # Watchlist Table
