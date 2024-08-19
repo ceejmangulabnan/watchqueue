@@ -3,7 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, Request, status, HTTPException, Cookie
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_409_CONFLICT,
+)
 from db.models import Users
 from db.database import db_dependency
 from dotenv import load_dotenv
@@ -53,6 +57,16 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
     """
 
     new_user_is_valid = validate_new_user_credentials(create_user_request)
+    duplicate_username = (
+        db.query(Users)
+        .filter(Users.username == create_user_request.registerUsername)
+        .first()
+    )
+    print(duplicate_username)
+    if duplicate_username:
+        raise HTTPException(
+            status_code=HTTP_409_CONFLICT, detail="Username is not available"
+        )
 
     if new_user_is_valid:
         new_user = Users(
@@ -122,10 +136,12 @@ async def login_for_access_token(
     response: Response,
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
+
     access_token = create_access_token(
         user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
@@ -133,7 +149,6 @@ async def login_for_access_token(
         user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     )
 
-    # FIX: refresh_token cookie is accessible on browser
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -142,9 +157,9 @@ async def login_for_access_token(
         max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
     )
 
-    print("Refresh Token: " + refresh_token)
+    print("\n\nRefresh Token: " + refresh_token + "\n")
     print("Access Token: " + access_token)
-    # Frontend should store access token in memory
+
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -159,9 +174,11 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode = {"sub": username, "id": user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({"exp": expires})
+    print("ACCESS TOKEN EXPIRY: ", expires)
     return jwt.encode(encode, ACCESS_JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+# Requires an access token
 # Dependency for routes than need an authenticated user to access
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
@@ -181,37 +198,41 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         )
 
 
-user_dependency = Annotated[dict, Depends(get_current_user)]
-
-
 @router.get("/refresh")
-async def get_refresh_from_cookie(
-    request: Request,
-    user: user_dependency,
-    # refresh_token: Annotated[str | None, Cookie()] = None,
-):
+async def get_refresh_from_cookie(request: Request):
     """
     Generates new access token if refresh token from HTTPonly cookie is not expired
     """
-    # TODO: Check if refresh token is not expired
-    # TODO If refresh token is expired, delete cookie -> prompting user to login again
-    # TODO: If access token is valid, but expired generate new access token
-    # TODO: If access token is invalid (has been tampered with), maybe delete refresh_token cookie
 
-    # If I don't pass the access token along with this request as Bearer token the request fails
-    print(request.cookies.get("refresh_token"))
+    # refresh_token from cookies
     refresh_token = request.cookies.get("refresh_token")
-    if user:
-        return {"refresh_token": refresh_token, "user": user}
-    elif HTTPException:
-        return HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED,
-            detail="User not valid, Could not print refresh token",
+
+    if refresh_token is None:
+        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
+
+    try:
+        payload = jwt.decode(
+            refresh_token, REFRESH_JWT_SECRET, algorithms=[JWT_ALGORITHM]
+        )
+        username = payload.get("sub")
+        user_id = payload.get("id")
+
+        if username is None or user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token",
+            )
+
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
         )
 
+    new_access_token = create_access_token(
+        username=username,
+        user_id=user_id,
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
 
-@router.get("/cookie")
-async def me(request: Request, user: user_dependency):
-    if user:
-        return request.cookies.get("refresh_token")
-    return {"message": "Check cookie jar"}
+    return {"access_token": new_access_token, "token_type": "bearer"}
