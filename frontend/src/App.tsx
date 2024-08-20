@@ -1,9 +1,10 @@
+import './app.scss'
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage/LandingPage"
 import Navbar from "./components/Navbar/Navbar"
-import './app.scss'
+import AuthProvider from "./contexts/AuthProvider"
 
 
 
@@ -14,14 +15,13 @@ const App = () => {
     <div className="app">
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-          </Routes>
+          <AuthProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
-
-        <div className="App"></div>
-
         <ReactQueryDevtools />
       </QueryClientProvider>
     </div>

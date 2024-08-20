@@ -1,9 +1,10 @@
-import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect } from 'react'
+import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useContext } from 'react'
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
 import { AxiosError } from 'axios'
 import api from '../ApiInstance'
+import { useAuth } from '../../contexts/AuthProvider'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -17,6 +18,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     username: '',
     password: ''
   })
+  const { auth, setAuth } = useAuth()
 
   useEffect(() => {
     validateForm()
@@ -86,7 +88,14 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
         })
         if (response.status === 200) {
           console.log('User authenticated')
+          setAuth({
+            ...auth,
+            accessToken: response.data.access_token
+          })
+          console.log(auth)
         }
+
+
 
         loginForm.reset()
         toggleLoginForm()
