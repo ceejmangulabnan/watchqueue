@@ -190,7 +190,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user",
             )
-        return {"username": username, "id": user_id}
+        return {"username": username, "id": user_id, "access_token": token}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -236,3 +236,9 @@ async def get_refresh_from_cookie(request: Request):
     )
 
     return {"access_token": new_access_token, "token_type": "bearer"}
+
+
+@router.get("/me")
+async def get_me(user: Annotated[dict, Depends(get_current_user)]):
+    if user:
+        return user
