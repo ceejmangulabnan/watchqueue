@@ -193,7 +193,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         return {"username": username, "id": user_id, "access_token": token}
     except JWTError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate user: Token Expired",
         )
 
