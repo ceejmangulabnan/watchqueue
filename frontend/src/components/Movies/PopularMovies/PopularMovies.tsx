@@ -1,8 +1,8 @@
-import axios from "axios"
 import { useQuery } from "@tanstack/react-query"
 import MovieItem from "../MovieItem"
 import { MovieDataQuery } from "../../../types/MovieTypes"
 import './popular-movies.scss'
+import axios from "../../../api/axios"
 
 const PopularMovies = () => {
   const fetchPopularMovies = async () => {

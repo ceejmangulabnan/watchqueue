@@ -3,7 +3,7 @@ import { AxiosError } from 'axios'
 import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
 import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState } from 'react'
-import api from '../ApiInstance'
+import axios from '../../api/axios'
 
 interface RegisterFormModalProps {
   toggleForm: MouseEventHandler
@@ -19,7 +19,6 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     registerEmail: ''
   })
 
-  // When registerFormData changes, validate the form for appropriate submit button style
   useEffect(() => {
     validateForm()
   }, [registerFormData])
@@ -107,7 +106,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     try {
       validateForm()
       if (registerFormIsValid) {
-        const response = await api.post('/users/register', registerFormData, {
+        const response = await axios.post('/users/register', registerFormData, {
           headers: {
             "Content-Type": "application/json"
           }
