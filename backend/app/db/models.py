@@ -21,7 +21,14 @@ class Users(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    refresh_token: Mapped[str] = mapped_column(String, nullable=False)
+
+
+# Refresh Tokens
+class RefreshTokens(Base):
+    __tablename__ = "refresh_tokens"
+
+    refresh_token: Mapped[str] = mapped_column(String, primary_key=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
 
 
 # Watchlist Table
