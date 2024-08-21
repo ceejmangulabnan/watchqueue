@@ -3,8 +3,8 @@ import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
 import { AxiosError } from 'axios'
-import api from '../ApiInstance'
 import { useAuth } from '../../contexts/AuthProvider'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -19,6 +19,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     password: ''
   })
   const { auth, setAuth } = useAuth()
+  const axiosPrivate = useAxiosPrivate()
 
   useEffect(() => {
     validateForm()
@@ -81,22 +82,17 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     try {
       validateForm()
       if (loginFormIsValid) {
-        const response = await api.post('/users/token', loginFormData, {
+        const response = await axiosPrivate.post('/users/token', loginFormData, {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded"
           }
         })
-        if (response.status === 200) {
-          console.log('User authenticated')
-          setAuth({
-            ...auth,
-            accessToken: response.data.access_token
-          })
-          console.log(auth)
-        }
-
-
-
+        const data = await response.data
+        setAuth({ ...auth, accessToken: data.access_token })
+        const userData = await axiosPrivate.get('users/me')
+        console.log('User Data from login: ', userData.data)
+        setAuth({ ...auth, username: userData.data.username, id: userData.data.id })
+        console.log('User Data and access token: ', auth)
         loginForm.reset()
         toggleLoginForm()
       }

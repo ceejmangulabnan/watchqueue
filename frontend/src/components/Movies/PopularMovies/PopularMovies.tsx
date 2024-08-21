@@ -18,7 +18,7 @@ const PopularMovies = () => {
     <div className="popular-movies">
       {
         popularMoviesData.data?.results.map(movie => (
-          <MovieItem movie={movie} />
+          <MovieItem movie={movie} key={movie.id} />
         ))
       }
     </div>

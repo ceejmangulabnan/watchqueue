@@ -5,7 +5,7 @@ import {
   useState,
   ReactNode
 } from "react"
-import api from "../components/ApiInstance"
+import { axiosPrivate } from "../api/axios"
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
@@ -43,24 +43,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     id: null,
     accessToken: null
   })
-
-  // useEffect(() => {
-  //   const getCurrentUser = async () => {
-  //     try {
-  //       const response = await api.get('/users/me')
-  //       const data = await response.data
-  //       setAuth({
-  //         ...auth,
-  //         accessToken: data.access_token as string
-  //       })
-  //
-  //     } catch {
-  //       console.log('Not authed')
-  //     }
-  //   }
-  //
-  //   getCurrentUser()
-  // }, [])
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
