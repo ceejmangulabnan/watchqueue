@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import './navbar.scss'
 import LoginRegisterToggle from '../LoginRegisterToggle/LoginRegisterToggle'
+import useRefreshToken from '../../hooks/useRefreshToken'
 
 const Navbar = () => {
+  const refresh = useRefreshToken()
+
   return (
     <div className='navbar'>
       <h1 className='navbar__title'>watchqueue</h1>
@@ -16,6 +19,10 @@ const Navbar = () => {
           </li>
           <li>
             <LoginRegisterToggle />
+          </li>
+          <li>
+            <button onClick={refresh}>Refresh</button>
+
           </li>
         </ul>
       </nav>

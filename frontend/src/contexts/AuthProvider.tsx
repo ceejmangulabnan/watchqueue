@@ -27,9 +27,9 @@ interface AuthProviderProps {
 }
 
 interface Auth {
-  username: string,
+  username: string | null,
   id: number | null,
-  accessToken: string
+  accessToken: string | null
 }
 
 interface AuthContextValue {
@@ -39,28 +39,28 @@ interface AuthContextValue {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [auth, setAuth] = useState<Auth>({
-    username: '',
+    username: null,
     id: null,
-    accessToken: ''
+    accessToken: null
   })
 
-  useEffect(() => {
-    const getCurrentUser = async () => {
-      try {
-        const response = await api.get('/users/me')
-        const data = await response.data
-        setAuth({
-          ...auth,
-          accessToken: data.access_token as string
-        })
-
-      } catch {
-        console.log('Not authed')
-      }
-    }
-
-    getCurrentUser()
-  }, [])
+  // useEffect(() => {
+  //   const getCurrentUser = async () => {
+  //     try {
+  //       const response = await api.get('/users/me')
+  //       const data = await response.data
+  //       setAuth({
+  //         ...auth,
+  //         accessToken: data.access_token as string
+  //       })
+  //
+  //     } catch {
+  //       console.log('Not authed')
+  //     }
+  //   }
+  //
+  //   getCurrentUser()
+  // }, [])
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
