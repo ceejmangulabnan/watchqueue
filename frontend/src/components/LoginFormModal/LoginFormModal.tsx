@@ -3,8 +3,9 @@ import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
 import { AxiosError } from 'axios'
-import { useAuth } from '../../contexts/AuthProvider'
+import { useAuth } from '../../hooks/useAuth'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import useIsLoggedIn from '../../hooks/useIsLoggedIn'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -19,6 +20,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     password: ''
   })
   const { auth, setAuth } = useAuth()
+  const { setIsLoggedIn } = useIsLoggedIn(auth)
   const axiosPrivate = useAxiosPrivate()
 
   useEffect(() => {
@@ -88,13 +90,16 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
           }
         })
         const data = await response.data
+        console.log(response)
         setAuth({ ...auth, accessToken: data.access_token })
         const userData = await axiosPrivate.get('users/me')
-        console.log('User Data from login: ', userData.data)
         setAuth({ ...auth, username: userData.data.username, id: userData.data.id })
-        console.log('User Data and access token: ', auth)
+        setIsLoggedIn(auth)
+
+
         loginForm.reset()
         toggleLoginForm()
+
       }
     } catch (e) {
       const error = e as AxiosError

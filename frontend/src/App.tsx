@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage/LandingPage"
 import Navbar from "./components/Navbar/Navbar"
 import AuthProvider from "./contexts/AuthProvider"
+import LoginProvider from './contexts/LoginProvider'
 
 
 
@@ -16,10 +17,12 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-            </Routes>
+            <LoginProvider>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+              </Routes>
+            </LoginProvider>
           </AuthProvider>
         </BrowserRouter>
         <ReactQueryDevtools />
