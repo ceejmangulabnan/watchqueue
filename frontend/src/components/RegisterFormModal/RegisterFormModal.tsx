@@ -23,7 +23,6 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     validateForm()
   }, [registerFormData])
 
-  // FormInput Props
   const registerFormInputs: FormInputData[] = [
     {
       id: 1,
@@ -75,9 +74,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     setRegisterFormData({ ...registerFormData, [e.target.name]: e.target.value })
   }
 
-  // Validation for each input, returns boolean validity status
   const validateInput = (input: FormInputData): boolean => {
-    // When user inputs check if pattern conditions are being fulfilled
     const inputElement = document.getElementsByName(input.name)[0] as HTMLInputElement
 
     // If input is not required, skip checking
