@@ -5,28 +5,15 @@ import {
   useState,
   ReactNode
 } from "react"
-import { axiosPrivate } from "../api/axios"
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
-// For checking if user is authenticated on the server
-export const useAuth = () => {
-  // Payload of access token?
-  const authContext = useContext(AuthContext)
-
-  // If authContext is null or undefined
-  if (!authContext) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-
-  return authContext
-}
 
 interface AuthProviderProps {
   children: ReactNode
 }
 
-interface Auth {
+export interface Auth {
   username: string | null,
   id: number | null,
   accessToken: string | null
