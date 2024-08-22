@@ -1,11 +1,10 @@
-import { useState, ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useContext } from 'react'
+import { useState, useEffect, useRef, ChangeEvent, ChangeEventHandler, MouseEventHandler, } from 'react'
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
 import { FormInputData } from '../../types/InputTypes'
 import { AxiosError } from 'axios'
 import { useAuth } from '../../hooks/useAuth'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
-import useIsLoggedIn from '../../hooks/useIsLoggedIn'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -19,8 +18,8 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     username: '',
     password: ''
   })
+  const inputRef = useRef<HTMLInputElement>(null)
   const { auth, setAuth } = useAuth()
-  const { setIsLoggedIn } = useIsLoggedIn(auth)
   const axiosPrivate = useAxiosPrivate()
 
   useEffect(() => {
@@ -94,8 +93,6 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
         setAuth({ ...auth, accessToken: data.access_token })
         const userData = await axiosPrivate.get('users/me')
         setAuth({ ...auth, username: userData.data.username, id: userData.data.id })
-        setIsLoggedIn(auth)
-
 
         loginForm.reset()
         toggleLoginForm()
@@ -129,7 +126,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
               <div className='login-form-modal__form-container'>
                 <form id='login-form'>
                   {loginFormInputData.map(input => (
-                    <FormInput key={input.id} inputData={input} onChange={handleChange} />
+                    <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />
                   ))}
                   <button className='login-form-modal__submit' type='submit' onClick={handleSubmit} disabled={!loginFormIsValid}>Submit</button>
                 </form>

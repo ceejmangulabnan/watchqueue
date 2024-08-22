@@ -2,7 +2,7 @@ import './register_form_modal.scss'
 import { AxiosError } from 'axios'
 import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState, useRef } from 'react'
 import axios from '../../api/axios'
 
 interface RegisterFormModalProps {
@@ -18,6 +18,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     registerConfirmPassword: '',
     registerEmail: ''
   })
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     validateForm()
@@ -149,7 +150,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
                 <form id='register-form'>
                   {
                     registerFormInputs.map(input => (
-                      <FormInput key={input.id} inputData={input} onChange={handleChange} />
+                      <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />
                     ))
                   }
                   <button className='register-form-modal__submit' type="submit" onClick={handleSubmit} disabled={!registerFormIsValid}>
