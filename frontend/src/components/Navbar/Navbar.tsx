@@ -5,6 +5,7 @@ import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import { useAuth } from '../../hooks/useAuth'
 import useIsLoggedIn from '../../hooks/useIsLoggedIn'
 import { useEffect } from 'react'
+import LogoutButton from '../LogoutButton'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
@@ -28,6 +29,7 @@ const Navbar = () => {
 
   // Check if user is logged in
   useEffect(() => {
+    console.log(auth)
     const checkAuthValues = () => {
       // Check auth values if not null
       if (auth && !Object.values(auth).includes(null)) {
@@ -46,15 +48,18 @@ const Navbar = () => {
           <li>
             <Link to='/'>Home</Link>
           </li>
-          <li>
-            <LoginRegisterToggle />
-          </li>
           {
             isLoggedIn ?
-              <li>
-                <button onClick={handleLogout}>Logout</button>
-              </li>
-              : <div></div>
+              (
+                <li>
+                  <LogoutButton onClick={handleLogout} />
+                </li>
+              )
+              : (
+                <li>
+                  <LoginRegisterToggle />
+                </li>
+              )
           }
         </ul>
       </nav>

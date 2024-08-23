@@ -89,10 +89,9 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
           }
         })
         const data = await response.data
+        const userData = await axiosPrivate.get('/users/me')
         console.log(response)
-        setAuth({ ...auth, accessToken: data.access_token })
-        const userData = await axiosPrivate.get('users/me')
-        setAuth({ ...auth, username: userData.data.username, id: userData.data.id })
+        setAuth({ ...auth, username: userData.data.username, id: userData.data.id, accessToken: data.access_token })
 
         loginForm.reset()
         toggleLoginForm()

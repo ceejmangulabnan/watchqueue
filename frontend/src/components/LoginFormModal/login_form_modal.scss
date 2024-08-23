@@ -64,3 +64,11 @@
     font-size: $fs-400;
   }
 }
+
+.logout__button {
+  padding: 0.5em;
+  color: $clr-btn-red;
+  background-color: white;
+  border: none;
+  border-radius: 0.6rem;
+}
