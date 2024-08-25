@@ -1,5 +1,7 @@
 .popular-movies {
-  display: flex;
+  display: grid;
+  grid-template-columns: 300px 300px 300px 300px;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 1rem;
+  padding: 2rem;
 }
