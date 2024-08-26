@@ -37,6 +37,7 @@ class Watchlists(Base):
     __tablename__ = "watchlists"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     items = mapped_column(MutableList.as_mutable(ARRAY(String)))
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
