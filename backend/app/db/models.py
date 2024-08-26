@@ -1,6 +1,7 @@
 # Models for Database Tables
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.mutable import MutableList
 
 
 # Declarative Base
@@ -32,3 +33,10 @@ class RefreshTokens(Base):
 
 
 # Watchlist Table
+class Watchlists(Base):
+    __tablename__ = "watchlists"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    items = mapped_column(MutableList.as_mutable(ARRAY(String)))
+    is_private: Mapped[bool] = mapped_column(Boolean, default=False)
