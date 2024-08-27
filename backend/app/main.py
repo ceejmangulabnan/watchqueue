@@ -9,7 +9,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 from db.database import engine, db_dependency
 from sqlalchemy.exc import DBAPIError, ProgrammingError
 from db import models
-from routers import users
+from routers import users, watchlists
 from routers.users import get_current_user
 
 
@@ -43,6 +43,7 @@ app.add_middleware(
 
 
 app.include_router(users.router)
+app.include_router(watchlists.router)
 # Creates Database Tables from models schema
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
