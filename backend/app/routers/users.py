@@ -16,6 +16,7 @@ from passlib.context import CryptContext
 from jose import jwt, JWTError
 import os
 import re
+from sqlalchemy import select
 
 # Import env variables
 load_dotenv()
@@ -58,12 +59,12 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
     """
 
     new_user_is_valid = validate_new_user_credentials(create_user_request)
-    duplicate_username = (
-        db.query(Users)
-        .filter(Users.username == create_user_request.registerUsername)
-        .first()
+    duplicate_username_query = select(Users).where(
+        Users.username == create_user_request.registerUsername
     )
-    print(duplicate_username)
+    result = db.execute(duplicate_username_query)
+    duplicate_username = result.scalar()
+
     if duplicate_username:
         raise HTTPException(
             status_code=HTTP_409_CONFLICT, detail="Username is not available"
@@ -121,7 +122,10 @@ def verify_password(password, hashed_password):
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
-    user = db.query(Users).filter(Users.username == username).first()
+    user_query = select(Users).where(Users.username == username)
+    result = db.execute(user_query)
+    user = result.scalar()
+
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -268,12 +272,19 @@ async def logout(request: Request, response: Response, db: db_dependency):
         raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
 
     try:
+        refresh_token_query = select(RefreshTokens).where(
+            RefreshTokens.refresh_token == refresh_token
+        )
+        result = db.execute(refresh_token_query)
+        db_refresh_token = result.scalar()
+
         db_refresh_token = db.query(RefreshTokens).filter_by(
             refresh_token=refresh_token
         )
 
         if db_refresh_token:
-            db_refresh_token.delete()
+            db.delete(db_refresh_token)
+            # db_refresh_token.delete()
             db.commit()
 
     except Exception as e:
