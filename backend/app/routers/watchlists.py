@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
 from starlette.status import (
-    HTTP_401_UNAUTHORIZED,
     HTTP_404_NOT_FOUND,
 )
 from db.models import Watchlists
@@ -74,4 +73,29 @@ async def delete_watchlist(user: user_dependency, db: db_dependency, watchlist_i
             return {"message": f"Watchlist {watchlist_id} was deleted successfully"}
         except Exception as e:
             db.rollback()
+            raise e
+
+
+@router.get("/user/{user_id}")
+async def get_user_watchlists(user_id: str, user: user_dependency, db: db_dependency):
+    if user:
+        try:
+            if user_id == user.get("id"):
+                user_watchlists_query = select(Watchlists).where(
+                    Watchlists.user_id == user.get("id")
+                )
+
+                results = db.execute(user_watchlists_query).all()
+                return results
+
+            else:
+                user_watchlists_query = select(Watchlists).where(
+                    Watchlists.user_id == user_id, Watchlists.is_private == False
+                )
+
+                results = db.execute(user_watchlists_query)
+                user_watchlists = results.scalar()
+
+                return user_watchlists
+        except Exception as e:
             raise e
