@@ -77,25 +77,38 @@ async def delete_watchlist(user: user_dependency, db: db_dependency, watchlist_i
 
 
 @router.get("/user/{user_id}")
-async def get_user_watchlists(user_id: str, user: user_dependency, db: db_dependency):
+async def get_user_watchlists_all(
+    user_id: int, user: user_dependency, db: db_dependency
+):
     if user:
         try:
+            print(type(user_id))
+            print(type(user.get("id")))
             if user_id == user.get("id"):
                 user_watchlists_query = select(Watchlists).where(
                     Watchlists.user_id == user.get("id")
                 )
 
                 results = db.execute(user_watchlists_query).all()
-                return results
+
+                user_watchlists = []
+                for result in results:
+                    user_watchlists.append(result[0])
+
+                return user_watchlists
 
             else:
                 user_watchlists_query = select(Watchlists).where(
                     Watchlists.user_id == user_id, Watchlists.is_private == False
                 )
 
-                results = db.execute(user_watchlists_query)
-                user_watchlists = results.scalar()
+                results = db.execute(user_watchlists_query).all()
+
+                user_watchlists = []
+                for result in results:
+                    user_watchlists.append(result[0])
 
                 return user_watchlists
+
         except Exception as e:
             raise e
