@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage/LandingPage"
 import Navbar from "./components/Navbar/Navbar"
 import AuthProvider from "./contexts/AuthProvider"
 import LoginProvider from './contexts/LoginProvider'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
 
 
 
@@ -21,6 +22,7 @@ const App = () => {
               <Navbar />
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
               </Routes>
             </LoginProvider>
           </AuthProvider>

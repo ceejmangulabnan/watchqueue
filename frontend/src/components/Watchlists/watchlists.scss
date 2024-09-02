@@ -1,0 +1,55 @@
+@use '../../styles/variables' as *;
+
+.watchlists {
+  max-width: 70rem;
+  margin: auto;
+
+  &__container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: $fs-700;
+    font-weight: $fw-700;
+  }
+
+  &__create {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    max-width: 9rem;
+
+    &__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #DDDDDD;
+      padding: 4rem 0;
+    }
+
+    &__text {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  svg {
+    fill: #AAAAAA;
+  }
+}
+
+@media (max-width: 75em) {
+  .watchlists {
+    max-width: 60rem;
+  }
+}
+
+@media (max-width: 65em) {
+  .watchlists {
+    max-width: 50rem;
+  }
+
+}

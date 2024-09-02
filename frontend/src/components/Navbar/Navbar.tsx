@@ -39,7 +39,6 @@ const Navbar = () => {
 
     checkAuthValues()
   }, [auth])
-
   return (
     <div className='navbar'>
       <h1 className='navbar__title'>watchqueue</h1>
@@ -51,9 +50,14 @@ const Navbar = () => {
           {
             isLoggedIn ?
               (
-                <li>
-                  <LogoutButton onClick={handleLogout} />
-                </li>
+                <>
+                  <li>
+                    <Link to='/profile'>Profile</Link>
+                  </li>
+                  <li>
+                    <LogoutButton onClick={handleLogout} />
+                  </li>
+                </>
               )
               : (
                 <li>
@@ -63,7 +67,7 @@ const Navbar = () => {
           }
         </ul>
       </nav>
-    </div>
+    </div >
   )
 }
 
