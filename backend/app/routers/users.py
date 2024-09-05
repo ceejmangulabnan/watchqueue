@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from starlette.status import (
     HTTP_200_OK,
+    HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
     HTTP_409_CONFLICT,
@@ -52,7 +53,7 @@ class Token(BaseModel):
     token_type: str
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=HTTP_201_CREATED)
 async def register_user(create_user_request: CreateUser, db: db_dependency):
     """
     Adds new user to the database
@@ -134,7 +135,7 @@ def authenticate_user(username: str, password: str, db: db_dependency):
 
 
 # Create token for user on login
-@router.post("/token", response_model=Token)
+@router.post("/token", status_code=HTTP_200_OK)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dependency,
@@ -161,11 +162,17 @@ async def login_for_access_token(
         # max_age is in seconds so multiply by 60
         max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
     )
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )
 
     print("\n\nRefresh Token: " + refresh_token + "\n")
     print("Access Token: " + access_token)
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"message": "refresh and access tokens created"}
 
 
 def create_refresh_token(username: str, user_id: int, expires_delta: timedelta):
@@ -179,13 +186,25 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode = {"sub": username, "id": user_id}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({"exp": expires})
-    print("ACCESS TOKEN EXPIRY: ", expires)
     return jwt.encode(encode, ACCESS_JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+async def get_access_token_cookie(request: Request):
+    access_token = request.cookies.get("access_token")
+    if access_token is None:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="Access token not found"
+        )
+    return access_token
+
+
+token = Annotated[str, Depends(oauth2_scheme)]
+
+
+# token: Annotated[str, Depends(oauth2_scheme)]
 # Requires an access token
-# Dependency for routes than need an authenticated user to access
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+# Dependency for routes that need an authenticated user to access
+async def get_current_user(token: Annotated[token, Depends(get_access_token_cookie)]):
     try:
         payload = jwt.decode(token, ACCESS_JWT_SECRET, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
@@ -204,7 +223,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @router.get("/refresh")
-async def get_refresh_from_cookie(request: Request):
+async def get_refresh_from_cookie(request: Request, response: Response):
     """
     Generates new access token if refresh token from HTTPonly cookie is not expired
     """
@@ -212,7 +231,9 @@ async def get_refresh_from_cookie(request: Request):
     refresh_token = request.cookies.get("refresh_token")
 
     if refresh_token is None:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED, detail="Refresh Token not found"
+        )
 
     try:
         payload = jwt.decode(
@@ -239,7 +260,14 @@ async def get_refresh_from_cookie(request: Request):
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    return {"access_token": new_access_token, "token_type": "bearer"}
+    response.set_cookie(
+        key="access_token",
+        value=new_access_token,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=True,
+    )
+
+    return {"message": "Refreshed access_token"}
 
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
@@ -251,9 +279,8 @@ async def get_me(user: user_dependency):
         return user
 
 
-# NOTE: Client should handle deleteion of access_token
 @router.post("/logout", status_code=HTTP_200_OK)
-async def logout(request: Request, response: Response, db: db_dependency):
+async def logout(request: Request, response: Response):
     """
     Sets token value to empty string on logout
     """
@@ -264,3 +291,6 @@ async def logout(request: Request, response: Response, db: db_dependency):
 
     # TODO: Set secure=True on deployment
     response.set_cookie(key="refresh_token", value="", max_age=0, httponly=True)
+    response.set_cookie(key="access_token", value="", max_age=0, httponly=True)
+
+    return {"message": "Logged out successfully"}
