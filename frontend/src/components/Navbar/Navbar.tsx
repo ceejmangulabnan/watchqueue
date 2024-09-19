@@ -26,8 +26,6 @@ const Navbar = () => {
         console.log('User is logged in')
       }
     }
-
-
     checkUserData()
   }, [auth])
 
@@ -36,9 +34,9 @@ const Navbar = () => {
     const response = await axiosPrivate.post("/users/logout")
     if (response.status == 200) {
       setAuth({ ...auth, id: null, username: null, accessToken: null })
+      setIsLoggedIn(false)
     }
     console.log(response)
-
   }
 
   return (

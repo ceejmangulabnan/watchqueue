@@ -94,10 +94,9 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
         // Causes 403, no access token being sent back
         const userDataResponse = await axiosPrivate.get('/users/me')
         const userData = await userDataResponse.data
-        setAuth({ ...auth, id: userData.id, username: userData.username })
+        setAuth({ ...auth, accessToken: data.access_token, id: userData.id, username: userData.username })
         formRef.current?.reset()
         toggleLoginForm()
-
       }
     } catch (e) {
       const error = e as AxiosError
