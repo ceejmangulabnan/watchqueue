@@ -3,13 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from starlette.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
-    HTTP_409_CONFLICT,
-)
 from db.models import Users
 from db.database import db_dependency
 from dotenv import load_dotenv
@@ -25,7 +18,7 @@ ACCESS_JWT_SECRET = str(os.getenv("ACCESS_JWT_SECRET"))
 REFRESH_JWT_SECRET = str(os.getenv("REFRESH_JWT_SECRET"))
 JWT_ALGORITHM = str(os.getenv("JWT_ALGORITHM"))
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 # 7 days
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
@@ -53,7 +46,7 @@ class Token(BaseModel):
     token_type: str
 
 
-@router.post("/register", status_code=HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(create_user_request: CreateUser, db: db_dependency):
     """
     Adds new user to the database
@@ -68,7 +61,7 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
 
     if duplicate_username:
         raise HTTPException(
-            status_code=HTTP_409_CONFLICT, detail="Username is not available"
+            status_code=status.HTTP_409_CONFLICT, detail="Username is not available"
         )
 
     if new_user_is_valid:
@@ -82,7 +75,7 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
         db.commit()
     else:
         raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Credentials did not match expected format",
         )
 
@@ -135,7 +128,7 @@ def authenticate_user(username: str, password: str, db: db_dependency):
 
 
 # Create token for user on login
-@router.post("/token", status_code=HTTP_200_OK)
+@router.post("/token", response_model=Token, status_code=status.HTTP_200_OK)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dependency,
@@ -148,9 +141,9 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
 
-    access_token = create_access_token(
-        user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    # TEST: Set to 30s exp
+    access_token = create_access_token(user.username, user.id, timedelta(seconds=10))
+
     refresh_token = create_refresh_token(
         user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     )
@@ -162,17 +155,11 @@ async def login_for_access_token(
         # max_age is in seconds so multiply by 60
         max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
     )
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
 
     print("\n\nRefresh Token: " + refresh_token + "\n")
     print("Access Token: " + access_token)
 
-    return {"message": "refresh and access tokens created"}
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 def create_refresh_token(username: str, user_id: int, expires_delta: timedelta):
@@ -193,7 +180,7 @@ async def get_access_token_cookie(request: Request):
     access_token = request.cookies.get("access_token")
     if access_token is None:
         raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED, detail="Access token not found"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token not found"
         )
     return access_token
 
@@ -201,10 +188,8 @@ async def get_access_token_cookie(request: Request):
 token = Annotated[str, Depends(oauth2_scheme)]
 
 
-# token: Annotated[str, Depends(oauth2_scheme)]
-# Requires an access token
 # Dependency for routes that need an authenticated user to access
-async def get_current_user(token: Annotated[token, Depends(get_access_token_cookie)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, ACCESS_JWT_SECRET, algorithms=[JWT_ALGORITHM])
         username = payload.get("sub")
@@ -218,12 +203,12 @@ async def get_current_user(token: Annotated[token, Depends(get_access_token_cook
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate user: Token Expired",
+            detail="Access Token Expired",
         )
 
 
-@router.get("/refresh")
-async def get_refresh_from_cookie(request: Request, response: Response):
+@router.get("/refresh", response_model=Token)
+async def get_refresh_from_cookie(request: Request):
     """
     Generates new access token if refresh token from HTTPonly cookie is not expired
     """
@@ -232,7 +217,7 @@ async def get_refresh_from_cookie(request: Request, response: Response):
 
     if refresh_token is None:
         raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED, detail="Refresh Token not found"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh Token not found"
         )
 
     try:
@@ -260,14 +245,7 @@ async def get_refresh_from_cookie(request: Request, response: Response):
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    response.set_cookie(
-        key="access_token",
-        value=new_access_token,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        httponly=True,
-    )
-
-    return {"message": "Refreshed access_token"}
+    return {"access_token": new_access_token, "token_type": "bearer"}
 
 
 user_dependency = Annotated[dict, Depends(get_current_user)]
@@ -279,7 +257,7 @@ async def get_me(user: user_dependency):
         return user
 
 
-@router.post("/logout", status_code=HTTP_200_OK)
+@router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(request: Request, response: Response):
     """
     Sets token value to empty string on logout
@@ -287,10 +265,9 @@ async def logout(request: Request, response: Response):
     refresh_token = request.cookies.get("refresh_token")
 
     if refresh_token is None:
-        raise HTTPException(status_code=HTTP_401_UNAUTHORIZED)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     # TODO: Set secure=True on deployment
     response.set_cookie(key="refresh_token", value="", max_age=0, httponly=True)
-    response.set_cookie(key="access_token", value="", max_age=0, httponly=True)
 
     return {"message": "Logged out successfully"}
