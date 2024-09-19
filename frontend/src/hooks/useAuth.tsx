@@ -10,10 +10,5 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within AuthProvider')
   }
 
-  // Check if auth has null values
-  // if (!Object.values(authContext.auth).includes(null)) {
-  //   setIsLoggedIn(true)
-  // }
-
   return authContext
 }

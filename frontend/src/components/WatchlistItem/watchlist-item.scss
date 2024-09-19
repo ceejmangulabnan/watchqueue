@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 
 .watchlist-item {
-  max-width: 9rem;
+  width: 9rem;
   flex: 1;
 
   &__image {

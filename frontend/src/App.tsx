@@ -5,10 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage/LandingPage"
 import Navbar from "./components/Navbar/Navbar"
 import AuthProvider from "./contexts/AuthProvider"
-import LoginProvider from './contexts/LoginProvider'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
-
-
 
 const queryClient = new QueryClient()
 
@@ -18,13 +15,11 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <LoginProvider>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-              </Routes>
-            </LoginProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
           </AuthProvider>
         </BrowserRouter>
         <ReactQueryDevtools />

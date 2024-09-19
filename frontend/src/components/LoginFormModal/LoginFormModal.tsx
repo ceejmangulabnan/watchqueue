@@ -19,6 +19,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
     password: ''
   })
   const inputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const { auth, setAuth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
 
@@ -79,7 +80,6 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
   // Submit Form
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault()
-    const loginForm = document.getElementById('login-form') as HTMLFormElement
     try {
       validateForm()
       if (loginFormIsValid) {
@@ -89,11 +89,13 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
           }
         })
         const data = await response.data
-        const userData = await axiosPrivate.get('/users/me')
-        console.log(response)
-        setAuth({ ...auth, username: userData.data.username, id: userData.data.id, accessToken: data.access_token })
+        console.log(data)
 
-        loginForm.reset()
+        // Causes 403, no access token being sent back
+        const userDataResponse = await axiosPrivate.get('/users/me')
+        const userData = await userDataResponse.data
+        setAuth({ ...auth, id: userData.id, username: userData.username })
+        formRef.current?.reset()
         toggleLoginForm()
 
       }
@@ -123,7 +125,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
               </svg>
               <p className='login-form-modal__title'>Login</p>
               <div className='login-form-modal__form-container'>
-                <form id='login-form'>
+                <form id='login-form' ref={formRef}>
                   {loginFormInputData.map(input => (
                     <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />
                   ))}

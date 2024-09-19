@@ -11,13 +11,15 @@ const PopularMovies = () => {
     return data
   }
 
-  const popularMoviesData = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
-  console.log(popularMoviesData.data)
+  const { data: popularMovies, ...rest } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
+  // console.log(popularMovies)
+  // console.log(rest)
+  // console.log(rest.error)
 
   return (
     <div className="popular-movies">
       {
-        popularMoviesData.data?.results.map(movie => (
+        popularMovies?.results.map(movie => (
           <MovieItem movie={movie} key={movie.id} />
         ))
       }

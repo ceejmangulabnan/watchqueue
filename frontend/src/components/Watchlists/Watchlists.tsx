@@ -40,6 +40,7 @@ const Watchlists = () => {
           </div>
           {userWatchlists.map((watchlist: WatchlistItemData) => (
             <WatchlistItem
+              key={watchlist.id}
               id={watchlist.id}
               title={watchlist.title}
               userId={watchlist.user_id}

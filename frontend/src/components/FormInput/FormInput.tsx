@@ -6,7 +6,6 @@ interface FormInputProps {
   inputData: FormInputData
   onChange: ChangeEventHandler
   inputRef: React.RefObject<HTMLInputElement>
-
 }
 
 const FormInput = ({ inputData, onChange, inputRef }: FormInputProps) => {
@@ -18,10 +17,8 @@ const FormInput = ({ inputData, onChange, inputRef }: FormInputProps) => {
 
   useEffect(() => {
     if (inputData.id === 1) {
-      console.log(inputData.name)
       inputRef.current?.focus()
     }
-
   }, [])
 
   return (
