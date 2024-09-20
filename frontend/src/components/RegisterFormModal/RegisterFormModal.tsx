@@ -76,18 +76,8 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     setRegisterFormData({ ...registerFormData, [e.target.name]: e.target.value })
   }
 
-  // Validates all inputs in a form, all must return true
-  // const validateForm = () => {
-  //   const isValid = registerFormInputs.every(input => {
-  //     return validateInput(input)
-  //   })
-  //   setRegisterFormIsValid(isValid)
-  // }
 
-
-
-
-  const handleSubmit = async (e: React.MouseEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       validateForm(registerFormInputs, setRegisterFormIsValid)
@@ -128,13 +118,13 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
               </svg>
               <p className='register-form-modal__title'>Create Account</p>
               <div className="register-form-modal__form-container">
-                <form id='register-form' ref={formRef}>
+                <form id='register-form' ref={formRef} onSubmit={handleSubmit}>
                   {
                     registerFormInputs.map(input => (
                       <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />
                     ))
                   }
-                  <button className='register-form-modal__submit' type="submit" onClick={handleSubmit} disabled={!registerFormIsValid}>
+                  <button className='register-form-modal__submit' type="submit" disabled={!registerFormIsValid}>
                     Submit
                   </button>
                 </form>

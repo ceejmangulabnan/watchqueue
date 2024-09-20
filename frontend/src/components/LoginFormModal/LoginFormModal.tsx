@@ -34,7 +34,7 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
 
 
   // Submit Form
-  const handleSubmit = async (e: React.MouseEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       validateForm(loginFormInputData, setLoginFormIsValid)
@@ -79,11 +79,11 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
               </svg>
               <p className='login-form-modal__title'>Login</p>
               <div className='login-form-modal__form-container'>
-                <form id='login-form' ref={formRef}>
+                <form id='login-form' ref={formRef} onSubmit={handleSubmit}>
                   {loginFormInputData.map(input => (
                     <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />
                   ))}
-                  <button className='login-form-modal__submit' type='submit' onClick={handleSubmit} disabled={!loginFormIsValid}>Submit</button>
+                  <button className='login-form-modal__submit' type='submit' disabled={!loginFormIsValid}>Submit</button>
                 </form>
               </div>
               <p>Don't have an account?
