@@ -4,6 +4,7 @@ import FormInput from "../FormInput/FormInput"
 import { FormInputData } from "../../types/InputTypes"
 import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useEffect, useState, useRef } from 'react'
 import axios from '../../api/axios'
+import { validateForm } from '../../utils/validateForm'
 
 interface RegisterFormModalProps {
   toggleForm: MouseEventHandler
@@ -19,9 +20,10 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
     registerEmail: ''
   })
   const inputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
-    validateForm()
+    validateForm(registerFormInputs, setRegisterFormIsValid)
   }, [registerFormData])
 
   const registerFormInputs: FormInputData[] = [
@@ -71,52 +73,31 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
   ]
 
   const handleChange: ChangeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(registerFormData)
     setRegisterFormData({ ...registerFormData, [e.target.name]: e.target.value })
   }
 
-  const validateInput = (input: FormInputData): boolean => {
-    const inputElement = document.getElementsByName(input.name)[0] as HTMLInputElement
+  // Validates all inputs in a form, all must return true
+  // const validateForm = () => {
+  //   const isValid = registerFormInputs.every(input => {
+  //     return validateInput(input)
+  //   })
+  //   setRegisterFormIsValid(isValid)
+  // }
 
-    // If input is not required, skip checking
-    if (!input.required) {
-      return true
-    }
 
-    // checks if set constraints have passed validation, returns true if valid
-    if (inputElement.checkValidity()) {
-      return true
-    }
-    return false
-  }
 
-  // Validates all inputs in a form, if all true, returns true
-  const validateForm = () => {
-    const isValid = registerFormInputs.every(input => {
-      return validateInput(input)
-    })
-    setRegisterFormIsValid(isValid)
-  }
 
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault()
-    const registerForm = document.getElementById('register-form') as HTMLFormElement
     try {
-      validateForm()
+      validateForm(registerFormInputs, setRegisterFormIsValid)
       if (registerFormIsValid) {
-        const response = await axios.post('/users/register', registerFormData, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        const response = await axios.post('/users/register', registerFormData)
         if (response.status === 200) {
           alert("Registration Successful")
         }
-        registerForm.reset()
+        formRef.current?.reset()
         toggleRegisterModal()
-      }
-      else {
-        console.log("FORM IS INVALID")
       }
     } catch (e) {
       const error = e as AxiosError
@@ -147,7 +128,7 @@ const RegisterFormModal = ({ toggleForm }: RegisterFormModalProps) => {
               </svg>
               <p className='register-form-modal__title'>Create Account</p>
               <div className="register-form-modal__form-container">
-                <form id='register-form'>
+                <form id='register-form' ref={formRef}>
                   {
                     registerFormInputs.map(input => (
                       <FormInput key={input.id} inputData={input} onChange={handleChange} inputRef={inputRef} />

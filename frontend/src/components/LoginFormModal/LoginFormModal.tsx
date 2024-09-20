@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, ChangeEvent, ChangeEventHandler, MouseEventHandler, } from 'react'
 import './login_form_modal.scss'
 import FormInput from '../FormInput/FormInput'
-import { FormInputData } from '../../types/InputTypes'
+import { loginFormInputData } from '../../types/InputTypes'
 import { AxiosError } from 'axios'
 import { useAuth } from '../../hooks/useAuth'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import { validateForm } from '../../utils/validateForm'
 
 interface LoginFormModalProps {
   toggleForm: MouseEventHandler
@@ -24,64 +25,19 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
   const axiosPrivate = useAxiosPrivate()
 
   useEffect(() => {
-    validateForm()
+    validateForm(loginFormInputData, setLoginFormIsValid)
   }, [loginFormData])
-
-  const loginFormInputData: FormInputData[] = [
-    {
-      id: 1,
-      name: 'username',
-      type: 'text',
-      placeholder: 'Username',
-      label: 'Username',
-      required: true,
-      pattern: '^[a-zA-Z0-9]{4,}$',
-      errorMessage: 'Username must be at least 4 characters long without special characters'
-    },
-    {
-      id: 2,
-      name: 'password',
-      type: 'password',
-      placeholder: 'Password',
-      label: 'Password',
-      pattern: '^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$',
-      required: true,
-      errorMessage: 'Password must include at least 1 uppercase and lowercase letter, 1 number, and 1 special character'
-    }
-  ]
-
 
   const handleChange: ChangeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setLoginFormData({ ...loginFormData, [e.target.name]: e.target.value })
   }
 
-  // Validation for each input, returns boolean validity status
-  const validateInput = (input: FormInputData): boolean => {
-    const inputElement = document.getElementsByName(input.name)[0] as HTMLInputElement
-
-    if (!input.required) {
-      return true
-    }
-
-    if (inputElement.checkValidity()) {
-      return true
-    }
-    return false
-  }
-
-  // Validates all inputs in a form, if all true, returns true
-  const validateForm = () => {
-    const isValid = loginFormInputData.every(input => {
-      return validateInput(input)
-    })
-    setLoginFormIsValid(isValid)
-  }
 
   // Submit Form
   const handleSubmit = async (e: React.MouseEvent) => {
     e.preventDefault()
     try {
-      validateForm()
+      validateForm(loginFormInputData, setLoginFormIsValid)
       if (loginFormIsValid) {
         const response = await axiosPrivate.post('/users/token', loginFormData, {
           headers: {
@@ -89,11 +45,10 @@ const LoginFormModal = ({ toggleForm, toggleLoginForm, modalActive }: LoginFormM
           }
         })
         const data = await response.data
-        console.log(data)
 
-        // Causes 403, no access token being sent back
         const userDataResponse = await axiosPrivate.get('/users/me')
         const userData = await userDataResponse.data
+
         setAuth({ ...auth, accessToken: data.access_token, id: userData.id, username: userData.username })
         formRef.current?.reset()
         toggleLoginForm()
