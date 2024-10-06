@@ -1,4 +1,3 @@
-import './app.scss'
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
@@ -11,7 +10,7 @@ const queryClient = new QueryClient()
 
 const App = () => {
   return (
-    <div className="app">
+    <div className="app mt-20 font-fira">
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>

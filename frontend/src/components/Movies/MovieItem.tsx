@@ -1,6 +1,8 @@
-import { MovieData } from "../../types/MovieTypes"
-import { generatePosterLink } from "../../utils/generateImgLinks"
-import { Card, CardDescription, CardTitle, CardFooter } from "../ui/card"
+import { MovieData } from "@/types/MovieTypes"
+import { generatePosterLink } from "@/utils/generateImgLinks"
+
+import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
+
 
 interface MovieItemProps {
   movie: MovieData

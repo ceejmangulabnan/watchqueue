@@ -1,4 +1,3 @@
-import './landing_page.scss'
 import PopularMovies from '../../components/Movies/PopularMovies/PopularMovies'
 
 const LandingPage = () => {

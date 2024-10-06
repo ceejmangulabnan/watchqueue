@@ -13,12 +13,16 @@ const PopularMovies = () => {
   const { data: popularMovies } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 m-8 ">
-      {
-        popularMovies?.results.map(movie => (
-          <MovieItem movie={movie} key={movie.id} />
-        ))
-      }
+    <div className="m-8 my-10">
+      <h3 className="text-xl font-semibold py-4 ">Popular Movies</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4">
+        {
+          popularMovies?.results.map(movie => (
+            <MovieItem movie={movie} key={movie.id} />
+          ))
+        }
+      </div>
+
     </div>
   )
 }
