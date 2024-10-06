@@ -11,7 +11,7 @@ const PopularMovies = () => {
     return data
   }
 
-  const { data: popularMovies, ...rest } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
+  const { data: popularMovies } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
   // console.log(popularMovies)
   // console.log(rest)
   // console.log(rest.error)
