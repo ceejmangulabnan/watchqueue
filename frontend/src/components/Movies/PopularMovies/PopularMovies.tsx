@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import MovieItem from "../MovieItem"
 import { MovieDataQuery } from "../../../types/MovieTypes"
-import './popular-movies.scss'
 import axios from "../../../api/axios"
 
 const PopularMovies = () => {
@@ -11,13 +10,10 @@ const PopularMovies = () => {
     return data
   }
 
-  const { data: popularMovies, ...rest } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
-  // console.log(popularMovies)
-  // console.log(rest)
-  // console.log(rest.error)
+  const { data: popularMovies } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
 
   return (
-    <div className="popular-movies">
+    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4 m-8 ">
       {
         popularMovies?.results.map(movie => (
           <MovieItem movie={movie} key={movie.id} />

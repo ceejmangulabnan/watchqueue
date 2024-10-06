@@ -1,6 +1,6 @@
 import { MovieData } from "../../types/MovieTypes"
 import { generatePosterLink } from "../../utils/generateImgLinks"
-import './movie_item.scss'
+import { Card, CardDescription, CardTitle, CardFooter } from "../ui/card"
 
 interface MovieItemProps {
   movie: MovieData
@@ -8,11 +8,13 @@ interface MovieItemProps {
 
 const MovieItem = ({ movie }: MovieItemProps) => {
   return (
-    <div className="movie-item">
-      <img className='movie-item__poster' src={generatePosterLink(movie.poster_path)} />
-      <h2 className="movie-item__title">{movie.title}</h2>
-      <p>{movie.release_date}</p>
-    </div>
+    <Card className="overflow-hidden">
+      <img src={generatePosterLink(movie.poster_path)} />
+      <CardFooter className="flex-col items-start p-4">
+        <CardTitle>{movie.title}</CardTitle>
+        <CardDescription>{movie.release_date}</CardDescription>
+      </CardFooter>
+    </Card>
   )
 }
 
