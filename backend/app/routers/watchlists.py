@@ -17,14 +17,14 @@ async def watchlists():
     return {"message": "watchlists"}
 
 
-class CreateWatchlistRequest(BaseModel):
+class CreateWatchlist(BaseModel):
     title: str
 
 
 # Create Watchlist
 @router.post("/create")
 async def create_watchlist(
-    user: user_dependency, db: db_dependency, request: CreateWatchlistRequest
+    user: user_dependency, db: db_dependency, request: CreateWatchlist
 ):
     if user:
         try:

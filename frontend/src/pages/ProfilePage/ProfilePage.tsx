@@ -1,5 +1,5 @@
 import './profile-page.scss'
-import Watchlists from '../../components/Watchlists/Watchlists'
+import Watchlists from '@/components/Watchlists'
 
 const ProfilePage = () => {
   return (

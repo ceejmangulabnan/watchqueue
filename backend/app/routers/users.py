@@ -156,9 +156,6 @@ async def login_for_access_token(
         max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
     )
 
-    print("\n\nRefresh Token: " + refresh_token + "\n")
-    print("Access Token: " + access_token)
-
     return {"access_token": access_token, "token_type": "bearer"}
 
 
