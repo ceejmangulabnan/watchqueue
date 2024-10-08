@@ -45,7 +45,7 @@ const Watchlists = () => {
         <h3 className="text-xl font-semibold">Your Watchlists</h3>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant={"outline"}>Create Watchlist</Button>
+            <Button variant={"secondary"}>Create Watchlist</Button>
           </PopoverTrigger>
           <PopoverContent>
             <form onSubmit={handleSubmit}>

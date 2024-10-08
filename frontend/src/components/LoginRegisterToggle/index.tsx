@@ -1,6 +1,6 @@
 import { useState } from "react"
-import LoginFormModal from "../LoginFormModal/LoginFormModal"
-import RegisterFormModal from "../RegisterFormModal/RegisterFormModal"
+import LoginFormModal from "@/components/LoginFormModal"
+import RegisterFormModal from "@/components/RegisterFormModal"
 
 // Handles the switching between the login and register forms
 const LoginRegisterToggle = () => {
