@@ -2,9 +2,10 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage/LandingPage"
-import Navbar from "./components/Navbar/Navbar"
-import AuthProvider from "./contexts/AuthProvider"
-import ProfilePage from './pages/ProfilePage/ProfilePage'
+import Navbar from "@/components/Navbar"
+import AuthProvider from "@/contexts/AuthProvider"
+import ProfilePage from '@/pages/ProfilePage/ProfilePage'
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 const queryClient = new QueryClient()
 
@@ -17,7 +18,9 @@ const App = () => {
             <Navbar />
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
             </Routes>
           </AuthProvider>
         </BrowserRouter>

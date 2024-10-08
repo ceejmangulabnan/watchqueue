@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import './navbar.scss'
 import LoginRegisterToggle from '../LoginRegisterToggle/LoginRegisterToggle'
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
@@ -12,6 +12,7 @@ const Navbar = () => {
   const { auth, setAuth } = useAuth()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const refreshUser = useRefreshUser()
+  const navigate = useNavigate()
 
   useLayoutEffect(() => {
     refreshUser()
@@ -35,6 +36,7 @@ const Navbar = () => {
     if (response.status == 200) {
       setAuth({ ...auth, id: null, username: null, accessToken: null })
       setIsLoggedIn(false)
+      navigate("/", { replace: true })
     }
     console.log(response)
   }
