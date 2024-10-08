@@ -1,7 +1,4 @@
-
 // Responsible for checking refresh token and retrieving data on site refresh or inital render
-
-import { useEffect } from "react"
 import { useAuth } from "./useAuth"
 import axios from "../api/axios"
 

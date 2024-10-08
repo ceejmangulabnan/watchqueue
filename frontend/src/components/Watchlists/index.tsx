@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react"
+import { useState } from "react"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"

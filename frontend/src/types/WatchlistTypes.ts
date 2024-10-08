@@ -1,5 +1,3 @@
-import { MouseEventHandler } from "react"
-
 export interface WatchlistItemData {
   id: number,
   title: string,
