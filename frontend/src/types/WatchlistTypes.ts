@@ -1,3 +1,5 @@
+import { MouseEventHandler } from "react"
+
 export interface WatchlistItemData {
   id: number,
   title: string,
@@ -13,4 +15,5 @@ export interface WatchlistItemProps {
   userId: number,
   isPrivate: boolean,
   items: number[]
+  handleDelete: (id: number) => Promise<void>
 }

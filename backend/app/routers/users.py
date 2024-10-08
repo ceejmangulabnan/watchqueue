@@ -18,7 +18,7 @@ ACCESS_JWT_SECRET = str(os.getenv("ACCESS_JWT_SECRET"))
 REFRESH_JWT_SECRET = str(os.getenv("REFRESH_JWT_SECRET"))
 JWT_ALGORITHM = str(os.getenv("JWT_ALGORITHM"))
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
+ACCESS_TOKEN_EXPIRE_MINUTES = 15
 # 7 days
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
@@ -141,8 +141,9 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
 
-    # TEST: Set to 30s exp
-    access_token = create_access_token(user.username, user.id, timedelta(seconds=10))
+    access_token = create_access_token(
+        user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
 
     refresh_token = create_refresh_token(
         user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)

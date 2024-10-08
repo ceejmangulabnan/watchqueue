@@ -40,7 +40,7 @@ const Navbar = () => {
   }
 
   return (
-    <div className='navbar'>
+    <div className='navbar z-10'>
       <h1 className='navbar__title'>watchqueue</h1>
       <nav className='navbar__links'>
         <ul>

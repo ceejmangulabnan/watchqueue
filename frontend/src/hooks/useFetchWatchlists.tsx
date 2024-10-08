@@ -13,9 +13,9 @@ const useFetchWatchlists = () => {
     return response.data as WatchlistItemData[]
   }
 
-  const { data: userWatchlists, refetch: refetchUserWatchlists, isError, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchWatchlists })
+  const { data: userWatchlists, refetch: refetchUserWatchlists, isError, isLoading, error } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchWatchlists })
 
-  return { userWatchlists, refetchUserWatchlists, isError, isLoading }
+  return { userWatchlists, refetchUserWatchlists, isError, isLoading, error }
 }
 
 export default useFetchWatchlists
