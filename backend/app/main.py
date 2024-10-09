@@ -31,6 +31,7 @@ origins = [
     "https://localhost",
     "https://127.0.0.1:5173",
     "https://localhost:5173",
+    "https://watchqueue.netlify.app",
 ]
 
 app.add_middleware(
