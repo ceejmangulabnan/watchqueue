@@ -12,9 +12,10 @@ load_dotenv()
 DB_USER = os.getenv("DB_USER")
 DB_PW = os.getenv("DB_PW")
 
-DB_URL = f"postgresql://{DB_USER}:{DB_PW}@localhost:5432/watchqueue_db"
+# DB_URL = f"postgresql://{DB_USER}:{DB_PW}@localhost:5432/watchqueue_db"
+DB_URI = f"{os.getenv('DB_URI')}"
 
-engine = create_engine(DB_URL)
+engine = create_engine(DB_URI)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
