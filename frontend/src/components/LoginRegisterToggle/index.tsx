@@ -1,18 +1,13 @@
 import { useState } from "react"
-import LoginFormModal from "@/components/LoginFormModal"
-import RegisterFormModal from "@/components/RegisterFormModal"
+import LoginForm from "@/components/LoginForm"
+import RegisterForm from "@/components/RegisterForm"
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 // Handles the switching between the login and register forms
 const LoginRegisterToggle = () => {
-
-  const [loginFormModalActive, setLoginFormModalActive] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
   const [loginButtonClicked, setLoginButtonClicked] = useState(false)
-
-  const toggleLoginForm = () => {
-    console.log("Login Form Active Toggle", !loginFormModalActive)
-    setLoginFormModalActive(!loginFormModalActive)
-  }
 
   const toggleForm = () => {
     setIsLogin(!isLogin)
@@ -20,22 +15,23 @@ const LoginRegisterToggle = () => {
 
   const loginButtonToggle = () => {
     setLoginButtonClicked(true)
-    setLoginFormModalActive(true)
     setIsLogin(true)
   }
 
-
   return (
     <div>
-      <button className='login-form-modal__button' onClick={loginButtonToggle}>
-        Login
-      </button>
-
-      {loginButtonClicked && (
-        isLogin
-          ? <LoginFormModal toggleForm={toggleForm} modalActive={loginFormModalActive} toggleLoginForm={toggleLoginForm} />
-          : <RegisterFormModal toggleForm={toggleForm} />
-      )}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button onClick={loginButtonToggle}>Login</Button>
+        </DialogTrigger>
+        <DialogContent>
+          {
+            (loginButtonClicked && isLogin)
+              ? <LoginForm toggleForm={toggleForm} />
+              : <RegisterForm toggleForm={toggleForm} />
+          }
+        </DialogContent>
+      </Dialog>
     </div >
   )
 }
