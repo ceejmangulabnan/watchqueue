@@ -35,10 +35,10 @@ async def hello_users():
 
 
 class CreateUser(BaseModel):
-    registerUsername: str
-    registerPassword: str
-    registerConfirmPassword: str
-    registerEmail: str
+    username: str
+    password: str
+    confirmPassword: str
+    email: str
 
 
 class Token(BaseModel):
@@ -54,7 +54,7 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
 
     new_user_is_valid = validate_new_user_credentials(create_user_request)
     duplicate_username_query = select(Users).where(
-        Users.username == create_user_request.registerUsername
+        Users.username == create_user_request.username
     )
     result = db.execute(duplicate_username_query)
     duplicate_username = result.scalar()
@@ -66,9 +66,9 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
 
     if new_user_is_valid:
         new_user = Users(
-            username=create_user_request.registerUsername,
-            password=get_password_hash(create_user_request.registerPassword),
-            email=create_user_request.registerEmail,
+            username=create_user_request.username,
+            password=get_password_hash(create_user_request.password),
+            email=create_user_request.email,
         )
 
         db.add(new_user)
@@ -86,19 +86,19 @@ def validate_new_user_credentials(credentials: CreateUser):
     """
     # Min 4 chars alphanumeric
     username_pattern = re.compile("^[a-zA-Z0-9]{4,}$")
-    username_valid = username_pattern.fullmatch(credentials.registerUsername)
+    username_valid = username_pattern.fullmatch(credentials.username)
 
     # Min 8 Chars, 1 uppercase, 1 lowercase, 1 symbol, and 1 number
     password_pattern = re.compile(
         "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$"
     )
-    password_valid = password_pattern.fullmatch(credentials.registerPassword)
+    password_valid = password_pattern.fullmatch(credentials.password)
 
     # email pattern is x@x.x where x is any char
     email_pattern = re.compile("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")
-    email_valid = email_pattern.fullmatch(credentials.registerEmail)
+    email_valid = email_pattern.fullmatch(credentials.email)
 
-    if credentials.registerPassword != credentials.registerConfirmPassword:
+    if credentials.password != credentials.confirmPassword:
         return False
 
     if username_valid is None or password_valid is None or email_valid is None:
