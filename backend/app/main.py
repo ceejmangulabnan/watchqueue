@@ -63,8 +63,3 @@ async def root():
 async def get_movie_popular():
     response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
     return response.json()
-
-
-# if __name__ == "__main__":
-#     PORT = int(os.getenv("PORT", 8000))
-#     uvicorn.run("main:app", host="0.0.0.0", port=PORT, reload=True)

@@ -23,19 +23,17 @@ class CreateWatchlist(BaseModel):
 
 # Create Watchlist
 @router.post("/create")
-async def create_watchlist():
-    return {"message": "Create watchlist route"}
-# async def create_watchlist(
-#     user: user_dependency, db: db_dependency, request: CreateWatchlist
-# ):
-#     if user:
-#         try:
-#             new_watchlist = Watchlists(title=request.title, user_id=user.get("id"))
-#             db.add(new_watchlist)
-#             db.commit()
-#         except Exception as e:
-#             db.rollback()
-#             raise e
+async def create_watchlist(
+    user: user_dependency, db: db_dependency, request: CreateWatchlist
+):
+    if user:
+        try:
+            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"))
+            db.add(new_watchlist)
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise e
 
 
 @router.get("/{watchlist_id}")
