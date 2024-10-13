@@ -12,8 +12,10 @@ import os
 import re
 from sqlalchemy import select
 
+
 # Import env variables
 load_dotenv()
+PROD = os.getenv("PROD", False)
 ACCESS_JWT_SECRET = str(os.getenv("ACCESS_JWT_SECRET"))
 REFRESH_JWT_SECRET = str(os.getenv("REFRESH_JWT_SECRET"))
 JWT_ALGORITHM = str(os.getenv("JWT_ALGORITHM"))
@@ -31,7 +33,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 @router.get("/")
 async def hello_users():
-    return "Hello Users"
+    return f"Hello {str(PROD)}"
 
 
 class CreateUser(BaseModel):
@@ -149,13 +151,23 @@ async def login_for_access_token(
         user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
     )
 
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        # max_age is in seconds so multiply by 60
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    if PROD:
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True,
+            # max_age is in seconds so multiply by 60
+            max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+        )
+    else:
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            # max_age is in seconds so multiply by 60
+            max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+        )
 
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -265,7 +277,6 @@ async def logout(request: Request, response: Response):
     if refresh_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Set secure=True on deployment
     response.set_cookie(key="refresh_token", value="", max_age=0, httponly=True)
 
     return {"message": "Logged out successfully"}
