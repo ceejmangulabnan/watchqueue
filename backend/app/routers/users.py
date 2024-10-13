@@ -157,6 +157,7 @@ async def login_for_access_token(
             value=refresh_token,
             httponly=True,
             secure=True,
+            samesite=None,
             # max_age is in seconds so multiply by 60
             max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
         )
