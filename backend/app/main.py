@@ -43,7 +43,7 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["Content-Type", "Set-Cookie", "Authorization", "Access-Control-Allow-Origin"]
+    allow_headers=["*"]
 )
 
 app.include_router(users.router)
@@ -62,3 +62,8 @@ async def root():
 async def get_movie_popular():
     response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
     return response.json()
+
+
+if __name__ == "__main__":
+   import uvicorn
+   uvicorn.run(app, host="0.0.0.0", port=8000)
