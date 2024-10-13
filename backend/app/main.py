@@ -1,17 +1,13 @@
 from typing import Annotated
-from fastapi.exceptions import HTTPException
 import requests
 import os
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from starlette.status import HTTP_401_UNAUTHORIZED
-from db.database import engine, db_dependency
-from sqlalchemy.exc import DBAPIError, ProgrammingError
+from db.database import engine
 from db import models
 from routers import users, watchlists
 from routers.users import get_current_user
-
 
 load_dotenv()
 
