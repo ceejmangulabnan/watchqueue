@@ -28,7 +28,7 @@ async def create_watchlist(
 ):
     if user:
         try:
-            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"))
+            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"), items=[])
             db.add(new_watchlist)
             db.commit()
         except Exception as e:
