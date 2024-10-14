@@ -278,6 +278,21 @@ async def logout(request: Request, response: Response):
     if refresh_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    response.set_cookie(key="refresh_token", value="", max_age=0, httponly=True)
+    if PROD:
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=0,
+        )
+    else:
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            max_age=0,
+        )
 
     return {"message": "Logged out successfully"}
