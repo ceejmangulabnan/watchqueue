@@ -15,7 +15,7 @@ const Navbar = () => {
 
   useLayoutEffect(() => {
     refreshUser()
-  }, [])
+  }, [refreshUser])
 
   useEffect(() => {
     const checkUserData = async () => {
@@ -38,7 +38,9 @@ const Navbar = () => {
 
   return (
     <div className='z-10 fixed top-0 left-0 right-0 flex justify-between items-center px-8 py-3 text-md font-medium shadow-md bg-white'>
-      <h1 className='text-2xl font-semibold'>watchqueue</h1>
+      <Link to='/'>
+        <h1 className='text-2xl font-semibold'>watchqueue</h1>
+      </Link>
       <nav>
         <ul className='flex items-center gap-3'>
           <li>
