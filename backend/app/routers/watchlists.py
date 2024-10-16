@@ -28,7 +28,9 @@ async def create_watchlist(
 ):
     if user:
         try:
-            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"), items=[])
+            new_watchlist = Watchlists(
+                title=request.title, user_id=user.get("id"), items=[]
+            )
             db.add(new_watchlist)
             db.commit()
         except Exception as e:
@@ -82,8 +84,6 @@ async def get_user_watchlists_all(
 ):
     if user:
         try:
-            print(type(user_id))
-            print(type(user.get("id")))
             if user_id == user.get("id"):
                 user_watchlists_query = select(Watchlists).where(
                     Watchlists.user_id == user.get("id")
@@ -112,3 +112,33 @@ async def get_user_watchlists_all(
 
         except Exception as e:
             raise e
+
+
+class AddToWatchlist(BaseModel):
+    movie_id: int
+
+
+@router.post("/{watchlist_id}/add")
+async def add_to_watchlist(
+    user: user_dependency, db: db_dependency, watchlist_id: int, request: AddToWatchlist
+):
+    try:
+        if user:
+            watchlist_query = select(Watchlists).where(
+                Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
+            )
+            result = db.execute(watchlist_query)
+            watchlist = result.scalar()
+
+            if watchlist is None:
+                raise HTTPException(
+                    status_code=HTTP_404_NOT_FOUND, detail="Watchlist not found"
+                )
+            else:
+                watchlist.items = watchlist.items + [request.movie_id]
+                db.add(watchlist)
+                db.commit()
+
+    except Exception as e:
+        db.rollback()
+        return e
