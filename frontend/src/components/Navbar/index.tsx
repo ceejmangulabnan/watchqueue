@@ -15,7 +15,7 @@ const Navbar = () => {
 
   useLayoutEffect(() => {
     refreshUser()
-  }, [refreshUser])
+  }, [])
 
   useEffect(() => {
     const checkUserData = async () => {

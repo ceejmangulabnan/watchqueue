@@ -22,12 +22,8 @@ const useRefreshUser = () => {
       })
       const userData = await user.data
 
-      console.log(refreshData)
-      console.log(userData)
-
       // If fetching is successful, then update the auth context
       setAuth({ ...auth, accessToken: refreshData.access_token, id: userData.id, username: userData.username })
-
 
     } catch (error) {
       console.log("Error fetching auth on intial render/reload. Refresh token not found, user must log in", error)
