@@ -17,18 +17,18 @@ async def watchlists():
     return {"message": "watchlists"}
 
 
-class CreateWatchlistRequest(BaseModel):
+class CreateWatchlist(BaseModel):
     title: str
 
 
 # Create Watchlist
 @router.post("/create")
 async def create_watchlist(
-    user: user_dependency, db: db_dependency, request: CreateWatchlistRequest
+    user: user_dependency, db: db_dependency, request: CreateWatchlist
 ):
     if user:
         try:
-            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"))
+            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"), items=[])
             db.add(new_watchlist)
             db.commit()
         except Exception as e:

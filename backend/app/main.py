@@ -1,17 +1,14 @@
+import uvicorn
 from typing import Annotated
-from fastapi.exceptions import HTTPException
 import requests
 import os
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from starlette.status import HTTP_401_UNAUTHORIZED
-from db.database import engine, db_dependency
-from sqlalchemy.exc import DBAPIError, ProgrammingError
+from db.database import engine
 from db import models
 from routers import users, watchlists
 from routers.users import get_current_user
-
 
 load_dotenv()
 
@@ -31,16 +28,24 @@ origins = [
     "https://localhost",
     "https://127.0.0.1:5173",
     "https://localhost:5173",
+    "https://watchqueue.netlify.app",
 ]
+
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+#     allow_headers=["*"]
+# )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Set-Cookie", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
-
 
 app.include_router(users.router)
 app.include_router(watchlists.router)

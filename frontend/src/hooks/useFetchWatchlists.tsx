@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react"
 import useAxiosPrivate from "./useAxiosPrivate"
 import { useAuth } from "./useAuth"
 import { WatchlistItemData } from "../types/WatchlistTypes"
+import { useQuery } from "@tanstack/react-query"
 
 
 const useFetchWatchlists = () => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
-  const [userWatchlists, setUserWatchlists] = useState<WatchlistItemData[] | null>(null)
 
-  useEffect(() => {
-    const fetchWatchlists = async () => {
-      const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-      const data = await response.data
+  const fetchWatchlists = async () => {
+    const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
+    return response.data as WatchlistItemData[]
+  }
 
-      console.log(response)
-      if (response.status === 200) {
-        setUserWatchlists(data)
-      }
-    }
+  const { data: userWatchlists, refetch: refetchUserWatchlists, isError, isLoading, error } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchWatchlists })
 
-    fetchWatchlists()
-  }, [])
-  return { userWatchlists }
+  return { userWatchlists, refetchUserWatchlists, isError, isLoading, error }
 }
 
 export default useFetchWatchlists

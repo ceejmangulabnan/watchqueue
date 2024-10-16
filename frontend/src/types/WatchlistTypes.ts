@@ -13,4 +13,5 @@ export interface WatchlistItemProps {
   userId: number,
   isPrivate: boolean,
   items: number[]
+  handleDelete: (id: number) => Promise<void>
 }
