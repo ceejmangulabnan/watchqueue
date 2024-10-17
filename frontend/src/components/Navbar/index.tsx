@@ -15,7 +15,7 @@ const Navbar = () => {
 
   useLayoutEffect(() => {
     refreshUser()
-  }, [])
+  }, [refreshUser])
 
   useEffect(() => {
     const checkUserData = async () => {
@@ -43,26 +43,29 @@ const Navbar = () => {
       </Link>
       <nav>
         <ul className='flex items-center gap-3'>
-          <li>
-            <Link to='/'>Home</Link>
-          </li>
           {
-            isLoggedIn
-              ? (
-                <>
-                  <li>
-                    <Link to='/profile'>Profile</Link>
-                  </li>
-                  <li>
-                    <Button variant={"destructive"} onClick={handleLogout}>Logout</Button>
-                  </li>
-                </>
-              )
-              : (
+            isLoggedIn ? (
+              <ul className='flex items-center gap-3'>
+                <li>
+                  <Link to='/'>Home</Link>
+                </li>
+                <li>
+                  <Link to='/profile'>Profile</Link>
+                </li>
+                <li>
+                  <Button variant={"destructive"} onClick={handleLogout}>Logout</Button>
+                </li>
+              </ul>
+            ) : (
+              <ul className='flex items-center gap-3'>
+                <li>
+                  <Link to='/'>Home</Link>
+                </li>
                 <li>
                   <LoginRegisterToggle />
                 </li>
-              )
+              </ul>
+            )
           }
         </ul>
       </nav>
