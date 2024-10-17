@@ -77,7 +77,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
         <DropdownMenuContent className='w-[12rem]'>
           <DropdownMenuGroup>
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading} className='flex'>
+              <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
                 <CirclePlus className='mr-2' />
                 Add to Watchlist
               </DropdownMenuSubTrigger>
