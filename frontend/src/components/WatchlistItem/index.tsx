@@ -1,14 +1,10 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuGroup } from '@/components/ui/dropdown-menu'
 import { WatchlistItemProps } from '../../types/WatchlistTypes'
 import { Card, CardFooter, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Ellipsis, Pencil, Trash2 } from 'lucide-react'
-import { DropdownMenuGroup, DropdownMenuLabel, DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu'
-
 
 const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
-
-
   return (
     <Card className="overflow-hidden relative">
       <DropdownMenu>
@@ -18,8 +14,6 @@ const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-[10rem]'>
-          <DropdownMenuLabel></DropdownMenuLabel>
-          <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Pencil color="#000000" size={20} className='mr-2' />

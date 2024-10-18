@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
-from starlette.status import (
-    HTTP_404_NOT_FOUND,
-)
+from starlette import status
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
@@ -28,12 +26,14 @@ async def create_watchlist(
 ):
     if user:
         try:
-            new_watchlist = Watchlists(title=request.title, user_id=user.get("id"), items=[])
+            new_watchlist = Watchlists(
+                title=request.title, user_id=user.get("id"), items=[]
+            )
             db.add(new_watchlist)
             db.commit()
         except Exception as e:
             db.rollback()
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{watchlist_id}")
@@ -47,12 +47,12 @@ async def get_watchlist(user: user_dependency, db: db_dependency, watchlist_id: 
             watchlist = result.scalar()
 
             if watchlist is None:
-                raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
             else:
                 return watchlist
 
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{watchlist_id}")
@@ -66,14 +66,15 @@ async def delete_watchlist(user: user_dependency, db: db_dependency, watchlist_i
             result = db.execute(watchlist_query)
             if result.rowcount == 0:
                 raise HTTPException(
-                    status_code=HTTP_404_NOT_FOUND, detail="Watchlist does not exist"
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Watchlist does not exist",
                 )
 
             db.commit()
             return {"message": f"Watchlist {watchlist_id} was deleted successfully"}
         except Exception as e:
             db.rollback()
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/user/{user_id}")
@@ -82,8 +83,6 @@ async def get_user_watchlists_all(
 ):
     if user:
         try:
-            print(type(user_id))
-            print(type(user.get("id")))
             if user_id == user.get("id"):
                 user_watchlists_query = select(Watchlists).where(
                     Watchlists.user_id == user.get("id")
@@ -99,9 +98,8 @@ async def get_user_watchlists_all(
 
             else:
                 user_watchlists_query = select(Watchlists).where(
-                    Watchlists.user_id == user_id, Watchlists.is_private == False
+                    Watchlists.user_id == user_id, ~Watchlists.is_private
                 )
-
                 results = db.execute(user_watchlists_query).all()
 
                 user_watchlists = []
@@ -111,4 +109,43 @@ async def get_user_watchlists_all(
                 return user_watchlists
 
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+class AddToWatchlist(BaseModel):
+    movie_id: int
+
+
+@router.post("/{watchlist_id}/add")
+async def add_to_watchlist(
+    user: user_dependency, db: db_dependency, watchlist_id: int, request: AddToWatchlist
+):
+    if user:
+        try:
+            watchlist_query = select(Watchlists).where(
+                Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
+            )
+            result = db.execute(watchlist_query)
+            watchlist = result.scalar()
+
+            if watchlist is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
+                )
+
+            if request.movie_id in watchlist.items:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Movie already exists in the watchlist",
+                )
+
+            watchlist.items = watchlist.items + [request.movie_id]
+            db.add(watchlist)
+            db.commit()
+            return {
+                "message": f"Watchlist Item {request.movie_id} has been added to Watchlist {watchlist_id}"
+            }
+
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
