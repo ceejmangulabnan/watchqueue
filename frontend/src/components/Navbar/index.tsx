@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useAuth } from '@/hooks/useAuth'
 import useRefreshUser from '@/hooks/useRefreshUser'
-import LoginRegisterToggle from '@/components/LoginRegisterToggle'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import NavLinks from '@/components/Navbar/NavLinks'
+import MobileNavLinks from '@/components/Navbar/MobileNavLinks'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
@@ -42,39 +41,8 @@ const Navbar = () => {
       <Link to='/'>
         <h1 className='text-2xl font-semibold'>watchqueue</h1>
       </Link>
-      <nav>
-        {loading ? (
-          // Render skeleton while fetching updated auth state
-          <ul className='flex items-center gap-3'>
-            <li><Skeleton className="h-9 w-16" /></li>
-            <li><Skeleton className="h-9 w-16" /></li>
-            <li><Skeleton className="h-9 w-20" /></li>
-          </ul>
-        ) : isAuthed ? (
-          // If user is authenticated, show logged-in navigation
-          <ul className='flex items-center gap-3'>
-            <li>
-              <Link to='/'>Home</Link>
-            </li>
-            <li>
-              <Link to='/profile'>Profile</Link>
-            </li>
-            <li>
-              <Button variant="destructive" onClick={handleLogout}>Logout</Button>
-            </li>
-          </ul>
-        ) : (
-          // If not authed, show login button
-          <ul className='flex items-center gap-3'>
-            <li>
-              <Link to='/'>Home</Link>
-            </li>
-            <li>
-              <LoginRegisterToggle />
-            </li>
-          </ul>
-        )}
-      </nav>
+      <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+      <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
     </div>
   )
 }
