@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import useRefreshUser from '@/hooks/useRefreshUser'
 import NavLinks from '@/components/Navbar/NavLinks'
 import MobileNavLinks from '@/components/Navbar/MobileNavLinks'
+import UserNav from '@/components/Navbar/UserNav'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
@@ -41,8 +42,12 @@ const Navbar = () => {
       <Link to='/'>
         <h1 className='text-2xl font-semibold'>watchqueue</h1>
       </Link>
-      <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-      <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+      <div className='flex items-center'>
+        <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+
+        <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+        <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+      </div>
     </div>
   )
 }
