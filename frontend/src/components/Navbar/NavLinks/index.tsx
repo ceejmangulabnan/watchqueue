@@ -25,7 +25,7 @@ const NavLinks = ({ loading, isAuthed }: NavLinksProps) => {
         </ul>
       ) : (
         // If not authed, show login button
-        <ul className='flex items-center gap-3'>
+        <ul className='flex items-center justify-between gap-3'>
           <li>
             <Link to='/'>Home</Link>
           </li>

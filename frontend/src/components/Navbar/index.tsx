@@ -43,12 +43,10 @@ const Navbar = () => {
         <Link to='/'>
           <h1 className='text-2xl font-semibold'>watchqueue</h1>
         </Link>
-        <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
       </div>
       <div className='flex items-center'>
-
+        <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
         <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-
         <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
       </div>
     </div>
