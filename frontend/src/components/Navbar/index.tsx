@@ -39,14 +39,17 @@ const Navbar = () => {
 
   return (
     <div className='z-10 fixed top-0 left-0 right-0 flex justify-between items-center px-8 py-3 text-md font-medium shadow-md bg-white'>
-      <Link to='/'>
-        <h1 className='text-2xl font-semibold'>watchqueue</h1>
-      </Link>
-      <div className='flex items-center'>
-        <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-
+      <div className='flex'>
+        <Link to='/'>
+          <h1 className='text-2xl font-semibold'>watchqueue</h1>
+        </Link>
         <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+      </div>
+      <div className='flex items-center'>
+
         <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+
+        <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
       </div>
     </div>
   )

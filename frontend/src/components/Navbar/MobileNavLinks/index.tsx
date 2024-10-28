@@ -25,20 +25,15 @@ const MobileNavLinks = ({ loading, isAuthed, handleLogout }: MobileNavLinksProps
             <ul className='flex-col items-center space-y-3 pt-4'>
               <li><Skeleton className="h-9 w-16" /></li>
               <li><Skeleton className="h-9 w-16" /></li>
-              <li><Skeleton className="h-9 w-20" /></li>
+              <li><Skeleton className="h-9 w-16" /></li>
             </ul>
           ) : isAuthed ? (
             // If user is authenticated, show logged-in navigation
             <ul className='flex-col items-center space-y-3 pt-4'>
-              <li>
-                <Link to='/'>Home</Link>
-              </li>
-              <li>
-                <Link to='/profile'>Profile</Link>
-              </li>
-              <li>
-                <Button variant="destructive" onClick={handleLogout}>Logout</Button>
-              </li>
+              {/* Main Navigation Links here */}
+              <li>Sample Nav 1</li>
+              <li>Sample Nav 2</li>
+              <li>Sample Nav 3</li>
             </ul>
           ) : (
             // If not authed, show login button
