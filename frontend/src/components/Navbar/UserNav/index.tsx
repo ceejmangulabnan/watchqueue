@@ -18,7 +18,7 @@ interface UserNavProps {
 const UserNav = ({ loading, isAuthed, handleLogout }: UserNavProps) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={'hidden md:flex' + (isAuthed ? '' : 'hidden')}>
+      <DropdownMenuTrigger className={'hidden md:flex ml-4' + (isAuthed ? '' : 'hidden')}>
         <Avatar>
           <AvatarImage></AvatarImage>
           <AvatarFallback></AvatarFallback>
