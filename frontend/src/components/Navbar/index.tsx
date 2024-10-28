@@ -47,7 +47,7 @@ const Navbar = () => {
       <div className='flex items-center'>
         <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
         <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-        <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+        <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} auth={auth} />
       </div>
     </div>
   )

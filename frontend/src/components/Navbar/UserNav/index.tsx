@@ -1,3 +1,5 @@
+import { LogOut, UserPen, Settings } from 'lucide-react'
+import { Auth } from '@/contexts/AuthProvider'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Link } from 'react-router-dom'
 import {
@@ -5,26 +7,35 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from '@/components/ui/skeleton'
 import LoginRegisterToggle from '@/components/LoginRegisterToggle'
-import { LogOut, UserPen, Settings } from 'lucide-react'
 
 interface UserNavProps {
   loading: boolean
   isAuthed: boolean
   handleLogout: () => Promise<void>
+  auth: Auth
 }
-const UserNav = ({ loading, isAuthed, handleLogout }: UserNavProps) => {
+
+const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
+
+  const generateAvatarFallback = () => {
+    if (isAuthed) {
+      return auth.username?.charAt(0)
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={'hidden md:flex ml-4' + (isAuthed ? '' : 'hidden')}>
         <Avatar>
           <AvatarImage></AvatarImage>
-          <AvatarFallback></AvatarFallback>
+          <AvatarFallback>{generateAvatarFallback()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className='px-4 py-2 mr-4 mt-4'>
         {loading ? (
           <ul className='flex-col items-center pt-4'>
             <li><Skeleton className="h-9 w-16" /></li>
@@ -45,6 +56,7 @@ const UserNav = ({ loading, isAuthed, handleLogout }: UserNavProps) => {
                 <Link to='/settings'>Settings</Link>
               </li>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem>
               <li onClick={handleLogout} className='flex gap-2 items-center'>
                 <LogOut size={20} />
