@@ -29,7 +29,7 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={'hidden md:flex ml-4' + (isAuthed ? '' : 'hidden')}>
+      <DropdownMenuTrigger className={(isAuthed ? 'hidden md:block' : 'hidden') + ' ml-4'}>
         <Avatar>
           <AvatarImage></AvatarImage>
           <AvatarFallback>{generateAvatarFallback()}</AvatarFallback>
