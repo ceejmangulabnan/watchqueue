@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
 import LoginRegisterToggle from '@/components/LoginRegisterToggle'
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
