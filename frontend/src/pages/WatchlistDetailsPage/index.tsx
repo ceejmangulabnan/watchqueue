@@ -5,23 +5,21 @@ import { WatchlistItemData } from '@/types/WatchlistTypes'
 import { MovieData } from '@/types/MovieTypes'
 import MovieItem from '@/components/Movies/MovieItem'
 
-
 const WatchlistDetailsPage = () => {
-  const { watchlistId, username } = useParams()
+  const { watchlistId } = useParams()
   const axiosPrivate = useAxiosPrivate()
-  console.log("watchlist ID: ", watchlistId, username)
 
   const fetchWatchlistDetails = async () => {
     const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
     return response.data as WatchlistItemData
   }
 
-  const { data: watchlistDetails } = useQuery({ queryKey: ['watchlistDetails'], queryFn: fetchWatchlistDetails })
-
   const fetchWatchlistItemDetails = async (movieId: number) => {
     const response = await axiosPrivate.get(`/movies/${movieId}`)
     return response.data as MovieData
   }
+
+  const { data: watchlistDetails } = useQuery({ queryKey: ['watchlistDetails'], queryFn: fetchWatchlistDetails })
 
   const watchlistItemsDetails = useQueries({
     queries: watchlistDetails ? watchlistDetails?.items.map(movieId => ({
@@ -32,23 +30,17 @@ const WatchlistDetailsPage = () => {
       : []
   })
 
-  console.log(watchlistItemsDetails)
-
   return (
     <div className="m-8 my-10">
-
-      <h3 className="text-xl font-semibold py-4 ">{watchlistDetails?.title}</h3>
+      <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4">
-
         {
-          watchlistItemsDetails &&
           watchlistItemsDetails.map(movieDetails => (
             movieDetails.data ?
               <MovieItem movie={movieDetails.data} />
               : null
           ))
         }
-
       </div>
     </div>
   )
