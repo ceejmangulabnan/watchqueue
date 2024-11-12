@@ -6,6 +6,8 @@ import LandingPage from "@/pages/LandingPage"
 import AuthProvider from "@/contexts/AuthProvider"
 import ProtectedRoute from "@/components/ProtectedRoute"
 import Navbar from "@/components/Navbar"
+import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
+import WatchlistDetails from '@/components/WatchlistDetails'
 
 const queryClient = new QueryClient()
 
@@ -20,6 +22,10 @@ const App = () => {
               <Route path="/" element={<LandingPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
+
+                <Route path=":username/watchlist" element={<WatchlistDetailsPage />}>
+                  <Route path=':watchlistId' element={<WatchlistDetails />}></Route>
+                </Route>
               </Route>
             </Routes>
           </AuthProvider>

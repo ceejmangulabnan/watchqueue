@@ -1,4 +1,3 @@
-import uvicorn
 from typing import Annotated
 import requests
 import os
@@ -7,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from db.database import engine
 from db import models
-from routers import users, watchlists
+from routers import users, watchlists, movies
 from routers.users import get_current_user
 
 load_dotenv()
@@ -31,14 +30,6 @@ origins = [
     "https://watchqueue.netlify.app",
 ]
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-#     allow_headers=["*"]
-# )
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -49,6 +40,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(watchlists.router)
+app.include_router(movies.router)
 # Creates Database Tables from models schema
 
 user_dependency = Annotated[dict, Depends(get_current_user)]

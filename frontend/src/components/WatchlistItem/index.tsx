@@ -3,10 +3,20 @@ import { WatchlistItemProps } from '../../types/WatchlistTypes'
 import { Card, CardFooter, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Ellipsis, Pencil, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 
 const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
+  const navigate = useNavigate()
+  const { auth } = useAuth()
+
+
+  const handleClick = () => {
+    navigate(`/${auth.username}/watchlist/${id}`)
+  }
+
   return (
-    <Card className="overflow-hidden relative">
+    <Card onClick={handleClick} className="overflow-hidden relative">
       <DropdownMenu>
         <DropdownMenuTrigger asChild className='absolute right-2 top-2'>
           <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
