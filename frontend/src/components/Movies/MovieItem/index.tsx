@@ -101,8 +101,8 @@ const MovieItem = ({ movie }: MovieItemProps) => {
 
       <img src={generatePosterLink(movie.poster_path)} />
       <CardFooter className="flex-col items-start p-4">
-        <CardTitle>{movie.title}</CardTitle>
-        <CardDescription>{movie.release_date}</CardDescription>
+        <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
+        <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
       </CardFooter>
       <Toaster></Toaster>
     </Card>
