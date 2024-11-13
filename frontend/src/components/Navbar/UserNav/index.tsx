@@ -35,7 +35,7 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
           <AvatarFallback>{generateAvatarFallback()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='px-4 py-2 mr-4 mt-4'>
+      <DropdownMenuContent className='w-40 mr-4 mt-4 flex justify-center'>
         {loading ? (
           <ul className='flex-col items-center pt-4'>
             <li><Skeleton className="h-9 w-16" /></li>
@@ -43,7 +43,7 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
             <li><Skeleton className="h-9 w-20" /></li>
           </ul>
         ) : isAuthed ? (
-          <ul className='flex-col items-center text-md font-medium'>
+          <ul className='flex-col items-center text-md font-medium w-full'>
             <DropdownMenuItem>
               <li className='flex items-center gap-2'>
                 <UserPen size={20} />
@@ -58,9 +58,9 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <li onClick={handleLogout} className='flex gap-2 items-center'>
-                <LogOut size={20} />
-                LogOut
+              <li onClick={handleLogout} className='flex gap-2 items-center text-red-500'>
+                <LogOut size={20} color='red' />
+                Log out
               </li>
             </DropdownMenuItem>
           </ul>
