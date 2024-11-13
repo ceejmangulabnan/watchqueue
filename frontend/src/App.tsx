@@ -22,7 +22,6 @@ const App = () => {
               <Route path="/" element={<LandingPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
-
                 <Route path=":username/watchlist" element={<WatchlistDetailsPage />}>
                   <Route path=':watchlistId' element={<WatchlistDetails />}></Route>
                 </Route>
