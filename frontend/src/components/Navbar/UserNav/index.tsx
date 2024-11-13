@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from '@/components/ui/skeleton'
 import LoginRegisterToggle from '@/components/LoginRegisterToggle'
+import { useState } from 'react'
 
 interface UserNavProps {
   loading: boolean
@@ -20,6 +21,7 @@ interface UserNavProps {
 }
 
 const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
+  const [isOpen, setIsOpen] = useState(false)
 
   const generateAvatarFallback = () => {
     if (isAuthed) {
@@ -28,7 +30,7 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger className={(isAuthed ? 'hidden md:block' : 'hidden') + ' ml-4'}>
         <Avatar>
           <AvatarImage></AvatarImage>
@@ -47,18 +49,18 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
             <DropdownMenuItem>
               <li className='flex items-center gap-2'>
                 <UserPen size={20} />
-                <Link to='/profile'>Profile</Link>
+                <Link to='/profile' onClick={() => setIsOpen(false)}>Profile</Link>
               </li>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <li className='flex items-center gap-2'>
                 <Settings size={20} />
-                <Link to='/settings'>Settings</Link>
+                <Link to='/settings' onClick={() => setIsOpen(false)}>Settings</Link>
               </li>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <li onClick={handleLogout} className='flex gap-2 items-center text-red-500'>
+              <li onClick={async () => { await handleLogout(); setIsOpen(false); }} className='flex gap-2 items-center text-red-500'>
                 <LogOut size={20} color='red' />
                 Log out
               </li>
