@@ -40,7 +40,7 @@ const Watchlists = () => {
   }
 
   return (
-    <div className="m-8 my-10">
+    <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
       <div className="flex justify-between items-center py-6">
         <h3 className="text-xl font-semibold">Your Watchlists</h3>
         <Popover>
@@ -56,7 +56,7 @@ const Watchlists = () => {
           </PopoverContent>
         </Popover>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
         { /* If the user has no watchlists, display "no watchlists", else render userWatchlists */}
         {
           userWatchlists && userWatchlists.length === 0
