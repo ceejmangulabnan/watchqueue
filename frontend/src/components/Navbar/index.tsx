@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import useRefreshUser from '@/hooks/useRefreshUser'
 import NavLinks from '@/components/Navbar/NavLinks'
 import MobileNavLinks from '@/components/Navbar/MobileNavLinks'
+import UserNav from '@/components/Navbar/UserNav'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
@@ -30,19 +31,27 @@ const Navbar = () => {
     const response = await axiosPrivate.post("/users/logout")
     if (response.status == 200) {
       setAuth({ ...auth, id: null, username: null, accessToken: null })
-      navigate("/", { replace: true })
+      navigate(0)
     }
   }
 
   const isAuthed = auth && !Object.values(auth).includes(null)
 
   return (
-    <div className='z-10 fixed top-0 left-0 right-0 flex justify-between items-center px-8 py-3 text-md font-medium shadow-md bg-white'>
-      <Link to='/'>
-        <h1 className='text-2xl font-semibold'>watchqueue</h1>
-      </Link>
-      <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-      <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+    <div className='z-10 fixed top-0 left-0 right-0 flex items-center justify-center px-10 md:px-20 py-3 text-md font-medium shadow-md bg-white'>
+      <div className='w-full 2xl:max-w-[1600px] flex justify-between items-center'>
+        <div className=''>
+          <Link to='/'>
+            <h1 className='text-2xl font-semibold'>watchqueue</h1>
+          </Link>
+        </div>
+        <div className='flex items-center'>
+          <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+          <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
+          <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} auth={auth} />
+        </div>
+
+      </div>
     </div>
   )
 }

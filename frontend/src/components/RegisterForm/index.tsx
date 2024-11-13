@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from 'react-router-dom'
 
 interface RegisterFormProps {
   toggleForm: () => void
@@ -22,6 +23,7 @@ interface RegisterFormProps {
 const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth, setAuth } = useAuth()
+  const navigate = useNavigate()
   const registerFormSchema = z.object({
     username: z.string().min(4).regex(/^[a-zA-Z0-9]{4,}$/, 'Username must be at least 4 characters long without special characters'),
     password: z.string().min(8).regex(/^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/, 'Password must include at least 1 uppercase and lowercase letter, 1 number, and 1 special character'),
@@ -56,6 +58,7 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
       console.error(error)
     } finally {
       registerForm.reset()
+      navigate(0)
     }
   }
 

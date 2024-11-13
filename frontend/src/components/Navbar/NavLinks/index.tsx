@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
 import LoginRegisterToggle from '@/components/LoginRegisterToggle'
 
 interface NavLinksProps {
@@ -9,15 +8,13 @@ interface NavLinksProps {
   handleLogout: () => Promise<void>
 }
 
-const NavLinks = ({ loading, isAuthed, handleLogout }: NavLinksProps) => {
+const NavLinks = ({ loading, isAuthed }: NavLinksProps) => {
   return (
-    <nav className='hidden md:flex'>
+    <nav className='hidden md:flex ml-6'>
       {loading ? (
         // Render skeleton while fetching updated auth state
         <ul className='flex items-center gap-3'>
           <li><Skeleton className="h-9 w-16" /></li>
-          <li><Skeleton className="h-9 w-16" /></li>
-          <li><Skeleton className="h-9 w-20" /></li>
         </ul>
       ) : isAuthed ? (
         // If user is authenticated, show logged-in navigation
@@ -25,16 +22,10 @@ const NavLinks = ({ loading, isAuthed, handleLogout }: NavLinksProps) => {
           <li>
             <Link to='/'>Home</Link>
           </li>
-          <li>
-            <Link to='/profile'>Profile</Link>
-          </li>
-          <li>
-            <Button variant="destructive" onClick={handleLogout}>Logout</Button>
-          </li>
         </ul>
       ) : (
         // If not authed, show login button
-        <ul className='flex items-center gap-3'>
+        <ul className='flex items-center justify-between gap-3'>
           <li>
             <Link to='/'>Home</Link>
           </li>
