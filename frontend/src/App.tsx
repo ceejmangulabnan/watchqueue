@@ -8,6 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute"
 import Navbar from "@/components/Navbar"
 import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
 import WatchlistDetails from '@/components/WatchlistDetails'
+import MovieDetailsPage from '@/pages/MovieDetailsPage'
 
 const queryClient = new QueryClient()
 
@@ -25,6 +26,7 @@ const App = () => {
                 <Route path=":username/watchlist" element={<WatchlistDetailsPage />}>
                   <Route path=':watchlistId' element={<WatchlistDetails />}></Route>
                 </Route>
+                <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
               </Route>
             </Routes>
           </AuthProvider>

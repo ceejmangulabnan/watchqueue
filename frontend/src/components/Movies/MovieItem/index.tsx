@@ -11,6 +11,7 @@ import { WatchlistItemData } from '@/types/WatchlistTypes'
 import { MovieData } from "@/types/MovieTypes"
 import { Ellipsis, CirclePlus } from 'lucide-react'
 import { AxiosError } from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 interface MovieItemProps {
   movie: MovieData
@@ -21,6 +22,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
   const { auth } = useAuth()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
@@ -99,7 +101,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <img src={generatePosterLink(movie.poster_path)} />
+      <img onClick={() => navigate(`/movie/${movie.id}`)} src={generatePosterLink(movie.poster_path)} />
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
