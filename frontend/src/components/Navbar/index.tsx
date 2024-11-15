@@ -6,6 +6,7 @@ import useRefreshUser from '@/hooks/useRefreshUser'
 import NavLinks from '@/components/Navbar/NavLinks'
 import MobileNavLinks from '@/components/Navbar/MobileNavLinks'
 import UserNav from '@/components/Navbar/UserNav'
+import SearchBar from '@/components/SearchBar'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
@@ -45,6 +46,7 @@ const Navbar = () => {
             <h1 className='text-2xl font-semibold'>watchqueue</h1>
           </Link>
         </div>
+        <SearchBar />
         <div className='flex items-center'>
           <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
           <MobileNavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
