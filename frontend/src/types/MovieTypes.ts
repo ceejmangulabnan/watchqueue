@@ -57,3 +57,10 @@ export interface MovieDataQuery {
   total_pages: number
   total_results: number
 }
+
+export interface RecommendedMovies {
+  page: number
+  results: MovieDetails[]
+  total_pages: number
+  total_results: number
+}
