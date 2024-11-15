@@ -23,25 +23,25 @@ const MovieDetailsPage = () => {
   if (isError) return <p>Error fetching movie details.</p>
 
   return movieDetails ? (
-    <div className="flex mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]">
-      <img className='mr-4 max-w-[300px]' src={generatePosterLink(movieDetails.poster_path)} alt={movieDetails.title} />
+    <div className="flex mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
+      <img className='mr-8 max-w-[300px] rounded-lg' src={generatePosterLink(movieDetails.poster_path)} alt={movieDetails.title} />
 
-      <div className='flex flex-col'>
-        <div className='flex gap-2 items-center'>
-          <h3 className='text-2xl font-bold'>{movieDetails.title}</h3>
-          <h4 className='text-xl font-semibold text-gray-500'>{movieDetails.release_date.slice(0, 4)}</h4>
+      <div className='flex flex-col p-4'>
+        <div className='flex gap-4 items-end'>
+          <h3 className='text-3xl font-bold font-merriweather'>{movieDetails.title}</h3>
+          <h4 className='text-xl font-medium text-gray-500'>{movieDetails.release_date.slice(0, 4)}</h4>
         </div>
-        <div className='flex'>
-          <p>{movieDetails.runtime} mins ·</p>
-          <p className='flex gap-2 ml-2 font-semibold'>{movieDetails.genres.map(genre => (
+        <div className='flex mt-2'>
+          <p>{movieDetails.runtime} mins<span className='mx-2'>·</span></p>
+          <p className='flex gap-2 font-semibold'>{movieDetails.genres.map(genre => (
             <p>{genre.name}</p>
           ))}</p>
           <p className='ml-2'>{movieDetails.id}</p>
         </div>
-        <div className='flex flex-col h-full justify-between'>
+        <div className='flex flex-col mt-4 gap-8'>
           <div>
-            <p className='mt-4 tracking-wider text-lg italic'>"{movieDetails.tagline}"</p>
-            <p className='mt-2 text-lg '>{movieDetails.overview}</p>
+            <p className='mt-4 tracking-wider text-lg italic font-medium'>"{movieDetails.tagline}"</p>
+            <p className='mt-2 text-lg max-w-[600px]'>{movieDetails.overview}</p>
           </div>
           <Button className='max-w-[200px] text-lg '>Add to Watchlist</Button>
         </div>
