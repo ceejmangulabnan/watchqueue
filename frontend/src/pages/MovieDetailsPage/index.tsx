@@ -4,10 +4,15 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { MovieDetails } from '@/types/MovieTypes'
 import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
+import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
+import { useAuth } from '@/hooks/useAuth'
+import { WatchlistItemData } from '@/types/WatchlistTypes'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const axiosPrivate = useAxiosPrivate()
+  const { auth } = useAuth()
 
   const fetchMovieDetails = async () => {
     const response = await axiosPrivate.get(`/movies/${movieId}`)
@@ -18,6 +23,13 @@ const MovieDetailsPage = () => {
     queryKey: ["movieDetails", movieId],
     queryFn: fetchMovieDetails,
   })
+
+  const fetchUserWatchlists = async () => {
+    const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
+    return response.data as WatchlistItemData[]
+  }
+
+  const { data: userWatchlists } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })
 
   if (isLoading) return <p>Loading...</p>
   if (isError) return <p>Error fetching movie details.</p>
@@ -43,7 +55,18 @@ const MovieDetailsPage = () => {
             <p className='mt-4 tracking-wider text-lg italic font-medium'>"{movieDetails.tagline}"</p>
             <p className='mt-2 text-lg max-w-[600px]'>{movieDetails.overview}</p>
           </div>
-          <Button className='max-w-[200px] text-lg '>Add to Watchlist</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className='max-w-[200px] text-lg '>Add to Watchlist</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side={"right"}>
+              {
+                userWatchlists &&
+                <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movieDetails} />
+              }
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
       </div>
     </div>

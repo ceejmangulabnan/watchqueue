@@ -1,17 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Toaster } from '@/components/ui/toaster'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/use-toast'
 import { WatchlistItemData } from '@/types/WatchlistTypes'
 import { MovieData } from "@/types/MovieTypes"
 import { Ellipsis, CirclePlus } from 'lucide-react'
-import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
+import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 
 interface MovieItemProps {
   movie: MovieData
@@ -20,8 +18,6 @@ interface MovieItemProps {
 const MovieItem = ({ movie }: MovieItemProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
-  const queryClient = useQueryClient()
-  const { toast } = useToast()
   const navigate = useNavigate()
 
   const fetchUserWatchlists = async () => {
@@ -31,43 +27,6 @@ const MovieItem = ({ movie }: MovieItemProps) => {
 
   const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })
 
-  const addToWatchlist = async ({ watchlistId, movieId }: { watchlistId: number, movieId: number }) => {
-    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { movie_id: movieId })
-    return response.data
-  }
-
-  const mutation = useMutation({
-    mutationFn: addToWatchlist,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userWatchlists'] }),
-        toast({
-          title: "Success",
-          description: `Movie "${movie.title}" has been added to your watchlist.`,
-          variant: "success",
-        })
-    },
-    onError: (error: AxiosError) => {
-      // 409 Conflict means movie item is already in watchlist
-      if (error.response?.status === 409) {
-        toast({
-          title: "Duplicate",
-          description: "Movie is already in the watchlist.",
-          variant: "destructive",
-        })
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to add the movie to the watchlist.",
-          variant: "destructive",
-        })
-      }
-    }
-  })
-
-  const handleAddToWatchlist = (watchlistId: number) => {
-    mutation.mutate({ watchlistId, movieId: movie.id })
-  }
-
   return (
     <Card className="overflow-hidden relative">
       <DropdownMenu>
@@ -76,7 +35,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
             <Ellipsis color='#000000' size={16} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-[12rem]'>
+        <DropdownMenuContent className='w-[12rem]' side={"right"}>
           <DropdownMenuGroup>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
@@ -86,13 +45,8 @@ const MovieItem = ({ movie }: MovieItemProps) => {
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
                   {
-                    /* Map over user watchlists */
                     userWatchlists &&
-                    userWatchlists.map(watchlist => (
-                      <DropdownMenuItem key={watchlist.id} onClick={() => handleAddToWatchlist(watchlist.id)}>
-                        {watchlist.title}
-                      </DropdownMenuItem>
-                    ))
+                    <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
                   }
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
@@ -106,8 +60,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
       </CardFooter>
-      <Toaster></Toaster>
-    </Card>
+    </Card >
   )
 }
 

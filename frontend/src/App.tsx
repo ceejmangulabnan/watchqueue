@@ -5,6 +5,7 @@ import ProfilePage from '@/pages/ProfilePage'
 import LandingPage from "@/pages/LandingPage"
 import AuthProvider from "@/contexts/AuthProvider"
 import ProtectedRoute from "@/components/ProtectedRoute"
+import { Toaster } from '@/components/ui/toaster'
 import Navbar from "@/components/Navbar"
 import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
 import WatchlistDetails from '@/components/WatchlistDetails'
@@ -33,6 +34,7 @@ const App = () => {
         </BrowserRouter>
         <ReactQueryDevtools />
       </QueryClientProvider>
+      <Toaster></Toaster>
     </div>
   )
 }
