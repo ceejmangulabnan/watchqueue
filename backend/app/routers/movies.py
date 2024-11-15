@@ -1,6 +1,4 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from starlette import status
+from fastapi import APIRouter
 import os
 from dotenv import load_dotenv
 import requests
@@ -22,16 +20,12 @@ async def movies():
 @router.get("/{movie_id}")
 async def get_movie_details(movie_id: int):
     response = requests.get(f"{BASE_URL}/movie/{movie_id}?api_key={API_KEY}")
+    return response.json()
 
-    data = response.json()
-
-    # if not data["success"]:
-    #     raise HTTPException(status_code=404)
-    #
-    # else:
-        # return data 
-
-    return data 
+@router.get("/{movie_id}/recommendations")
+async def get_movie_recommendations(movie_id: int):
+    response = requests.get(f"{BASE_URL}/movie/{movie_id}/recommendations?api_key={API_KEY}")
+    return response.json()
 
 
 

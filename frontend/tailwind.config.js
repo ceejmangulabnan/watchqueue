@@ -57,8 +57,8 @@ export default {
 			},
 			fontFamily: {
 				fira: ['Fira Sans', 'sans-serif'],
-				lato: ['Lato', 'sans-serif']
-
+				lato: ['Lato', 'sans-serif'],
+				merriweather: ['Merriweather', 'serif']
 			}
 		}
 	},
