@@ -11,6 +11,7 @@ import { Ellipsis, CirclePlus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { useState } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface MovieItemProps {
   movie: MovieData
@@ -31,6 +32,18 @@ const MovieItem = ({ movie }: MovieItemProps) => {
 
   const handlePosterError = () => {
     setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-start">
+        <Skeleton className="h-[18rem] w-full" />
+        <div className="mt-4 space-y-2 h-20 w-full">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+      </div>
+    )
   }
 
   return (
