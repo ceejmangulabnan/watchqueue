@@ -9,11 +9,13 @@ import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDro
 import { useAuth } from '@/hooks/useAuth'
 import { WatchlistItemData } from '@/types/WatchlistTypes'
 import RecommendedMovies from '@/components/RecommendedMovies'
+import { useState } from 'react'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
+  const [posterLink, setPosterLink] = useState<string | undefined>(() => generatePosterLink(movieDetails.poster_path))
 
   const fetchMovieDetails = async () => {
     const response = await axiosPrivate.get(`/movies/${movieId}`)
@@ -54,7 +56,7 @@ const MovieDetailsPage = () => {
           </div>
           <div className='flex flex-col mt-4 gap-8'>
             <div>
-              <p className='mt-4 tracking-wider text-lg italic font-medium'>"{movieDetails.tagline}"</p>
+              <p className={`mt-4 tracking-wider text-lg italic font-medium ${movieDetails.tagline ? '' : 'hidden'}`}>"{movieDetails.tagline}"</p>
               <p className='mt-2 text-lg max-w-[600px]'>{movieDetails.overview}</p>
             </div>
             <DropdownMenu>
