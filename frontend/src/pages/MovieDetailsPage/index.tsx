@@ -15,11 +15,13 @@ const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
-  const [posterLink, setPosterLink] = useState<string | undefined>(() => generatePosterLink(movieDetails.poster_path))
+  const [posterLink, setPosterLink] = useState<string | undefined>('')
 
   const fetchMovieDetails = async () => {
     const response = await axiosPrivate.get(`/movies/${movieId}`)
-    return response.data as MovieDetails
+    const data = await response.data as MovieDetails
+    setPosterLink(generatePosterLink(data.poster_path))
+    return data
   }
 
   const { data: movieDetails, isLoading, isError } = useQuery({
@@ -34,13 +36,17 @@ const MovieDetailsPage = () => {
 
   const { data: userWatchlists } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })
 
+  const handlePosterError = () => {
+    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
+  }
+
   if (isLoading) return <p>Loading...</p>
   if (isError) return <p>Error fetching movie details.</p>
 
   return movieDetails ? (
     <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
       <div className='flex py-8'>
-        <img className='mr-8 max-w-[300px] rounded-lg' src={generatePosterLink(movieDetails.poster_path)} alt={movieDetails.title} />
+        <img className='mr-8 max-w-[300px] rounded-lg' src={posterLink} alt={movieDetails.title} onError={handlePosterError} />
 
         <div className='flex flex-col p-4'>
           <div className='flex gap-4 items-end'>
