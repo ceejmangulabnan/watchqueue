@@ -33,7 +33,7 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
 
   return (
     <div className='flex ml-4 items-center'>
-      <Avatar className='cursor-pointer' onClick={() => navigate('/profile')}>
+      <Avatar className={`${isAuthed ? 'flex' : 'hidden'} cursor-pointer`} onClick={() => navigate('/profile')}>
         <AvatarImage></AvatarImage>
         <AvatarFallback>{generateAvatarFallback()}</AvatarFallback>
       </Avatar>
