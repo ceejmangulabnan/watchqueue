@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from db.database import engine
 from db import models
-from routers import users, watchlists, movies
+from routers import users, watchlists, movies, search
 from routers.users import get_current_user
 
 load_dotenv()
@@ -41,6 +41,8 @@ app.add_middleware(
 app.include_router(users.router)
 app.include_router(watchlists.router)
 app.include_router(movies.router)
+app.include_router(search.router)
+
 # Creates Database Tables from models schema
 
 user_dependency = Annotated[dict, Depends(get_current_user)]

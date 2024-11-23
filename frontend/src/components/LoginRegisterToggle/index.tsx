@@ -2,7 +2,7 @@ import { useState } from "react"
 import LoginForm from "@/components/LoginForm"
 import RegisterForm from "@/components/RegisterForm"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
-import { LogIn } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 // Handles the switching between the login and register forms
 const LoginRegisterToggle = () => {
@@ -23,8 +23,7 @@ const LoginRegisterToggle = () => {
       <Dialog>
         <DialogTrigger asChild>
           <div className='flex items-center gap-2'>
-            <LogIn size={20} />
-            <button onClick={loginButtonToggle}>Login</button>
+            <Button onClick={loginButtonToggle}>Login</Button>
           </div>
         </DialogTrigger>
         <DialogContent>

@@ -33,13 +33,13 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
 
   return (
     <div className='flex ml-4 items-center'>
-      <Avatar className='cursor-pointer' onClick={() => navigate('/profile')}>
+      <Avatar className={`${isAuthed ? 'flex' : 'hidden'} cursor-pointer`} onClick={() => navigate('/profile')}>
         <AvatarImage></AvatarImage>
         <AvatarFallback>{generateAvatarFallback()}</AvatarFallback>
       </Avatar>
 
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger className={(isAuthed ? 'hidden md:flex ' : 'hidden ') + 'ml-2 items-center justify-center hover:bg-gray-100 rounded-full w-6 h-6'}>
+        <DropdownMenuTrigger className={(isAuthed ? 'flex ' : 'hidden ') + 'ml-2 items-center justify-center hover:bg-gray-100 rounded-full w-6 h-6'}>
           <ChevronDown />
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-40 mr-4 mt-4 flex justify-center'>

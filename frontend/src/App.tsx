@@ -10,6 +10,8 @@ import Navbar from "@/components/Navbar"
 import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
 import WatchlistDetails from '@/components/WatchlistDetails'
 import MovieDetailsPage from '@/pages/MovieDetailsPage'
+import SearchResultsPage from '@/pages/SearchResultsPage'
+import MovieSearchResults from '@/pages/SearchResultsPage/MovieSearchResults'
 
 const queryClient = new QueryClient()
 
@@ -28,6 +30,9 @@ const App = () => {
                   <Route path=':watchlistId' element={<WatchlistDetails />}></Route>
                 </Route>
                 <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
+              </Route>
+              <Route path="/search" element={<SearchResultsPage />}>
+                <Route path="movie" element={<MovieSearchResults />} />
               </Route>
             </Routes>
           </AuthProvider>

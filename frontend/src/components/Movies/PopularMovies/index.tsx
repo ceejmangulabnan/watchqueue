@@ -15,7 +15,7 @@ const PopularMovies = () => {
   return (
     <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
       <h3 className="text-xl font-semibold py-4 ">Popular Movies</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8  gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
         {
           popularMovies?.results.map(movie => (
             <MovieItem movie={movie} key={movie.id} />

@@ -10,6 +10,8 @@ import { MovieData } from "@/types/MovieTypes"
 import { Ellipsis, CirclePlus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
+import { useState } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface MovieItemProps {
   movie: MovieData
@@ -19,6 +21,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
   const navigate = useNavigate()
+  const [posterLink, setPosterLink] = useState(() => generatePosterLink(movie.poster_path))
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
@@ -26,6 +29,22 @@ const MovieItem = ({ movie }: MovieItemProps) => {
   }
 
   const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })
+
+  const handlePosterError = () => {
+    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-start">
+        <Skeleton className="h-[18rem] w-full" />
+        <div className="mt-4 space-y-2 h-20 w-full">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Card className="overflow-hidden relative">
@@ -55,7 +74,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <img onClick={() => navigate(`/movie/${movie.id}`)} src={generatePosterLink(movie.poster_path)} />
+      <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
