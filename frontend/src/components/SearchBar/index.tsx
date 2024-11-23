@@ -20,7 +20,7 @@ const SearchBar = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <Input placeholder='Search...' className='w-[400px]' value={searchQuery} onChange={handleChange} />
+        <Input placeholder='Search...' className='max-w-[400px]' value={searchQuery} onChange={handleChange} />
       </form>
     </div>
   )
