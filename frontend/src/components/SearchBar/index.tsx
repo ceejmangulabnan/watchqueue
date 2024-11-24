@@ -18,9 +18,9 @@ const SearchBar = () => {
   }
 
   return (
-    <div>
+    <div className='flex-1 min-w-[100px] max-w-[600px]'>
       <form onSubmit={handleSubmit}>
-        <Input placeholder='Search...' className='max-w-[400px]' value={searchQuery} onChange={handleChange} />
+        <Input placeholder='Search...' className='' value={searchQuery} onChange={handleChange} />
       </form>
     </div>
   )

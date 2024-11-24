@@ -42,7 +42,8 @@ const Navbar = () => {
       <div className='w-full 2xl:max-w-[1600px] flex justify-between items-center'>
         <div className='mr-6'>
           <Link to='/'>
-            <h1 className='text-xl md:text-2xl font-semibold'>watchqueue</h1>
+            <h1 className='hidden md:block text-xl  md:text-2xl font-semibold'>watchqueue</h1>
+            <h1 className='text-2xl md:hidden font-bold'>wq</h1>
           </Link>
         </div>
         <SearchBar />
