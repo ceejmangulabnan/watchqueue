@@ -1,19 +1,28 @@
-import axios from "../api/axios"
-import { useAuth } from "./useAuth"
+import { useAuth } from '@/hooks/useAuth'
+import { AxiosError } from 'axios'
+import axios from '@/api/axios'
 
 const useRefreshToken = () => {
   const { setAuth } = useAuth()
 
   const refresh = async () => {
-    const response = await axios.get('/users/refresh', {
-      withCredentials: true
-    })
+    try {
+      const response = await axios.get('/users/refresh', {
+        withCredentials: true
+      })
 
-    setAuth(auth => {
-      return { ...auth, accessToken: response.data.access_token }
+      setAuth(auth => {
+        return { ...auth, accessToken: response.data.access_token }
+      })
 
-    })
-    return response.data.access_token
+      return response.data.access_token
+
+    } catch (error) {
+      if (error instanceof AxiosError && error.status === 401) {
+        return null
+      }
+    }
+
   }
 
   return refresh

@@ -15,17 +15,14 @@ const Navbar = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const initAuthCheck = async () => {
-      try {
-        await refreshUser()
-      } catch (error) {
-        console.error("Error refreshing user data", error)
-      } finally {
-        setLoading(false)
-      }
+    const initAuth = async () => {
+      await refreshUser()
+      setLoading(false)
     }
-    initAuthCheck()
-  }, [refreshUser])
+
+    initAuth()
+  }, [])
+
 
   const handleLogout = async () => {
     const response = await axiosPrivate.post("/users/logout")
