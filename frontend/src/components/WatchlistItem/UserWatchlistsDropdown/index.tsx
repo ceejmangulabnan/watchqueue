@@ -56,11 +56,11 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
   }
 
   return (
-    <div>
+    <div className='text-sm md:text-base'>
       {
         userWatchlists &&
         userWatchlists.map(watchlist => (
-          <DropdownMenuItem className='text-md max-w-[150px]' key={watchlist.id} onClick={() => handleAddToWatchlist(watchlist.id)}>
+          <DropdownMenuItem className='text-sm md:text-base max-w-[150px]' key={watchlist.id} onClick={() => handleAddToWatchlist(watchlist.id)}>
             {watchlist.title}
           </DropdownMenuItem>
         ))

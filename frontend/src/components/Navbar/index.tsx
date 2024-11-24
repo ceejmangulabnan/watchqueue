@@ -15,17 +15,14 @@ const Navbar = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const initAuthCheck = async () => {
-      try {
-        await refreshUser()
-      } catch (error) {
-        console.error("Error refreshing user data", error)
-      } finally {
-        setLoading(false)
-      }
+    const initAuth = async () => {
+      await refreshUser()
+      setLoading(false)
     }
-    initAuthCheck()
-  }, [refreshUser])
+
+    initAuth()
+  }, [])
+
 
   const handleLogout = async () => {
     const response = await axiosPrivate.post("/users/logout")
@@ -42,7 +39,8 @@ const Navbar = () => {
       <div className='w-full 2xl:max-w-[1600px] flex justify-between items-center'>
         <div className='mr-6'>
           <Link to='/'>
-            <h1 className='text-xl md:text-2xl font-semibold'>watchqueue</h1>
+            <h1 className='hidden md:block text-xl  md:text-2xl font-semibold'>watchqueue</h1>
+            <h1 className='text-2xl md:hidden font-bold'>wq</h1>
           </Link>
         </div>
         <SearchBar />

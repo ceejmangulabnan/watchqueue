@@ -38,7 +38,7 @@ const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
       </DropdownMenu>
       <img src="https://placehold.co/400x600" alt="" />
       <CardFooter className="flex-col items-start p-4">
-        <CardTitle className='text-md font-medium'>{title}</CardTitle>
+        <CardTitle className='text-sm md:text-base font-medium'>{title}</CardTitle>
       </CardFooter>
     </Card>
   )

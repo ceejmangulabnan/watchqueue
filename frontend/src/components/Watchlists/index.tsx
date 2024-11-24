@@ -43,11 +43,11 @@ const Watchlists = () => {
 
   return (
     <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
-      <div className="flex justify-between items-center py-6">
-        <h3 className="text-xl font-semibold">Your Watchlists</h3>
+      <div className="flex justify-between items-center py-4 pb-6">
+        <h3 className="text-base md:text-xl font-semibold">Your Watchlists</h3>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button variant={"secondary"}>Create Watchlist</Button>
+            <Button variant={"secondary"} className='text-sm md:text-base'>Create Watchlist</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -64,11 +64,8 @@ const Watchlists = () => {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
         {
-          userWatchlists && userWatchlists.length === 0
+          userWatchlists?.length
             ? (
-              <div>No watchlists</div>
-            )
-            : (
               userWatchlists?.map((watchlist: WatchlistItemData) => (
                 <WatchlistItem
                   key={watchlist.id}
@@ -80,6 +77,9 @@ const Watchlists = () => {
                   handleDelete={handleDelete}
                 />
               ))
+            )
+            : (
+              <div>No watchlists</div>
             )
         }
       </div>
