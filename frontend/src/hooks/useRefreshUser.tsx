@@ -1,7 +1,6 @@
 // Responsible for checking refresh token and retrieving data on site refresh or inital render
 import useRefreshToken from '@/hooks/useRefreshToken'
-import { useAuth } from "./useAuth"
-// import axios from "../api/axios"
+import { useAuth } from '@/hooks/useAuth'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { AxiosError } from 'axios'
 
