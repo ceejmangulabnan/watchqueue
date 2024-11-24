@@ -58,7 +58,7 @@ export interface MovieDataQuery {
   total_results: number
 }
 
-export interface RecommendedMovies {
+export interface RecommendedMoviesData {
   page: number
   results: MovieDetails[]
   total_pages: number

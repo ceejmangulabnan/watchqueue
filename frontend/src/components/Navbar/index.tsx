@@ -6,14 +6,12 @@ import useRefreshUser from '@/hooks/useRefreshUser'
 import NavLinks from '@/components/Navbar/NavLinks'
 import UserNav from '@/components/Navbar/UserNav'
 import SearchBar from '@/components/SearchBar'
-import useRefreshToken from '@/hooks/useRefreshToken'
 
 const Navbar = () => {
   const axiosPrivate = useAxiosPrivate()
   const { auth, setAuth } = useAuth()
   const [loading, setLoading] = useState(true)
   const refreshUser = useRefreshUser()
-  // const refresh = useRefreshToken()
   const navigate = useNavigate()
 
   useEffect(() => {
