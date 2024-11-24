@@ -1,0 +1,19 @@
+@use '../../styles/variables' as *;
+
+.movie-item {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  &__title {
+    font-size: $fs-400;
+    padding: 0.5rem 0;
+    font-weight: $fw-500;
+  }
+
+  &__poster {
+    width: 10rem;
+    border-radius: 0.4rem;
+
+  }
+}
