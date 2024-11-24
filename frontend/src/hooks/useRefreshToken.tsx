@@ -1,14 +1,13 @@
 import { useAuth } from '@/hooks/useAuth'
 import { AxiosError } from 'axios'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axios from '@/api/axios'
 
 const useRefreshToken = () => {
   const { setAuth } = useAuth()
-  const axiosPrivate = useAxiosPrivate()
 
   const refresh = async () => {
     try {
-      const response = await axiosPrivate.get('/users/refresh', {
+      const response = await axios.get('/users/refresh', {
         withCredentials: true
       })
 
