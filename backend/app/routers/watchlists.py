@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
+from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
+from starlette.types import Message
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
@@ -36,15 +38,20 @@ async def create_watchlist(
             raise HTTPException(status_code=500, detail=str(e))
 
 
+async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
+    watchlist_query = select(Watchlists).where(
+            Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
+        )
+    result = db.execute(watchlist_query)
+    watchlist = result.scalar()
+    return watchlist
+
+
 @router.get("/{watchlist_id}")
 async def get_watchlist(user: user_dependency, db: db_dependency, watchlist_id: int):
     if user:
         try:
-            watchlist_query = select(Watchlists).where(
-                Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
-            )
-            result = db.execute(watchlist_query)
-            watchlist = result.scalar()
+            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
 
             if watchlist is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -122,11 +129,7 @@ async def add_to_watchlist(
 ):
     if user:
         try:
-            watchlist_query = select(Watchlists).where(
-                Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
-            )
-            result = db.execute(watchlist_query)
-            watchlist = result.scalar()
+            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
 
             if watchlist is None:
                 raise HTTPException(
@@ -149,3 +152,32 @@ async def add_to_watchlist(
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete('/{watchlist_id}/{movie_id}')
+async def remove_from_watchlist(watchlist_id: int, movie_id: int, user: user_dependency, db: db_dependency ):
+    if user:
+        try:
+            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
+
+            if watchlist is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
+                )
+
+            if movie_id not in watchlist.items:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie is not in watchlist")
+
+            watchlist.items.remove(movie_id)
+            flag_modified(watchlist, "items")
+
+
+            db.add(watchlist)
+            db.commit()
+            return {
+                "message": f"Movie: {movie_id} was successfully removed from watchlist: {watchlist_id}."
+            }
+
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useQuery, useQueries } from '@tanstack/react-query'
+import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { WatchlistItemData } from '@/types/WatchlistTypes'
 import { MovieData } from '@/types/MovieTypes'
@@ -8,6 +8,7 @@ import MovieItem from '@/components/Movies/MovieItem'
 const WatchlistDetailsPage = () => {
   const { watchlistId } = useParams()
   const axiosPrivate = useAxiosPrivate()
+  const queryClient = useQueryClient()
 
   const fetchWatchlistDetails = async () => {
     const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
@@ -19,7 +20,7 @@ const WatchlistDetailsPage = () => {
     return response.data as MovieData
   }
 
-  const { data: watchlistDetails } = useQuery({ queryKey: ['watchlistDetails'], queryFn: fetchWatchlistDetails })
+  const { data: watchlistDetails } = useQuery({ queryKey: ['watchlistDetails', Number(watchlistId)], queryFn: fetchWatchlistDetails })
 
   const watchlistItemsDetails = useQueries({
     queries: watchlistDetails ? watchlistDetails?.items.map(movieId => ({
@@ -30,6 +31,13 @@ const WatchlistDetailsPage = () => {
       : []
   })
 
+  const handleRemoveFromWatchlist = async (watchlistId: number, movieId: number) => {
+    const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${movieId}`)
+    if (response.status === 200) {
+      queryClient.invalidateQueries({ queryKey: ['watchlistDetails', watchlistId] })
+    }
+  }
+
   return (
     <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
       <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
@@ -37,7 +45,7 @@ const WatchlistDetailsPage = () => {
         {
           watchlistItemsDetails.map(movieDetails => (
             movieDetails.data ?
-              <MovieItem movie={movieDetails.data} />
+              <MovieItem key={movieDetails.data.id} movie={movieDetails.data} inWatchlist={true} handleRemoveFromWatchlist={handleRemoveFromWatchlist} currentWatchlist={watchlistDetails} />
               : null
           ))
         }
