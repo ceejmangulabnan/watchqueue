@@ -15,10 +15,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 interface MovieItemProps {
   movie: MovieData
+  currentWatchlist?: WatchlistItemData
   inWatchlist?: boolean
+  handleRemoveFromWatchlist?: (watchlistId: number, movieId: number) => Promise<void>
 }
 
-const MovieItem = ({ movie, inWatchlist }: MovieItemProps) => {
+const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
   const navigate = useNavigate()
@@ -75,7 +77,7 @@ const MovieItem = ({ movie, inWatchlist }: MovieItemProps) => {
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
-                  <DropdownMenuItem className='flex'>
+                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, movie.id)}>
                     <Trash2 className='mr-2' />
                     Remove from Watchlist
                   </DropdownMenuItem>
