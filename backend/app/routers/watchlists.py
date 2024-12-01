@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import delete, select
+from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
 from starlette.types import Message
 from db.models import Watchlists
@@ -168,6 +169,11 @@ async def remove_from_watchlist(watchlist_id: int, movie_id: int, user: user_dep
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie is not in watchlist")
 
             watchlist.items.remove(movie_id)
+            flag_modified(watchlist, "items")
+
+
+            db.add(watchlist)
+            db.commit()
             return {
                 "message": f"Movie: {movie_id} was successfully removed from watchlist: {watchlist_id}."
             }
