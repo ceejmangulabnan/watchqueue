@@ -37,7 +37,7 @@ const WatchlistDetailsPage = () => {
         {
           watchlistItemsDetails.map(movieDetails => (
             movieDetails.data ?
-              <MovieItem movie={movieDetails.data} />
+              <MovieItem movie={movieDetails.data} inWatchlist={true} />
               : null
           ))
         }
