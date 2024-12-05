@@ -6,7 +6,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 const PopularMovies = () => {
   const axiosPrivate = useAxiosPrivate()
   const fetchPopularMovies = async () => {
-    const response = await axiosPrivate.get('/movie/popular')
+    const response = await axiosPrivate.get('/movies/popular')
     return response.data as MovieDataQuery
   }
 
@@ -22,7 +22,6 @@ const PopularMovies = () => {
           ))
         }
       </div>
-
     </div>
   )
 }

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 import requests
 import os
@@ -52,8 +53,7 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/log")
+async def log():
+    return {"uptime_robot": f"{datetime.now()}"}
 
-@app.get("/movie/popular")
-async def get_movie_popular():
-    response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
-    return response.json()
