@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { TvDataQuery } from '@/types/ShowTypes'
+import { TvDataQuery } from '@/types/TvTypes'
 import TvItem from '@/components/TvItem'
 
 const TvSearchResults = () => {

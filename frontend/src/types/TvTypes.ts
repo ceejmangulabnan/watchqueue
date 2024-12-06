@@ -3,6 +3,7 @@ export interface TvData {
   backdrop_path: string | null // Can be null if no backdrop is available
   genre_ids: number[] // Array of genre IDs
   id: number
+  media_type?: "tv"
   origin_country: string[] // Array of country codes
   original_language: string
   original_name: string

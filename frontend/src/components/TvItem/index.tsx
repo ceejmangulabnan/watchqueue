@@ -7,7 +7,7 @@ import { Card, CardTitle, CardFooter, CardDescription } from '@/components/ui/ca
 import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuSubContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Ellipsis, CirclePlus } from 'lucide-react'
-import { TvData } from '@/types/ShowTypes'
+import { TvData } from '@/types/TvTypes'
 import { WatchlistItemData } from '@/types/WatchlistTypes'
 import { generatePosterLink } from '@/utils/generateImgLinks'
 
