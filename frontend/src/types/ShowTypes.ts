@@ -1,4 +1,4 @@
-interface ShowData {
+export interface TvData {
   adult: boolean
   backdrop_path: string | null // Can be null if no backdrop is available
   genre_ids: number[] // Array of genre IDs
@@ -81,7 +81,7 @@ interface SpokenLanguage {
   name: string
 }
 
-interface ShowDetails extends ShowData {
+export interface TvDetails extends TvData {
   created_by: Creator[]
   episode_run_time: number[] // Array of runtimes in minutes
   genres: Genre[]
@@ -101,4 +101,11 @@ interface ShowDetails extends ShowData {
   status: string // E.g., "Ended", "Returning Series"
   tagline: string | null // Nullable if no tagline
   type: string // E.g., "Scripted"
+}
+
+export interface TvDataQuery {
+  pages: number
+  results: TvData[]
+  total_pages: number
+  total_results: number
 }
