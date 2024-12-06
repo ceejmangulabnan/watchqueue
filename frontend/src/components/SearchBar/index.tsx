@@ -17,7 +17,17 @@ const SearchBar = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}`)
+      switch (searchCategory) {
+        case "All":
+          navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}`)
+          break
+        case "Movies":
+          navigate(`/search/movies?query=${encodeURIComponent(searchQuery)}`)
+          break
+        case "Shows":
+          navigate(`/search/shows?query=${encodeURIComponent(searchQuery)}`)
+          break
+      }
     }
   }
 
