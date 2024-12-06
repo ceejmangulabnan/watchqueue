@@ -22,10 +22,10 @@ const SearchBar = () => {
           navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}`)
           break
         case "Movies":
-          navigate(`/search/movies?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}`)
           break
-        case "Shows":
-          navigate(`/search/shows?query=${encodeURIComponent(searchQuery)}`)
+        case "TV":
+          navigate(`/search/tv?query=${encodeURIComponent(searchQuery)}`)
           break
       }
     }
@@ -48,8 +48,8 @@ const SearchBar = () => {
               <DropdownMenuItem onClick={() => setSearchCategory('Movies')}>
                 Movies
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSearchCategory('Shows')}>
-                Shows
+              <DropdownMenuItem onClick={() => setSearchCategory('TV')}>
+                TV
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

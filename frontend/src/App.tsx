@@ -11,9 +11,9 @@ import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
 import WatchlistDetails from '@/components/WatchlistDetails'
 import MovieDetailsPage from '@/pages/MovieDetailsPage'
 import SearchResultsPage from '@/pages/SearchResultsPage'
-import MovieSearchResults from '@/pages/SearchResultsPage'
-import ShowSearchResults from '@/pages/SearchResultsPage/ShowSearchResults'
+import MovieSearchResults from '@/pages/SearchResultsPage/MovieSearchResults'
 import MultiSearchResults from '@/pages/SearchResultsPage/MultiSearchResults'
+import TvSearchResults from '@/pages/SearchResultsPage/TvSearchResults'
 
 const queryClient = new QueryClient()
 
@@ -35,8 +35,8 @@ const App = () => {
               </Route>
               <Route path="/search" element={<SearchResultsPage />}>
                 <Route path="multi" element={<MultiSearchResults />} />
-                <Route path="movies" element={<MovieSearchResults />} />
-                <Route path="shows" element={<ShowSearchResults />} />
+                <Route path="movie" element={<MovieSearchResults />} />
+                <Route path="tv" element={<TvSearchResults />} />
               </Route>
             </Routes>
           </AuthProvider>
