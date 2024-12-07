@@ -5,21 +5,23 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { MovieData, MovieDetails } from '@/types/MovieTypes'
+import { TvDetails, TvData } from '@/types/TvTypes'
 import { AxiosError } from 'axios'
 
 interface UserWatchlistsDropdownProps {
   userWatchlists: WatchlistItemData[]
   movie: MovieData | MovieDetails
+  tv: TvData | TvDetails
 }
 
-const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdownProps) => {
+const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDropdownProps) => {
 
   const { toast } = useToast()
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
 
-  const addToWatchlist = async ({ watchlistId, movieId }: { watchlistId: number, movieId: number }) => {
-    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { movie_id: movieId })
+  const addToWatchlist = async ({ watchlistId, itemId }: { watchlistId: number, itemId: number }) => {
+    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { item_id: itemId })
     return response.data
   }
 
@@ -29,7 +31,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
       queryClient.invalidateQueries({ queryKey: ['userWatchlists'] }),
         toast({
           title: "Success",
-          description: `Movie "${movie.title}" has been added to your watchlist.`,
+          description: `Item "${movie.title}" has been added to your watchlist.`,
           variant: "success",
         })
     },
@@ -52,7 +54,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
   })
 
   const handleAddToWatchlist = (watchlistId: number) => {
-    mutation.mutate({ watchlistId, movieId: movie.id })
+    mutation.mutate({ watchlistId, itemId: movie.id | tv.id })
   }
 
   return (

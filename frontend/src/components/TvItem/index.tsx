@@ -6,6 +6,7 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { Card, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuSubContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { Ellipsis, CirclePlus } from 'lucide-react'
 import { TvData } from '@/types/TvTypes'
 import { WatchlistItemData } from '@/types/WatchlistTypes'
@@ -51,6 +52,8 @@ const TvItem = ({ tv }: TvItemProps) => {
                 <DropdownMenuSubContent>
                   {
                     // Render User Watchlists Here
+                    userWatchlists &&
+                    <UserWatchlistsDropdown userWatchlists={userWatchlists} tv={tv} />
                   }
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>

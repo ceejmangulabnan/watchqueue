@@ -120,7 +120,7 @@ async def get_user_watchlists_all(
 
 
 class AddToWatchlist(BaseModel):
-    movie_id: int
+    item_id: int
 
 
 @router.post("/{watchlist_id}/add")
@@ -136,17 +136,17 @@ async def add_to_watchlist(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
                 )
 
-            if request.movie_id in watchlist.items:
+            if request.item_id in watchlist.items:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail="Movie already exists in the watchlist",
+                    detail="Item already exists in the watchlist",
                 )
 
-            watchlist.items = watchlist.items + [request.movie_id]
+            watchlist.items = watchlist.items + [request.item_id]
             db.add(watchlist)
             db.commit()
             return {
-                "message": f"Watchlist Item {request.movie_id} has been added to Watchlist {watchlist_id}"
+                "message": f"Watchlist Item {request.item_id} has been added to Watchlist {watchlist_id}"
             }
 
         except Exception as e:
@@ -154,8 +154,8 @@ async def add_to_watchlist(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete('/{watchlist_id}/{movie_id}')
-async def remove_from_watchlist(watchlist_id: int, movie_id: int, user: user_dependency, db: db_dependency ):
+@router.delete('/{watchlist_id}/{item_id}')
+async def remove_from_watchlist(watchlist_id: int, item_id: int, user: user_dependency, db: db_dependency ):
     if user:
         try:
             watchlist = await get_watchlist_from_db(user, db, watchlist_id)
@@ -165,17 +165,17 @@ async def remove_from_watchlist(watchlist_id: int, movie_id: int, user: user_dep
                     status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
                 )
 
-            if movie_id not in watchlist.items:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie is not in watchlist")
+            if item_id not in watchlist.items:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item is not in watchlist")
 
-            watchlist.items.remove(movie_id)
+            watchlist.items.remove(item_id)
             flag_modified(watchlist, "items")
 
 
             db.add(watchlist)
             db.commit()
             return {
-                "message": f"Movie: {movie_id} was successfully removed from watchlist: {watchlist_id}."
+                "message": f"Item: {item_id} was successfully removed from watchlist: {watchlist_id}."
             }
 
         except Exception as e:
