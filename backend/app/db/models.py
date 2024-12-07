@@ -31,5 +31,5 @@ class Watchlists(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    items: Mapped[list[dict]] = mapped_column(JSONB, server_default="{}")
+    items: Mapped[list[dict]] = mapped_column(JSONB, server_default="[]")
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
