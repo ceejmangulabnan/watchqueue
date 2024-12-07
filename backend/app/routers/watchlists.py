@@ -153,6 +153,8 @@ async def add_to_watchlist(
                 'media_type': watchlist_item.media_type
             })
 
+            flag_modified(watchlist, "items")
+
             db.add(watchlist)
             db.commit()
             return {
