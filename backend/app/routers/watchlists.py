@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from sqlalchemy import delete, select
 from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
-from starlette.types import Message
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
