@@ -10,12 +10,11 @@ import { AxiosError } from 'axios'
 
 interface UserWatchlistsDropdownProps {
   userWatchlists: WatchlistItemData[]
-  movie: MovieData | MovieDetails
-  tv: TvData | TvDetails
+  movie?: MovieData | MovieDetails
+  tv?: TvData | TvDetails
 }
 
 const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDropdownProps) => {
-
   const { toast } = useToast()
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
@@ -31,7 +30,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
       queryClient.invalidateQueries({ queryKey: ['userWatchlists'] }),
         toast({
           title: "Success",
-          description: `Item "${movie.title}" has been added to your watchlist.`,
+          description: `"${movie ? movie.title : tv?.name}" has been added to your watchlist.`,
           variant: "success",
         })
     },
@@ -40,13 +39,13 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
       if (error.response?.status === 409) {
         toast({
           title: "Duplicate",
-          description: "Movie is already in the watchlist.",
+          description: `${movie ? movie.title : tv?.name} is already in the watchlist.`,
           variant: "destructive",
         })
       } else {
         toast({
           title: "Error",
-          description: "Failed to add the movie to the watchlist.",
+          description: `Failed to add "${movie ? movie.title : tv?.name}" to the watchlist.`,
           variant: "destructive",
         })
       }
@@ -54,7 +53,11 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
   })
 
   const handleAddToWatchlist = (watchlistId: number) => {
-    mutation.mutate({ watchlistId, itemId: movie.id | tv.id })
+    if (movie?.id) {
+      mutation.mutate({ watchlistId, itemId: movie.id })
+    } else if (tv?.id) {
+      mutation.mutate({ watchlistId, itemId: tv.id })
+    }
   }
 
   return (
