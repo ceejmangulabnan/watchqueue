@@ -110,7 +110,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
       </CardFooter>
-    </Card >
+    </Card>
   )
 }
 

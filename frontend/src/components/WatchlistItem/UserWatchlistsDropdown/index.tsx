@@ -5,21 +5,22 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { MovieData, MovieDetails } from '@/types/MovieTypes'
+import { TvDetails, TvData } from '@/types/TvTypes'
 import { AxiosError } from 'axios'
 
 interface UserWatchlistsDropdownProps {
   userWatchlists: WatchlistItemData[]
-  movie: MovieData | MovieDetails
+  movie?: MovieData | MovieDetails
+  tv?: TvData | TvDetails
 }
 
-const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdownProps) => {
-
+const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDropdownProps) => {
   const { toast } = useToast()
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
 
-  const addToWatchlist = async ({ watchlistId, movieId }: { watchlistId: number, movieId: number }) => {
-    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { movie_id: movieId })
+  const addToWatchlist = async ({ watchlistId, itemId }: { watchlistId: number, itemId: number }) => {
+    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { item_id: itemId })
     return response.data
   }
 
@@ -29,7 +30,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
       queryClient.invalidateQueries({ queryKey: ['userWatchlists'] }),
         toast({
           title: "Success",
-          description: `Movie "${movie.title}" has been added to your watchlist.`,
+          description: `"${movie ? movie.title : tv?.name}" has been added to your watchlist.`,
           variant: "success",
         })
     },
@@ -38,13 +39,13 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
       if (error.response?.status === 409) {
         toast({
           title: "Duplicate",
-          description: "Movie is already in the watchlist.",
+          description: `${movie ? movie.title : tv?.name} is already in the watchlist.`,
           variant: "destructive",
         })
       } else {
         toast({
           title: "Error",
-          description: "Failed to add the movie to the watchlist.",
+          description: `Failed to add "${movie ? movie.title : tv?.name}" to the watchlist.`,
           variant: "destructive",
         })
       }
@@ -52,7 +53,11 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie }: UserWatchlistsDropdow
   })
 
   const handleAddToWatchlist = (watchlistId: number) => {
-    mutation.mutate({ watchlistId, movieId: movie.id })
+    if (movie?.id) {
+      mutation.mutate({ watchlistId, itemId: movie.id })
+    } else if (tv?.id) {
+      mutation.mutate({ watchlistId, itemId: tv.id })
+    }
   }
 
   return (

@@ -3,6 +3,7 @@ export interface MovieData {
   backdrop_path: string
   genre_ids: number[]
   id: number
+  media_type?: "movie"
   original_language: string
   original_title: string
   overview: string
