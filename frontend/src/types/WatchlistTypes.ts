@@ -1,17 +1,17 @@
-export interface WatchlistItemData {
+export interface WatchlistData {
   id: number,
   title: string,
   user_id: number,
   is_private: boolean,
-  items: number[]
+  items: WatchlistItem[]
 }
 
-
 export interface WatchlistItemProps {
-  id: number,
-  title: string,
-  userId: number,
-  isPrivate: boolean,
-  items: number[]
+  watchlist: WatchlistData
   handleDelete: (id: number) => Promise<void>
+}
+
+export interface WatchlistItem {
+  media_type: "movie" | "tv"
+  id: number
 }

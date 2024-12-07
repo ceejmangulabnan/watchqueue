@@ -6,13 +6,13 @@ import { Ellipsis, Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
-const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
+const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
   const navigate = useNavigate()
   const { auth } = useAuth()
 
 
   const handleClick = () => {
-    navigate(`/${auth.username}/watchlist/${id}`)
+    navigate(`/${auth.username}/watchlist/${watchlist.id}`)
   }
 
   return (
@@ -29,7 +29,7 @@ const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
               <Pencil color="#000000" size={20} className='mr-2' />
               Rename
             </DropdownMenuItem>
-            <DropdownMenuItem className='text-red-500' onClick={() => handleDelete(id)}>
+            <DropdownMenuItem className='text-red-500' onClick={() => handleDelete(watchlist.id)}>
               <Trash2 color="red" size={20} className='mr-2' />
               Delete
             </DropdownMenuItem>
@@ -38,7 +38,7 @@ const WatchlistItem = ({ id, title, handleDelete }: WatchlistItemProps) => {
       </DropdownMenu>
       <img src="https://placehold.co/400x600" alt="" />
       <CardFooter className="flex-col items-start p-4">
-        <CardTitle className='text-sm md:text-base font-medium'>{title}</CardTitle>
+        <CardTitle className='text-sm md:text-base font-medium'>{watchlist.title}</CardTitle>
       </CardFooter>
     </Card>
   )

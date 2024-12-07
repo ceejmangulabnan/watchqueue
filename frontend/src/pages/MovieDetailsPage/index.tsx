@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { useAuth } from '@/hooks/useAuth'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
+import { WatchlistData } from '@/types/WatchlistTypes'
 import RecommendedMovies from '@/components/RecommendedMovies'
 import { useState } from 'react'
 
@@ -31,7 +31,7 @@ const MovieDetailsPage = () => {
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistItemData[]
+    return response.data as WatchlistData[]
   }
 
   const { data: userWatchlists } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })

@@ -1,6 +1,6 @@
 import useAxiosPrivate from "./useAxiosPrivate"
 import { useAuth } from "./useAuth"
-import { WatchlistItemData } from "../types/WatchlistTypes"
+import { WatchlistData } from '@/types/WatchlistTypes'
 import { useQuery } from "@tanstack/react-query"
 
 
@@ -10,7 +10,7 @@ const useFetchWatchlists = () => {
 
   const fetchWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistItemData[]
+    return response.data as WatchlistData[]
   }
 
   const { data: userWatchlists, refetch: refetchUserWatchlists, isError, isLoading, error } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchWatchlists })
