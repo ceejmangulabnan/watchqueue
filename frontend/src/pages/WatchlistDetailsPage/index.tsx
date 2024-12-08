@@ -12,7 +12,7 @@ const WatchlistDetailsPage = () => {
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
 
-  // Need to differentiate movie from tv items before 
+  // Distinguish movie and tv items
   type WatchlistItemDetailsQuery = {
     type: "movie" | "tv";
     mediaData: MovieDetails | TvDetails;
@@ -23,7 +23,6 @@ const WatchlistDetailsPage = () => {
     return response.data as WatchlistData
   }
 
-  // takes in the itemId of the watchlist item object
   const fetchWatchlistItemDetails = async (watchlistItem: WatchlistItem) => {
     if (watchlistItem.media_type === "movie") {
       const response = await axiosPrivate.get(`/movies/${watchlistItem.id}`)
@@ -67,8 +66,6 @@ const WatchlistDetailsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['watchlistDetails', watchlistId] })
     }
   }
-  if (watchlistItemsDetails)
-    console.log(watchlistItemsDetails)
 
   return (
     <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
@@ -92,7 +89,6 @@ const WatchlistDetailsPage = () => {
               return null;
             }
           })
-
         }
       </div>
     </div>
