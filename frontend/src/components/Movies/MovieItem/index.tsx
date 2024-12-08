@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuItem, DropdownMenuPortal, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useAuth } from '@/hooks/useAuth'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
+import { WatchlistData } from '@/types/WatchlistTypes'
 import { MovieData } from "@/types/MovieTypes"
-import { Ellipsis, CirclePlus } from 'lucide-react'
+import { Ellipsis, CirclePlus, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { useState } from 'react'
@@ -15,9 +15,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 interface MovieItemProps {
   movie: MovieData
+  currentWatchlist?: WatchlistData
+  inWatchlist?: boolean
+  handleRemoveFromWatchlist?: (watchlistId: number, movieId: number) => Promise<void>
 }
 
-const MovieItem = ({ movie }: MovieItemProps) => {
+const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
   const navigate = useNavigate()
@@ -25,7 +28,7 @@ const MovieItem = ({ movie }: MovieItemProps) => {
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistItemData[]
+    return response.data as WatchlistData[]
   }
 
   const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists, enabled: !!auth.id })
@@ -54,32 +57,60 @@ const MovieItem = ({ movie }: MovieItemProps) => {
             <Ellipsis color='#000000' size={16} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-[12rem]' side={"right"}>
-          <DropdownMenuGroup>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
-                <CirclePlus className='mr-2' />
-                Add to Watchlist
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  {
-                    userWatchlists &&
-                    <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
-                  }
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          </DropdownMenuGroup>
+
+        <DropdownMenuContent className='w-[14rem]' side={"right"}>
+          {
+            inWatchlist
+              ? (
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                      <CirclePlus className='mr-2' />
+                      Add to Watchlist
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {
+                          userWatchlists &&
+                          <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
+                        }
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, movie.id)}>
+                    <Trash2 className='mr-2' />
+                    Remove from Watchlist
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              )
+              : (
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                      <CirclePlus className='mr-2' />
+                      Add to Watchlist
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {
+                          userWatchlists &&
+                          <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
+                        }
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+              )
+          }
         </DropdownMenuContent>
       </DropdownMenu>
 
       <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
-        <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
+        <CardDescription className='text-xs md:text-sm lg:text-md'>{movie?.release_date.slice(0, 4) ?? "N/A"}</CardDescription>
       </CardFooter>
-    </Card >
+    </Card>
   )
 }
 

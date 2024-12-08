@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 import requests
 import os
@@ -6,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from db.database import engine
 from db import models
-from routers import users, watchlists, movies, search
+from routers import users, watchlists, movies, search, tv
 from routers.users import get_current_user
 
 load_dotenv()
@@ -42,6 +43,7 @@ app.include_router(users.router)
 app.include_router(watchlists.router)
 app.include_router(movies.router)
 app.include_router(search.router)
+app.include_router(tv.router)
 
 # Creates Database Tables from models schema
 
@@ -52,8 +54,7 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/log")
+async def log():
+    return {"uptime_robot": f"{datetime.now()}"}
 
-@app.get("/movie/popular")
-async def get_movie_popular():
-    response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
-    return response.json()
