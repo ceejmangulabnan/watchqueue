@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import useFetchWatchlists from "@/hooks/useFetchWatchlists"
 import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import WatchlistItem from "@/components/WatchlistItem"
-import { WatchlistItemData } from "@/types/WatchlistTypes"
+import { WatchlistData } from "@/types/WatchlistTypes"
 
 
 const Watchlists = () => {
@@ -66,14 +66,10 @@ const Watchlists = () => {
         {
           userWatchlists?.length
             ? (
-              userWatchlists?.map((watchlist: WatchlistItemData) => (
+              userWatchlists?.map((watchlist: WatchlistData) => (
                 <WatchlistItem
                   key={watchlist.id}
-                  id={watchlist.id}
-                  title={watchlist.title}
-                  userId={watchlist.user_id}
-                  isPrivate={watchlist.is_private}
-                  items={watchlist.items}
+                  watchlist={watchlist}
                   handleDelete={handleDelete}
                 />
               ))

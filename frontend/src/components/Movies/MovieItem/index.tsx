@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuItem, DropdownMenuPortal, DropdownMenuContent
 import { Button } from '@/components/ui/button'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useAuth } from '@/hooks/useAuth'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
+import { WatchlistData } from '@/types/WatchlistTypes'
 import { MovieData } from "@/types/MovieTypes"
 import { Ellipsis, CirclePlus, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 interface MovieItemProps {
   movie: MovieData
-  currentWatchlist?: WatchlistItemData
+  currentWatchlist?: WatchlistData
   inWatchlist?: boolean
   handleRemoveFromWatchlist?: (watchlistId: number, movieId: number) => Promise<void>
 }
@@ -28,7 +28,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistItemData[]
+    return response.data as WatchlistData[]
   }
 
   const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists, enabled: !!auth.id })
@@ -108,7 +108,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
       <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
-        <CardDescription className='text-xs md:text-sm lg:text-md'>{movie.release_date.slice(0, 4)}</CardDescription>
+        <CardDescription className='text-xs md:text-sm lg:text-md'>{movie?.release_date.slice(0, 4) ?? "N/A"}</CardDescription>
       </CardFooter>
     </Card>
   )

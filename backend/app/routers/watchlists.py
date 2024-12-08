@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from sqlalchemy import delete, select
 from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
-from starlette.types import Message
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
@@ -20,6 +19,9 @@ async def watchlists():
 class CreateWatchlist(BaseModel):
     title: str
 
+class WatchlistItem(BaseModel):
+    media_type: str
+    id: int
 
 # Create Watchlist
 @router.post("/create")
@@ -119,13 +121,10 @@ async def get_user_watchlists_all(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-class AddToWatchlist(BaseModel):
-    item_id: int
-
 
 @router.post("/{watchlist_id}/add")
 async def add_to_watchlist(
-    user: user_dependency, db: db_dependency, watchlist_id: int, request: AddToWatchlist
+    user: user_dependency, db: db_dependency, watchlist_id: int, watchlist_item: WatchlistItem
 ):
     if user:
         try:
@@ -136,17 +135,30 @@ async def add_to_watchlist(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
                 )
 
-            if request.item_id in watchlist.items:
+            # Check if watchlist_item is already in the watchlist
+            if any(
+                item.get('id') == watchlist_item.id and 
+                item.get('media_type') == watchlist_item.media_type 
+                for item in watchlist.items
+            ):
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
-                    detail="Item already exists in the watchlist",
+                    detail="Item already exists in the watchlist"
                 )
 
-            watchlist.items = watchlist.items + [request.item_id]
+
+            # Append the new item to the existing items
+            watchlist.items.append({
+                'id': watchlist_item.id,
+                'media_type': watchlist_item.media_type
+            })
+
+            flag_modified(watchlist, "items")
+
             db.add(watchlist)
             db.commit()
             return {
-                "message": f"Watchlist Item {request.item_id} has been added to Watchlist {watchlist_id}"
+                "message": f"Watchlist Item {watchlist_item.id} has been added to Watchlist {watchlist_id}"
             }
 
         except Exception as e:
@@ -154,8 +166,8 @@ async def add_to_watchlist(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete('/{watchlist_id}/{item_id}')
-async def remove_from_watchlist(watchlist_id: int, item_id: int, user: user_dependency, db: db_dependency ):
+@router.delete('/{watchlist_id}/{media_type}/{item_id}')
+async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str, user: user_dependency, db: db_dependency ):
     if user:
         try:
             watchlist = await get_watchlist_from_db(user, db, watchlist_id)
@@ -165,12 +177,23 @@ async def remove_from_watchlist(watchlist_id: int, item_id: int, user: user_depe
                     status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
                 )
 
-            if item_id not in watchlist.items:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item is not in watchlist")
+            # Find the item to remove
+            item_to_remove = next(
+                (item for item in watchlist.items 
+                 if item['id'] == item_id and item['media_type'] == media_type),
+                None
+            )
 
-            watchlist.items.remove(item_id)
+            if item_to_remove is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, 
+                    detail="Item is not in watchlist"
+                )
+
+            # Remove the item
+            watchlist.items.remove(item_to_remove)
+
             flag_modified(watchlist, "items")
-
 
             db.add(watchlist)
             db.commit()

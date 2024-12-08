@@ -1,5 +1,5 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
+import { WatchlistData } from '@/types/WatchlistTypes'
 import { useToast } from '@/hooks/use-toast'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useMutation } from '@tanstack/react-query'
@@ -9,7 +9,7 @@ import { TvDetails, TvData } from '@/types/TvTypes'
 import { AxiosError } from 'axios'
 
 interface UserWatchlistsDropdownProps {
-  userWatchlists: WatchlistItemData[]
+  userWatchlists: WatchlistData[]
   movie?: MovieData | MovieDetails
   tv?: TvData | TvDetails
 }
@@ -19,8 +19,11 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
 
+  const mediaType = () => movie ? "movie" : "tv"
+  const mediaTitle = () => movie ? movie.title : tv?.name
+
   const addToWatchlist = async ({ watchlistId, itemId }: { watchlistId: number, itemId: number }) => {
-    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { item_id: itemId })
+    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { id: itemId, media_type: mediaType() })
     return response.data
   }
 
@@ -30,7 +33,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
       queryClient.invalidateQueries({ queryKey: ['userWatchlists'] }),
         toast({
           title: "Success",
-          description: `"${movie ? movie.title : tv?.name}" has been added to your watchlist.`,
+          description: `"${mediaTitle()}" has been added to your watchlist.`,
           variant: "success",
         })
     },
@@ -39,13 +42,13 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
       if (error.response?.status === 409) {
         toast({
           title: "Duplicate",
-          description: `${movie ? movie.title : tv?.name} is already in the watchlist.`,
+          description: `${mediaTitle()} is already in the watchlist.`,
           variant: "destructive",
         })
       } else {
         toast({
           title: "Error",
-          description: `Failed to add "${movie ? movie.title : tv?.name}" to the watchlist.`,
+          description: `Failed to add "${mediaTitle()}" to the watchlist.`,
           variant: "destructive",
         })
       }

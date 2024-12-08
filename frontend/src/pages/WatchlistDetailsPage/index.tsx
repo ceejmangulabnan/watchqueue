@@ -1,34 +1,63 @@
 import { useParams } from 'react-router-dom'
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
-import { MovieData } from '@/types/MovieTypes'
+import { WatchlistData, WatchlistItem } from '@/types/WatchlistTypes'
+import { MovieDetails } from '@/types/MovieTypes'
 import MovieItem from '@/components/Movies/MovieItem'
+import TvItem from '@/components/TvItem'
+import { TvDetails } from '@/types/TvTypes'
 
 const WatchlistDetailsPage = () => {
   const { watchlistId } = useParams()
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
 
-  const fetchWatchlistDetails = async () => {
-    const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
-    return response.data as WatchlistItemData
+  // Distinguish movie and tv items
+  type WatchlistItemDetailsQuery = {
+    type: "movie" | "tv";
+    mediaData: MovieDetails | TvDetails;
   }
 
-  const fetchWatchlistItemDetails = async (movieId: number) => {
-    const response = await axiosPrivate.get(`/movies/${movieId}`)
-    return response.data as MovieData
+  const fetchWatchlistDetails = async () => {
+    const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
+    return response.data as WatchlistData
+  }
+
+  const fetchWatchlistItemDetails = async (watchlistItem: WatchlistItem) => {
+    if (watchlistItem.media_type === "movie") {
+      const response = await axiosPrivate.get(`/movies/${watchlistItem.id}`)
+      const watchlistItemDetails: WatchlistItemDetailsQuery = {
+        type: "movie",
+        mediaData: response.data as MovieDetails
+      }
+      return watchlistItemDetails
+
+    } else if (watchlistItem.media_type === "tv") {
+      const response = await axiosPrivate.get(`/tv/${watchlistItem.id}`)
+      const watchlistItemDetails: WatchlistItemDetailsQuery = {
+        type: "tv",
+        mediaData: response.data as TvDetails
+      }
+      return watchlistItemDetails
+    }
   }
 
   const { data: watchlistDetails } = useQuery({ queryKey: ['watchlistDetails', Number(watchlistId)], queryFn: fetchWatchlistDetails })
 
+  // Collects data of watchlist items
   const watchlistItemsDetails = useQueries({
-    queries: watchlistDetails ? watchlistDetails?.items.map(movieId => ({
-      queryKey: ["watchlistItemDetails", movieId],
-      queryFn: () => fetchWatchlistItemDetails(movieId),
+    queries: watchlistDetails ? watchlistDetails?.items.map(watchlistItem => ({
+      queryKey: ["watchlistItemDetails", watchlistItem.id],
+      queryFn: () => fetchWatchlistItemDetails(watchlistItem),
       enabled: watchlistDetails.items.length > 0
     }))
-      : []
+      : [],
+    combine: (results) => {
+      return {
+        data: results.map((result) => result.data),
+        pending: results.some((result) => result.isPending),
+      }
+    },
   })
 
   const handleRemoveFromWatchlist = async (watchlistId: number, movieId: number) => {
@@ -43,11 +72,23 @@ const WatchlistDetailsPage = () => {
       <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
         {
-          watchlistItemsDetails.map(movieDetails => (
-            movieDetails.data ?
-              <MovieItem key={movieDetails.data.id} movie={movieDetails.data} inWatchlist={true} handleRemoveFromWatchlist={handleRemoveFromWatchlist} currentWatchlist={watchlistDetails} />
-              : null
-          ))
+          !watchlistItemsDetails.pending && watchlistItemsDetails.data.map((watchlistItem) => {
+            if (watchlistItem?.type === "movie") {
+              return (
+                <MovieItem
+                  key={watchlistItem?.mediaData.id}
+                  movie={watchlistItem?.mediaData as MovieDetails}
+                  inWatchlist={true}
+                  handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+                  currentWatchlist={watchlistDetails}
+                />
+              );
+            } else if (watchlistItem?.type === "tv") {
+              return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />;
+            } else {
+              return null;
+            }
+          })
         }
       </div>
     </div>

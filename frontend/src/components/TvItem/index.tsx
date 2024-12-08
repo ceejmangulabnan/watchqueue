@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { Ellipsis, CirclePlus } from 'lucide-react'
 import { TvData } from '@/types/TvTypes'
-import { WatchlistItemData } from '@/types/WatchlistTypes'
+import { WatchlistData } from '@/types/WatchlistTypes'
 import { generatePosterLink } from '@/utils/generateImgLinks'
 
 interface TvItemProps {
@@ -28,7 +28,7 @@ const TvItem = ({ tv }: TvItemProps) => {
 
   const fetchUserWatchlists = async () => {
     const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistItemData[]
+    return response.data as WatchlistData[]
   }
 
   const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists, enabled: !!auth.id })
