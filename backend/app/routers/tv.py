@@ -14,8 +14,13 @@ BASE_IMG_URL = os.getenv("BASE_IMG_URL")
 
 
 @router.get("/popular")
-async def get_popular_tv():
+async def get_tv_popular():
     response = requests.get(f"{BASE_URL}/tv/popular?api_key={API_KEY}")
+    return response.json()
+
+@router.get("/top_rated")
+async def get_tv_top_rated():
+    response = requests.get(f"{BASE_URL}/tv/top_rated?api_key={API_KEY}")
     return response.json()
 
 @router.get("/{tv_id}")

@@ -22,6 +22,10 @@ async def get_movie_popular():
     response = requests.get(f"{BASE_URL}/movie/popular?api_key={API_KEY}")
     return response.json()
 
+@router.get("/top_rated")
+async def get_movie_top_rated():
+    response = requests.get(f"{BASE_URL}/movie/top_rated?api_key={API_KEY}")
+    return response.json()
 
 @router.get("/{movie_id}")
 async def get_movie_details(movie_id: int):

@@ -35,7 +35,7 @@ const Navbar = () => {
   const isAuthed = auth && !Object.values(auth).includes(null)
 
   return (
-    <div className='z-10 fixed top-0 left-0 right-0 flex items-center justify-center px-10 md:px-20 py-3 text-md font-medium shadow-md bg-white'>
+    <div className='z-50 fixed top-0 left-0 right-0 flex items-center justify-center px-10 md:px-20 py-3 text-md font-medium shadow-md bg-white'>
       <div className='w-full 2xl:max-w-[1600px] flex justify-between items-center'>
         <div className='mr-6'>
           <Link to='/'>

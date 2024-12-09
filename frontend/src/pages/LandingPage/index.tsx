@@ -7,30 +7,53 @@ import ScrollableList from '@/components/ScrollableList'
 const LandingPage = () => {
   const axiosPrivate = useAxiosPrivate()
 
-  const fetchPopularMovies = async () => {
+  const fetchMoviePopular = async () => {
     const response = await axiosPrivate.get('/movies/popular')
     return response.data as MovieDataQuery
   }
 
-  const { data: popularMovies, isLoading: isPopularMoviesLoading } = useQuery({ queryKey: ['popularMovies'], queryFn: fetchPopularMovies })
+  const { data: moviePopular, isLoading: isMoviePopularLoading } = useQuery({ queryKey: ['moviePopular'], queryFn: fetchMoviePopular })
 
-  const fetchPopularTv = async () => {
+  const fetchMovieTopRated = async () => {
+    const response = await axiosPrivate.get('/movies/top_rated')
+    return response.data as MovieDataQuery
+  }
+
+  const { data: movieTopRated, isLoading: isMovieTopRatedLoading } = useQuery({ queryKey: ['movieTopRated'], queryFn: fetchMovieTopRated })
+
+  const fetchTvPopular = async () => {
     const response = await axiosPrivate.get('/tv/popular')
     return response.data as TvDataQuery
   }
 
-  const { data: popularTv, isLoading: isPopularTvLoading } = useQuery({ queryKey: ['popularTv'], queryFn: fetchPopularTv })
+  const { data: tvPopular, isLoading: isTvPopularLoading } = useQuery({ queryKey: ['tvPopular'], queryFn: fetchTvPopular })
+
+  const fetchTvTopRated = async () => {
+    const response = await axiosPrivate.get('/tv/top_rated')
+    return response.data as TvDataQuery
+  }
+
+  const { data: tvTopRated, isLoading: isTvTopRatedLoading } = useQuery({ queryKey: ['tvTopRated'], queryFn: fetchTvTopRated })
+
 
   return (
     <div className='mx-10 md:mx-20 my-10'>
       <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
         <h3 className="text-base md:text-xl font-semibold py-4 ">Popular Movies</h3>
-        {(popularMovies && !isPopularMoviesLoading) &&
-          <ScrollableList scrollableItems={popularMovies} isDataLoading={isPopularMoviesLoading} />}
+        {(moviePopular && !isMoviePopularLoading) &&
+          <ScrollableList scrollableItems={moviePopular} isDataLoading={isMoviePopularLoading} />}
+
+        <h3 className="text-base md:text-xl font-semibold py-4 ">Top Rated Movies</h3>
+        {(movieTopRated && !isMovieTopRatedLoading) &&
+          <ScrollableList scrollableItems={movieTopRated} isDataLoading={isMovieTopRatedLoading} />}
 
         <h3 className="text-base md:text-xl font-semibold py-4 ">Popular TV Shows</h3>
-        {(popularTv && !isPopularTvLoading) &&
-          <ScrollableList scrollableItems={popularTv} isDataLoading={isPopularTvLoading} />}
+        {(tvPopular && !isTvPopularLoading) &&
+          <ScrollableList scrollableItems={tvPopular} isDataLoading={isTvPopularLoading} />}
+
+        <h3 className="text-base md:text-xl font-semibold py-4 ">Top Rated TV Shows</h3>
+        {(tvTopRated && !isTvTopRatedLoading) &&
+          <ScrollableList scrollableItems={tvTopRated} isDataLoading={isTvTopRatedLoading} />}
       </div>
     </div>
   )
