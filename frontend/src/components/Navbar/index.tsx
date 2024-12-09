@@ -48,7 +48,6 @@ const Navbar = () => {
           <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
           <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} auth={auth} />
         </div>
-
       </div>
     </div>
   )
