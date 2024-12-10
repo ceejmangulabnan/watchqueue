@@ -32,15 +32,15 @@ const MultiSearchResults = () => {
                 case "movie":
                   return (
                     <MovieItem key={media.id} movie={media} />
-                  );
+                  )
                 case "tv":
                   return (
                     <TvItem key={media.id} tv={media} />
-                  );
+                  )
                 case "person":
                   return (
                     <PersonItem key={media.id} person={media} />
-                  );
+                  )
                 default:
                   return null
               }

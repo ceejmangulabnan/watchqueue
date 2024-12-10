@@ -14,8 +14,8 @@ const WatchlistDetailsPage = () => {
 
   // Distinguish movie and tv items
   type WatchlistItemDetailsQuery = {
-    type: "movie" | "tv";
-    mediaData: MovieDetails | TvDetails;
+    type: "movie" | "tv"
+    mediaData: MovieDetails | TvDetails
   }
 
   const fetchWatchlistDetails = async () => {
@@ -82,11 +82,11 @@ const WatchlistDetailsPage = () => {
                   handleRemoveFromWatchlist={handleRemoveFromWatchlist}
                   currentWatchlist={watchlistDetails}
                 />
-              );
+              )
             } else if (watchlistItem?.type === "tv") {
-              return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />;
+              return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />
             } else {
-              return null;
+              return null
             }
           })
         }

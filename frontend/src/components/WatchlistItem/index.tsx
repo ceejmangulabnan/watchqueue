@@ -17,16 +17,16 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
     {
       queryKey: ['watchlistCover', watchlist.id],
       queryFn: async () => {
-        const response = await axiosPrivate.get(`${import.meta.env.VITE_BASE_URL}/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' });
-        return URL.createObjectURL(response.data);
+        const response = await axiosPrivate.get(`${import.meta.env.VITE_BASE_URL}/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' })
+        return URL.createObjectURL(response.data)
       }
     },
-  );
+  )
 
   // Handle image loading failure (in case the image is invalid or not found)
   const handleImageError = () => {
-    console.error('Failed to load image.');
-  };
+    console.error('Failed to load image.')
+  }
 
   const handleClick = () => {
     navigate(`/${auth.username}/watchlist/${watchlist.id}`)
