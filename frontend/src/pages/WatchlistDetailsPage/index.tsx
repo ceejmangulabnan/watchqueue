@@ -60,8 +60,8 @@ const WatchlistDetailsPage = () => {
     },
   })
 
-  const handleRemoveFromWatchlist = async (watchlistId: number, movieId: number) => {
-    const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${movieId}`)
+  const handleRemoveFromWatchlist = async (watchlistId: number, mediaType: string, itemId: number) => {
+    const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${mediaType}/${itemId}`)
     if (response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ['watchlistDetails', watchlistId] })
     }

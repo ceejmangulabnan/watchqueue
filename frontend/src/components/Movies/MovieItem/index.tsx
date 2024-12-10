@@ -17,7 +17,7 @@ interface MovieItemProps {
   movie: MovieData
   currentWatchlist?: WatchlistData
   inWatchlist?: boolean
-  handleRemoveFromWatchlist?: (watchlistId: number, movieId: number) => Promise<void>
+  handleRemoveFromWatchlist?: (watchlistId: number, mediaType: string, itemId: number) => Promise<void>
 }
 
 const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
@@ -77,7 +77,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
-                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, movie.id)}>
+                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, "movie", movie.id)}>
                     <Trash2 className='mr-2' />
                     Remove from Watchlist
                   </DropdownMenuItem>
