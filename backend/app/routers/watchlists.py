@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import delete, select
 from sqlalchemy.orm.attributes import flag_modified
@@ -6,7 +7,17 @@ from starlette import status
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
+import requests
+import os
+from dotenv import load_dotenv
+from PIL import Image
+from io import BytesIO
 
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+BASE_IMG_URL = os.getenv("BASE_IMG_URL")
 
 router = APIRouter(prefix="/watchlists")
 
@@ -23,6 +34,15 @@ class WatchlistItem(BaseModel):
     media_type: str
     id: int
 
+
+async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
+    watchlist_query = select(Watchlists).where(
+            Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
+        )
+    result = db.execute(watchlist_query)
+    watchlist = result.scalar()
+    return watchlist
+
 # Create Watchlist
 @router.post("/create")
 async def create_watchlist(
@@ -38,15 +58,6 @@ async def create_watchlist(
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=500, detail=str(e))
-
-
-async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
-    watchlist_query = select(Watchlists).where(
-            Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
-        )
-    result = db.execute(watchlist_query)
-    watchlist = result.scalar()
-    return watchlist
 
 
 @router.get("/{watchlist_id}")
@@ -204,3 +215,54 @@ async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str
         except Exception as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get('/{watchlist_id}/cover_image')
+async def watchlist_cover_image(user: user_dependency, db: db_dependency, watchlist_id: int):
+    # Get watchlist
+    if user:
+        try:
+            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
+
+            if watchlist is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
+                )
+
+            # Get Poster URLS
+            poster_urls = []
+            for items in watchlist.items[:4]:
+                if items["media_type"] == "movie":
+                    response = requests.get(f"{BASE_URL}/movie/{items['id']}?api_key={API_KEY}")
+                    movie_item = response.json()
+                    poster_path = movie_item.get("poster_path")
+                    if poster_path:
+                        poster_urls.append(f"{BASE_IMG_URL}{poster_path}")
+                    else:
+                        poster_urls.append("https://placehold.co/400x600?text=Poster+Unavailable")
+
+            # Generate Image Grid using PIL
+            images = []
+            for image in poster_urls:
+                response = requests.get(image)
+                if response.status_code == 200:
+                    img = Image.open(BytesIO(response.content))
+                    images.append(img.resize((200, 300), Image.Resampling.LANCZOS))
+
+            # Put the posters into a grid Image
+            grid_size = (400, 600)  # 400x600 pixels
+            grid = Image.new("RGB", grid_size)
+            positions = [(0, 0), (200, 0), (0, 300), (200, 300)]
+
+            for pos, img in zip(positions, images):
+                grid.paste(img, pos)
+
+            # Convert the grid image to a byte stream
+            img_bytes = BytesIO()
+            grid.save(img_bytes, format="JPEG")
+            img_bytes.seek(0)
+
+            return StreamingResponse(img_bytes, media_type="image/jpeg")
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
