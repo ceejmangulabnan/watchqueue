@@ -110,3 +110,10 @@ export interface TvDataQuery {
   total_pages: number
   total_results: number
 }
+
+export interface RecommendedTvData {
+  pages: number
+  results: TvDetails[]
+  total_pages: number
+  total_results: number
+}
