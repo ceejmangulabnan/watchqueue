@@ -8,7 +8,6 @@ import ProtectedRoute from "@/components/ProtectedRoute"
 import { Toaster } from '@/components/ui/toaster'
 import Navbar from "@/components/Navbar"
 import WatchlistDetailsPage from '@/pages/WatchlistDetailsPage'
-import WatchlistDetails from '@/components/WatchlistDetails'
 import MovieDetailsPage from '@/pages/MovieDetailsPage'
 import SearchResultsPage from '@/pages/SearchResultsPage'
 import MovieSearchResults from '@/pages/SearchResultsPage/MovieSearchResults'
@@ -28,9 +27,7 @@ const App = () => {
               <Route path="/" element={<LandingPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path=":username/watchlist" element={<WatchlistDetailsPage />}>
-                  <Route path=':watchlistId' element={<WatchlistDetails />}></Route>
-                </Route>
+                <Route path=":username/watchlist/:watchlistId" element={<WatchlistDetailsPage />} />
                 <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
               </Route>
               <Route path="/search" element={<SearchResultsPage />}>
