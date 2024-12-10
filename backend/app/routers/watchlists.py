@@ -240,6 +240,15 @@ async def watchlist_cover_image(user: user_dependency, db: db_dependency, watchl
                         poster_urls.append(f"{BASE_IMG_URL}{poster_path}")
                     else:
                         poster_urls.append("https://placehold.co/400x600?text=Poster+Unavailable")
+                elif items["media_type"] == "tv":
+                    response = requests.get(f"{BASE_URL}/tv/{items['id']}?api_key={API_KEY}")
+                    tv_item = response.json()
+                    poster_path = tv_item.get("poster_path")
+                    if poster_path:
+                        poster_urls.append(f"{BASE_IMG_URL}{poster_path}")
+                    else:
+                        poster_urls.append("https://placehold.co/400x600?text=Poster+Unavailable")
+
 
             # Generate Image Grid using PIL
             images = []
