@@ -28,16 +28,16 @@ const PopularMovies = () => {
   }
 
   useEffect(() => {
-    const scrollContainer = movieContainerRef.current;
+    const scrollContainer = movieContainerRef.current
     if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", updateButtonVisibility);
+      scrollContainer.addEventListener("scroll", updateButtonVisibility)
       // Initial update
       updateButtonVisibility()
       return () => {
-        scrollContainer.removeEventListener("scroll", updateButtonVisibility);
-      };
+        scrollContainer.removeEventListener("scroll", updateButtonVisibility)
+      }
     }
-  }, []);
+  }, [])
 
   // Check scroll container once data has finished loading to get accurate dimensions
   useEffect(() => {

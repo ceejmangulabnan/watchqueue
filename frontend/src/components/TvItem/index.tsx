@@ -4,19 +4,22 @@ import { useAuth } from '@/hooks/useAuth'
 import { useQuery } from '@tanstack/react-query'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { Card, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'
-import { DropdownMenu, DropdownMenuPortal, DropdownMenuContent, DropdownMenuSubContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuItem, DropdownMenuPortal, DropdownMenuContent, DropdownMenuSubContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
-import { Ellipsis, CirclePlus } from 'lucide-react'
+import { Ellipsis, CirclePlus, Trash2 } from 'lucide-react'
 import { TvData } from '@/types/TvTypes'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { generatePosterLink } from '@/utils/generateImgLinks'
 
 interface TvItemProps {
   tv: TvData
+  currentWatchlist?: WatchlistData
+  inWatchlist?: boolean
+  handleRemoveFromWatchlist?: (watchlistId: number, mediaType: string, itemId: number) => Promise<void>
 }
 
-const TvItem = ({ tv }: TvItemProps) => {
+const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: TvItemProps) => {
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
   const navigate = useNavigate()
@@ -42,27 +45,53 @@ const TvItem = ({ tv }: TvItemProps) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuGroup>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
-                <CirclePlus className='mr-2' />
-                Add to Watchlist
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  {
-                    // Render User Watchlists Here
-                    userWatchlists &&
-                    <UserWatchlistsDropdown userWatchlists={userWatchlists} tv={tv} />
-                  }
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          </DropdownMenuGroup>
+          {
+            inWatchlist ?
+              (
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                      <CirclePlus className='mr-2' />
+                      Add to Watchlist
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {
+                          // Render User Watchlists Here
+                          userWatchlists &&
+                          <UserWatchlistsDropdown userWatchlists={userWatchlists} tv={tv} />
+                        }
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, "tv", tv.id)}>
+                    <Trash2 className='mr-2' />
+                    Remove from Watchlist
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              ) :
+              (
+                <DropdownMenuGroup>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                      <CirclePlus className='mr-2' />
+                      Add to Watchlist
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {
+                          // Render User Watchlists Here
+                          userWatchlists &&
+                          <UserWatchlistsDropdown userWatchlists={userWatchlists} tv={tv} />
+                        }
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuGroup>
+              )
+          }
         </DropdownMenuContent>
       </DropdownMenu>
-
-
 
       <img onClick={() => navigate(`/tv/${tv.id}`)} src={posterLink} onError={handlePosterError} />
 

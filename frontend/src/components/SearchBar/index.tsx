@@ -36,7 +36,7 @@ const SearchBar = () => {
       <form onSubmit={handleSubmit}>
         <div className='flex items-center shadow-sm border border-input rounded-sm'>
           <DropdownMenu>
-            <DropdownMenuTrigger className=''>
+            <DropdownMenuTrigger asChild>
               <Button variant={"outline"} className='border-none shadow-none w-28 justify-between'>{searchCategory}
                 <ChevronDown size={20} />
               </Button>

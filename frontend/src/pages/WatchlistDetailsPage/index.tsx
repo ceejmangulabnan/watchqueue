@@ -14,8 +14,8 @@ const WatchlistDetailsPage = () => {
 
   // Distinguish movie and tv items
   type WatchlistItemDetailsQuery = {
-    type: "movie" | "tv";
-    mediaData: MovieDetails | TvDetails;
+    type: "movie" | "tv"
+    mediaData: MovieDetails | TvDetails
   }
 
   const fetchWatchlistDetails = async () => {
@@ -60,36 +60,38 @@ const WatchlistDetailsPage = () => {
     },
   })
 
-  const handleRemoveFromWatchlist = async (watchlistId: number, movieId: number) => {
-    const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${movieId}`)
+  const handleRemoveFromWatchlist = async (watchlistId: number, mediaType: string, itemId: number) => {
+    const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${mediaType}/${itemId}`)
     if (response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ['watchlistDetails', watchlistId] })
     }
   }
 
   return (
-    <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
-      <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-        {
-          !watchlistItemsDetails.pending && watchlistItemsDetails.data.map((watchlistItem) => {
-            if (watchlistItem?.type === "movie") {
-              return (
-                <MovieItem
-                  key={watchlistItem?.mediaData.id}
-                  movie={watchlistItem?.mediaData as MovieDetails}
-                  inWatchlist={true}
-                  handleRemoveFromWatchlist={handleRemoveFromWatchlist}
-                  currentWatchlist={watchlistDetails}
-                />
-              );
-            } else if (watchlistItem?.type === "tv") {
-              return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />;
-            } else {
-              return null;
-            }
-          })
-        }
+    <div className='mx-10 md:mx-20 my-10'>
+      <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
+        <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+          {
+            !watchlistItemsDetails.pending && watchlistItemsDetails.data.map((watchlistItem) => {
+              if (watchlistItem?.type === "movie") {
+                return (
+                  <MovieItem
+                    key={watchlistItem?.mediaData.id}
+                    movie={watchlistItem?.mediaData as MovieDetails}
+                    inWatchlist={true}
+                    handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+                    currentWatchlist={watchlistDetails}
+                  />
+                )
+              } else if (watchlistItem?.type === "tv") {
+                return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />
+              } else {
+                return null
+              }
+            })
+          }
+        </div>
       </div>
     </div>
   )
