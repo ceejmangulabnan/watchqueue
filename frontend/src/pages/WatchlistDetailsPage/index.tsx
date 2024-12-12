@@ -85,7 +85,7 @@ const WatchlistDetailsPage = () => {
                   />
                 )
               } else if (watchlistItem?.type === "tv") {
-                return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} />
+                return <TvItem key={watchlistItem.mediaData.id} tv={watchlistItem.mediaData as TvDetails} currentWatchlist={watchlistDetails} inWatchlist={true} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
               } else {
                 return null
               }
