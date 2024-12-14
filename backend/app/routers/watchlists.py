@@ -69,6 +69,7 @@ async def get_watchlist(user: user_dependency, db: db_dependency, watchlist_id: 
             if watchlist is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
             else:
+                print(watchlist.statuses)
                 return watchlist
 
         except Exception as e:

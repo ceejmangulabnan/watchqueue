@@ -36,7 +36,7 @@ class Watchlists(Base):
     statuses: Mapped[list[str]] = mapped_column(
         ARRAY(String),
         nullable=False,
-        server_default="{'completed', 'queued', 'on-hold', 'dropped', 'watching'}"
+        server_default="{completed,queued,on-hold,dropped,watching}"
     )
     all_tags: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False, server_default="{}")
 
