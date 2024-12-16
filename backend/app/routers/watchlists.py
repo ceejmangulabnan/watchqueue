@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import delete, select
@@ -7,13 +8,11 @@ from starlette import status
 from db.models import Watchlists
 from routers.users import user_dependency
 from db.database import db_dependency
-import requests
 import os
 from dotenv import load_dotenv
 from PIL import Image
 from io import BytesIO
 import aiohttp
-import asyncio
 
 load_dotenv()
 
@@ -37,13 +36,26 @@ class WatchlistItem(BaseModel):
     id: int
 
 
+
 async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
-    watchlist_query = select(Watchlists).where(
-            Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
-        )
-    result = db.execute(watchlist_query)
-    watchlist = result.scalar()
-    return watchlist
+    if user:
+        try:
+            watchlist_query = select(Watchlists).where(
+                    Watchlists.id == watchlist_id, Watchlists.user_id == user.get("id")
+                )
+            result = db.execute(watchlist_query)
+            watchlist = result.scalar()
+
+            if watchlist is None:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+            # print(type(watchlist.items))
+            return watchlist
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+# Watchlist Item Dependency
+watchlist_dependency = Annotated[Watchlists, Depends(get_watchlist_from_db)]
 
 # Create Watchlist
 @router.post("/create")
@@ -61,23 +73,12 @@ async def create_watchlist(
             db.rollback()
             raise HTTPException(status_code=500, detail=str(e))
 
-
+# Get watchlist details
 @router.get("/{watchlist_id}")
-async def get_watchlist(user: user_dependency, db: db_dependency, watchlist_id: int):
-    if user:
-        try:
-            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
+async def get_watchlist(watchlist: watchlist_dependency):
+    return watchlist
 
-            if watchlist is None:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-            else:
-                print(watchlist.statuses)
-                return watchlist
-
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-
-
+# Delete watchlist
 @router.delete("/{watchlist_id}")
 async def delete_watchlist(user: user_dependency, db: db_dependency, watchlist_id: int):
     if user:
@@ -135,49 +136,39 @@ async def get_user_watchlists_all(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-
 @router.post("/{watchlist_id}/add")
 async def add_to_watchlist(
-    user: user_dependency, db: db_dependency, watchlist_id: int, watchlist_item: WatchlistItem
+    db: db_dependency, watchlist: watchlist_dependency, watchlist_id: int, watchlist_item: WatchlistItem
 ):
-    if user:
-        try:
-            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
+    try:
+        # Check if watchlist_item is already in the watchlist
+        if any(
+            item.get('id') == watchlist_item.id and 
+            item.get('media_type') == watchlist_item.media_type 
+            for item in watchlist.items
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Item already exists in the watchlist"
+            )
 
-            if watchlist is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
-                )
+        # Append the new item to the existing items
+        watchlist.items.append({
+            'id': watchlist_item.id,
+            'media_type': watchlist_item.media_type
+        })
 
-            # Check if watchlist_item is already in the watchlist
-            if any(
-                item.get('id') == watchlist_item.id and 
-                item.get('media_type') == watchlist_item.media_type 
-                for item in watchlist.items
-            ):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="Item already exists in the watchlist"
-                )
+        flag_modified(watchlist, "items")
 
+        db.add(watchlist)
+        db.commit()
+        return {
+            "message": f"Watchlist Item {watchlist_item.id} has been added to Watchlist {watchlist_id}"
+        }
 
-            # Append the new item to the existing items
-            watchlist.items.append({
-                'id': watchlist_item.id,
-                'media_type': watchlist_item.media_type
-            })
-
-            flag_modified(watchlist, "items")
-
-            db.add(watchlist)
-            db.commit()
-            return {
-                "message": f"Watchlist Item {watchlist_item.id} has been added to Watchlist {watchlist_id}"
-            }
-
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete('/{watchlist_id}/{media_type}/{item_id}')
