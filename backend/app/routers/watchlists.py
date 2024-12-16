@@ -35,8 +35,6 @@ class WatchlistItem(BaseModel):
     media_type: str
     id: int
 
-
-
 async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
     if user:
         try:
@@ -49,8 +47,8 @@ async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchl
             if watchlist is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-            # print(type(watchlist.items))
             return watchlist
+
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -172,7 +170,7 @@ async def add_to_watchlist(
 
 
 @router.delete('/{watchlist_id}/{media_type}/{item_id}')
-async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str, db: db_dependency, watchlist: watchlist_dependency ):
+async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str, db: db_dependency, watchlist: watchlist_dependency):
     try:
         # Find the item to remove
         item_to_remove = next(
