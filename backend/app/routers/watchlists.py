@@ -172,109 +172,93 @@ async def add_to_watchlist(
 
 
 @router.delete('/{watchlist_id}/{media_type}/{item_id}')
-async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str, user: user_dependency, db: db_dependency ):
-    if user:
-        try:
-            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
+async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str, db: db_dependency, watchlist: watchlist_dependency ):
+    try:
+        # Find the item to remove
+        item_to_remove = next(
+            (item for item in watchlist.items 
+             if item['id'] == item_id and item['media_type'] == media_type),
+            None
+        )
 
-            if watchlist is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
-                )
-
-            # Find the item to remove
-            item_to_remove = next(
-                (item for item in watchlist.items 
-                 if item['id'] == item_id and item['media_type'] == media_type),
-                None
+        if item_to_remove is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="Item is not in watchlist"
             )
 
-            if item_to_remove is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, 
-                    detail="Item is not in watchlist"
-                )
+        # Remove the item
+        watchlist.items.remove(item_to_remove)
 
-            # Remove the item
-            watchlist.items.remove(item_to_remove)
+        flag_modified(watchlist, "items")
 
-            flag_modified(watchlist, "items")
+        db.add(watchlist)
+        db.commit()
+        return {
+            "message": f"Item: {item_id} was successfully removed from watchlist: {watchlist_id}."
+        }
 
-            db.add(watchlist)
-            db.commit()
-            return {
-                "message": f"Item: {item_id} was successfully removed from watchlist: {watchlist_id}."
-            }
-
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.get('/{watchlist_id}/cover_image')
-async def watchlist_cover_image(user: user_dependency, db: db_dependency, watchlist_id: int):
-    if user:
-        try:
-            # Get watchlist
-            watchlist = await get_watchlist_from_db(user, db, watchlist_id)
-            if watchlist is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Watchlist not found"
-                )
-
-            # get watchlist item details
-            watchlist_item_details = []
-            for items in watchlist.items[:4]:
-                if items["media_type"] == "movie":
-                    watchlist_item_details.append(f"{BASE_URL}/movie/{items['id']}?api_key={API_KEY}")
-                elif items["media_type"] == "tv":
-                    watchlist_item_details.append(f"{BASE_URL}/tv/{items['id']}?api_key={API_KEY}")
+async def watchlist_cover_image(watchlist: watchlist_dependency):
+    try:
+        # get watchlist item details
+        watchlist_item_details = []
+        for items in watchlist.items[:4]:
+            if items["media_type"] == "movie":
+                watchlist_item_details.append(f"{BASE_URL}/movie/{items['id']}?api_key={API_KEY}")
+            elif items["media_type"] == "tv":
+                watchlist_item_details.append(f"{BASE_URL}/tv/{items['id']}?api_key={API_KEY}")
 
 
-            # extract the poster_path, then fetch images concurrently
-            # NOTE: This improved request speed from 1.5s to 500ms
-            async with aiohttp.ClientSession() as session:
-                poster_paths = []
-                for url in watchlist_item_details:
-                    async with session.get(url) as response:
-                        data = await response.json()
-                        poster_path = data.get("poster_path")
-                        if poster_path:
-                            # Use smaller image size of w154
-                            poster_paths.append(f"{BASE_IMG_URL}/w154{poster_path}")
-                        else:
-                            # If no available image, use placeholder
-                            poster_paths.append("https://placehold.co/400x600?text=Poster+Unavailable")
+        # extract the poster_path, then fetch images concurrently
+        # NOTE: This improved request speed from 1.5s to 500ms
+        async with aiohttp.ClientSession() as session:
+            poster_paths = []
+            for url in watchlist_item_details:
+                async with session.get(url) as response:
+                    data = await response.json()
+                    poster_path = data.get("poster_path")
+                    if poster_path:
+                        # Use smaller image size of w154
+                        poster_paths.append(f"{BASE_IMG_URL}/w154{poster_path}")
+                    else:
+                        # If no available image, use placeholder
+                        poster_paths.append("https://placehold.co/400x600?text=Poster+Unavailable")
 
-                # Fetch and process poster images
-                images = []
-                for image_url in poster_paths:
-                    async with session.get(image_url) as response:
-                        if response.status == 200:
-                            img_data = await response.read()
-                            img = Image.open(BytesIO(img_data))
-                            images.append(img.resize((200, 300), Image.Resampling.LANCZOS))  # Resize to reduce dimensions
+            # Fetch and process poster images
+            images = []
+            for image_url in poster_paths:
+                async with session.get(image_url) as response:
+                    if response.status == 200:
+                        img_data = await response.read()
+                        img = Image.open(BytesIO(img_data))
+                        images.append(img.resize((200, 300), Image.Resampling.LANCZOS))  # Resize to reduce dimensions
 
-                # Create a grid image
-                grid_size = (400, 600)  # Target grid size
-                grid = Image.new("RGB", grid_size)
-                positions = [(0, 0), (200, 0), (0, 300), (200, 300)]
+            # Create a grid image
+            grid_size = (400, 600)  # Target grid size
+            grid = Image.new("RGB", grid_size)
+            positions = [(0, 0), (200, 0), (0, 300), (200, 300)]
 
-                for pos, img in zip(positions, images):
-                    grid.paste(img, pos)
+            for pos, img in zip(positions, images):
+                grid.paste(img, pos)
 
-                # Compress and optimize the grid image
-                img_bytes = BytesIO()
-                grid.save(
-                    img_bytes,
-                    format="WEBP", # WEBP format for lower file size
-                    quality=60,  # Medium quality
-                    optimize=True  # Enable JPEG optimization
-                )
-                img_bytes.seek(0)
+            # Compress and optimize the grid image
+            img_bytes = BytesIO()
+            grid.save(
+                img_bytes,
+                format="WEBP", # WEBP format for lower file size
+                quality=60,  # Medium quality
+                optimize=True  # Enable JPEG optimization
+            )
+            img_bytes.seek(0)
 
-                # Return the optimized image
-                return StreamingResponse(img_bytes, media_type="image/webp")
+            # Return the optimized image
+            return StreamingResponse(img_bytes, media_type="image/webp")
 
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
