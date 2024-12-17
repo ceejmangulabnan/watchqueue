@@ -4,6 +4,8 @@ export interface WatchlistData {
   user_id: number,
   is_private: boolean,
   items: WatchlistItem[]
+  statuses: "completed" | "queued" | "on-hold" | "dropped" | "watching"
+  all_tags: string[]
 }
 
 export interface WatchlistItemProps {
