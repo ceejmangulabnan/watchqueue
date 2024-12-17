@@ -34,6 +34,8 @@ class CreateWatchlist(BaseModel):
 class WatchlistItem(BaseModel):
     media_type: str
     id: int
+    status: str
+    tags: list[str]
 
 async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
     if user:
@@ -153,7 +155,9 @@ async def add_to_watchlist(
         # Append the new item to the existing items
         watchlist.items.append({
             'id': watchlist_item.id,
-            'media_type': watchlist_item.media_type
+            'media_type': watchlist_item.media_type,
+            'status': watchlist_item.status,
+            'tags': watchlist_item.tags
         })
 
         flag_modified(watchlist, "items")
