@@ -1,5 +1,5 @@
-const statuses = ["completed", "queued", "on-hold", "dropped", "watching"] as const;
-type StatusType = typeof statuses[number];
+export const statuses = ["completed", "queued", "on-hold", "dropped", "watching"] as const;
+export type StatusType = typeof statuses[number];
 
 export interface WatchlistData {
   id: number,
