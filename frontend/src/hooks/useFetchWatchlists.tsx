@@ -3,7 +3,6 @@ import { useAuth } from "./useAuth"
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { useQuery } from "@tanstack/react-query"
 
-
 const useFetchWatchlists = () => {
   const axiosPrivate = useAxiosPrivate()
   const { auth } = useAuth()
