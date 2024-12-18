@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import delete, select
 from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
-from db.models import Watchlists
+from db.models import Watchlists, WatchlistItem
 from routers.users import user_dependency
 from db.database import db_dependency
 import os
@@ -27,15 +27,8 @@ router = APIRouter(prefix="/watchlists")
 async def watchlists():
     return {"message": "watchlists"}
 
-
 class CreateWatchlist(BaseModel):
     title: str
-
-class WatchlistItem(BaseModel):
-    media_type: str
-    id: int
-    status: str
-    tags: list[str]
 
 async def get_watchlist_from_db(user: user_dependency, db: db_dependency, watchlist_id: int):
     if user:
@@ -143,8 +136,8 @@ async def add_to_watchlist(
     try:
         # Check if watchlist_item is already in the watchlist
         if any(
-            item.get('id') == watchlist_item.id and 
-            item.get('media_type') == watchlist_item.media_type 
+            item.id == watchlist_item.id and 
+            item.media_type == watchlist_item.media_type 
             for item in watchlist.items
         ):
             raise HTTPException(
@@ -152,21 +145,44 @@ async def add_to_watchlist(
                 detail="Item already exists in the watchlist"
             )
 
-        # Append the new item to the existing items
-        watchlist.items.append({
-            'id': watchlist_item.id,
-            'media_type': watchlist_item.media_type,
-            'status': watchlist_item.status,
-            'tags': watchlist_item.tags
-        })
+        # Add new watchlist_item to items array
+        watchlist.items.append(watchlist_item)
 
         flag_modified(watchlist, "items")
 
         db.add(watchlist)
         db.commit()
+
         return {
             "message": f"Watchlist Item {watchlist_item.id} has been added to Watchlist {watchlist_id}"
         }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/{watchlist_id}/")
+async def update_status(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
+    try:
+        # Find the matching item in the watchlist by id and media type
+        matching_item = next(
+            (item for item in watchlist.items if item.id == watchlist_item.id and item.media_type == watchlist_item.media_type),
+            None
+        )
+
+        if not matching_item:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matches found for Watchlist Item.")
+
+        # Update status and tags of matching item
+        matching_item.status = watchlist_item.status
+        if matching_item.tags is not None:
+            matching_item.tags = watchlist_item.tags
+
+        # Apply changes to watchlist
+        flag_modified(watchlist, "items")
+
+        db.add(watchlist)
+        db.commit()
 
     except Exception as e:
         db.rollback()
@@ -179,7 +195,7 @@ async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str
         # Find the item to remove
         item_to_remove = next(
             (item for item in watchlist.items 
-             if item['id'] == item_id and item['media_type'] == media_type),
+             if item.id == item_id and item.media_type == media_type),
             None
         )
 
@@ -211,10 +227,10 @@ async def watchlist_cover_image(watchlist: watchlist_dependency):
         # get watchlist item details
         watchlist_item_details = []
         for items in watchlist.items[:4]:
-            if items["media_type"] == "movie":
-                watchlist_item_details.append(f"{BASE_URL}/movie/{items['id']}?api_key={API_KEY}")
-            elif items["media_type"] == "tv":
-                watchlist_item_details.append(f"{BASE_URL}/tv/{items['id']}?api_key={API_KEY}")
+            if items.media_type == "movie":
+                watchlist_item_details.append(f"{BASE_URL}/movie/{items.id}?api_key={API_KEY}")
+            elif items.media_type == "tv":
+                watchlist_item_details.append(f"{BASE_URL}/tv/{items.id}?api_key={API_KEY}")
 
 
         # extract the poster_path, then fetch images concurrently

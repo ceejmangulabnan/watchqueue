@@ -2,6 +2,7 @@
 from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.dialects.postgresql import JSONB
+from pydantic import BaseModel
 
 
 # Declarative Base
@@ -23,6 +24,12 @@ class Users(Base):
     email: Mapped[str] = mapped_column(String, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
+# WatchlistItem
+class WatchlistItem(BaseModel):
+    media_type: str
+    id: int
+    status: str
+    tags: list[str]
 
 # Watchlist Table
 class Watchlists(Base):
@@ -31,7 +38,7 @@ class Watchlists(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    items: Mapped[list[dict]] = mapped_column(JSONB, nullable=False, server_default="jsonb '[]'")
+    items: Mapped[list[WatchlistItem]] = mapped_column(JSONB, nullable=False, server_default="jsonb '[]'")
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
     statuses: Mapped[list[str]] = mapped_column(
         ARRAY(String),
