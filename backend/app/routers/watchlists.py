@@ -136,8 +136,8 @@ async def add_to_watchlist(
     try:
         # Check if watchlist_item is already in the watchlist
         if any(
-            item.id == watchlist_item.id and 
-            item.media_type == watchlist_item.media_type 
+            item["id"] == watchlist_item["id"] and 
+            item["media_type"] == watchlist_item["media_type"] 
             for item in watchlist.items
         ):
             raise HTTPException(
@@ -154,19 +154,19 @@ async def add_to_watchlist(
         db.commit()
 
         return {
-            "message": f"Watchlist Item {watchlist_item.id} has been added to Watchlist {watchlist_id}"
+            "message": f"Watchlist Item {watchlist_item['id']} has been added to Watchlist {watchlist_id}"
         }
 
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.put("/{watchlist_id}/")
+@router.put("/{watchlist_id}")
 async def update_status(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
     try:
         # Find the matching item in the watchlist by id and media type
         matching_item = next(
-            (item for item in watchlist.items if item.id == watchlist_item.id and item.media_type == watchlist_item.media_type),
+            (item for item in watchlist.items if item["id"] == watchlist_item["id"] and item["media_type"] == watchlist_item["media_type"]),
             None
         )
 
@@ -174,9 +174,9 @@ async def update_status(db: db_dependency, watchlist_item: WatchlistItem, watchl
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matches found for Watchlist Item.")
 
         # Update status and tags of matching item
-        matching_item.status = watchlist_item.status
-        if matching_item.tags is not None:
-            matching_item.tags = watchlist_item.tags
+        matching_item["status"] = watchlist_item["status"]
+        if matching_item["tags"] is not None:
+            matching_item["tags"] = watchlist_item["tags"]
 
         # Apply changes to watchlist
         flag_modified(watchlist, "items")
@@ -195,7 +195,7 @@ async def remove_from_watchlist(watchlist_id: int, item_id: int, media_type: str
         # Find the item to remove
         item_to_remove = next(
             (item for item in watchlist.items 
-             if item.id == item_id and item.media_type == media_type),
+             if item["id"] == item_id and item["media_type"] == media_type),
             None
         )
 
@@ -227,10 +227,10 @@ async def watchlist_cover_image(watchlist: watchlist_dependency):
         # get watchlist item details
         watchlist_item_details = []
         for items in watchlist.items[:4]:
-            if items.media_type == "movie":
-                watchlist_item_details.append(f"{BASE_URL}/movie/{items.id}?api_key={API_KEY}")
-            elif items.media_type == "tv":
-                watchlist_item_details.append(f"{BASE_URL}/tv/{items.id}?api_key={API_KEY}")
+            if items["media_type"] == "movie":
+                watchlist_item_details.append(f"{BASE_URL}/movie/{items["id"]}?api_key={API_KEY}")
+            elif items["media_type"] == "tv":
+                watchlist_item_details.append(f"{BASE_URL}/tv/{items["id"]}?api_key={API_KEY}")
 
 
         # extract the poster_path, then fetch images concurrently
