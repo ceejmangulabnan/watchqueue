@@ -18,7 +18,7 @@ interface WatchlistItemViewProps {
     data: (WatchlistItemDetailsQuery | undefined)[];
     pending: boolean;
   }
-  watchlistDetails: WatchlistData
+  watchlistDetails: WatchlistData | undefined
   handleRemoveFromWatchlist: (watchlistId: number, mediaType: string, itemId: number) => Promise<void>
 }
 
@@ -86,7 +86,6 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
       header: "Title",
       cell: info => info.getValue()
     }),
-    // Having trouble updating the state sa UI
     columnHelper.accessor("status", {
       header: "Status",
       cell: ({ row }) => {
@@ -128,7 +127,6 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
       header: "Tags",
       cell: info => info.getValue()
     }),
-    // All good no need to break lol
     columnHelper.display({
       header: "",
       id: "actions",
@@ -167,7 +165,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
 
   return !watchlistItemsDetails.pending ? (
     <Table>
-      <TableCaption>{`Watchlist: ${watchlistDetails.title}`}</TableCaption>
+      <TableCaption>{`Watchlist: ${watchlistDetails?.title}`}</TableCaption>
       <TableHeader>
         {
           table.getHeaderGroups().map((headerGroup) => (
