@@ -16,7 +16,6 @@ interface WatchlistItemDropdownContentProps {
 
 const WatchlistItemDropdownContent = ({ inWatchlist, currentWatchlist, mediaType, itemDetails, handleRemoveFromWatchlist }: WatchlistItemDropdownContentProps) => {
   const { userWatchlists, isLoading } = useFetchWatchlists()
-  console.log(userWatchlists)
   return (
     <DropdownMenuContent className='w-[14rem]' side={"right"}>
       {
