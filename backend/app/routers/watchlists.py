@@ -161,8 +161,9 @@ async def add_to_watchlist(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+# Adding and Removing tags from watchlist
 @router.put("/{watchlist_id}")
-async def update_status(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
+async def update_status_tags(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
     try:
         # Find the matching item in the watchlist by id and media type
         matching_item = next(
@@ -187,6 +188,27 @@ async def update_status(db: db_dependency, watchlist_item: WatchlistItem, watchl
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Should take the watchlist, with new all_tags content
+# Mutation for adding new tags should be passed as a prop
+@router.put("/{watchlist_id}/tags")
+async def edit_tags(db: db_dependency, watchlist: watchlist_dependency, tags: list[str]):
+    try:
+        if not watchlist.all_tags == tags:
+            # If there is a difference, then replace with new tags list
+            watchlist.all_tags = tags
+
+        flag_modified(watchlist, "all_tags")
+
+        db.add(watchlist)
+        db.commit()
+
+        return watchlist.all_tags
+
+    except Exception as e:
+        db.rollback()
+        raise e
 
 
 @router.delete('/{watchlist_id}/{media_type}/{item_id}')
