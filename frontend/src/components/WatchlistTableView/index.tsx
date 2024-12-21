@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Ellipsis } from 'lucide-react'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
 import { useMutation } from '@tanstack/react-query'
-import TagsPicker from '@/components/StatusPicker'
+import TagsPicker from '@/components/TagsPicker'
 
 
 interface WatchlistItemViewProps {

@@ -24,10 +24,8 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
                   selectedTags.map(tag => (
                     <p>{tag}</p>
                   ))
-
                 }
               </div>
-
             )
         }
       </DropdownMenuTrigger>
