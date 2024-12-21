@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Ellipsis } from 'lucide-react'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
 import { useMutation } from '@tanstack/react-query'
+import TagsPicker from '@/components/StatusPicker'
 
 
 interface WatchlistItemViewProps {
@@ -23,7 +24,7 @@ interface WatchlistItemViewProps {
 }
 
 // Row Shape
-type TWatchlistItem = {
+export type TWatchlistItem = {
   id: number
   title: string
   status: StatusType
@@ -86,6 +87,10 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
       header: "Title",
       cell: info => info.getValue()
     }),
+    columnHelper.accessor('mediaType', {
+      header: "Media Type",
+      cell: info => info.getValue()
+    }),
     columnHelper.accessor("status", {
       header: "Status",
       cell: ({ row }) => {
@@ -119,13 +124,11 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
 
       }
     }),
-    columnHelper.accessor('mediaType', {
-      header: "Media Type",
-      cell: info => info.getValue()
-    }),
     columnHelper.accessor('tags', {
       header: "Tags",
-      cell: info => info.getValue()
+      cell: ({ row }) => {
+        return <TagsPicker row={row} watchlistDetails={watchlistDetails} />
+      }
     }),
     columnHelper.display({
       header: "",
