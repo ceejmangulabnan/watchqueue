@@ -6,6 +6,8 @@ import { WatchlistData, WatchlistItem } from '@/types/WatchlistTypes'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import { CircleX, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface StatusPickerProps {
   row: Row<TWatchlistItem>
@@ -17,8 +19,6 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
   const [newTag, setNewTag] = useState<string>('')
   const queryClient = useQueryClient()
   const axiosPrivate = useAxiosPrivate()
-
-  console.log(selectedTags)
 
   const updateTags = (newTags: string[]) => {
     return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/tags`, newTags)
@@ -81,48 +81,57 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className='h-full w-full'>
+    <div className='flex items-center'>
+      <div className='w-full flex items-center gap-2'>
         {
-          !selectedTags.length ?
-            <p className='text-left'>Add Tags</p>
-            :
-            (
-              <div className='text-left'>
-                {
-                  selectedTags.map(tag => (
-                    <p>{tag}</p>
-                  ))
-                }
-              </div>
-            )
-        }
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-[15rem]'>
-        <DropdownMenuLabel className='text-xs text-gray-400'>Select multiple tags </DropdownMenuLabel>
-        <form onSubmit={(e) => handleSubmitTag(e)}>
-          <Input placeholder='Search for a tag...' value={newTag} onChange={handleInputChange} />
-          {
-            newTag
-              ? (
-                <button className='w-full relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50' type='submit'>Create tag {`"${newTag}"?`}</button>
-              )
-              : null
-          }
-        </form>
-        <DropdownMenuSeparator />
-        {
-          filteredTags?.map((tag) => (
-            <DropdownMenuItem onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
+          selectedTags.map(tag => (
+            <div className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
+              <p className='flex'>{tag}</p>
+              <CircleX size={16} />
+            </div>
           ))
         }
-
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <button className='text-red-500' onClick={() => setSelectedTags([])}>Remove All Tags</button>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          {
+            <Button className='rounded-full bg-white hover:bg-white shadow'>
+              <Plus color='#000000' size={16} />
+              <p className='text-foreground ml-2'>Add Tag</p>
+            </Button>
+          }
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className='w-[15rem]'>
+          <DropdownMenuLabel className='text-xs text-gray-400'>Select multiple tags </DropdownMenuLabel>
+          <form onSubmit={(e) => handleSubmitTag(e)}>
+            <Input placeholder='Search for a tag...' value={newTag} onChange={handleInputChange} />
+            {
+              newTag
+                ? (
+                  <button
+                    className='w-full relative flex cursor-default select-none items-center rounded-sm
+                    px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent 
+                    focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+                    type='submit'>
+                    Create tag {`"${newTag}"?`}
+                  </button>
+                )
+                : null
+            }
+          </form>
+          <DropdownMenuSeparator />
+          {
+            filteredTags?.map((tag) => (
+              <DropdownMenuItem onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
+            ))
+          }
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <button className='text-red-500' onClick={() => setSelectedTags([])}>Remove All Tags</button>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
