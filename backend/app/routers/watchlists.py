@@ -161,37 +161,7 @@ async def add_to_watchlist(
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
-# Adding and Removing tags from watchlist
-@router.put("/{watchlist_id}")
-async def update_status_tags(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
-    try:
-        # Find the matching item in the watchlist by id and media type
-        matching_item = next(
-            (item for item in watchlist.items if item["id"] == watchlist_item["id"] and item["media_type"] == watchlist_item["media_type"]),
-            None
-        )
-
-        if not matching_item:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matches found for Watchlist Item.")
-
-        # Update status and tags of matching item
-        matching_item["status"] = watchlist_item["status"]
-        if matching_item["tags"] is not None:
-            matching_item["tags"] = watchlist_item["tags"]
-
-        # Apply changes to watchlist
-        flag_modified(watchlist, "items")
-
-        db.add(watchlist)
-        db.commit()
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# Should take the watchlist, with new all_tags content
-# Mutation for adding new tags should be passed as a prop
+# Update All tags for watchlist
 @router.put("/{watchlist_id}/tags")
 async def edit_tags(db: db_dependency, watchlist: watchlist_dependency, tags: list[str]):
     try:
@@ -209,6 +179,64 @@ async def edit_tags(db: db_dependency, watchlist: watchlist_dependency, tags: li
     except Exception as e:
         db.rollback()
         raise e
+
+# Update Status Watchlist Item
+@router.put("/{watchlist_id}/item/status")
+async def update_status_tags(db: db_dependency, watchlist_item: WatchlistItem, watchlist: watchlist_dependency):
+    try:
+        # Find the matching item in the watchlist by id and media type
+        matching_item = next(
+            (item for item in watchlist.items if item["id"] == watchlist_item["id"] and item["media_type"] == watchlist_item["media_type"]),
+            None
+        )
+
+        if not matching_item:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matches found for Watchlist Item.")
+
+        # Update status and tags of matching item
+        matching_item["status"] = watchlist_item["status"]
+
+        # Apply changes to watchlist
+        flag_modified(watchlist, "items")
+
+        db.add(watchlist)
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
+@router.put("/{watchlist_id}/item/tags")
+async def edit_item_tags(db: db_dependency, watchlist: watchlist_dependency, watchlist_item: WatchlistItem):
+    try:
+    # Get watchlist item, compare matching item 
+
+        matching_item = next(
+            (item for item in watchlist.items if item["id"] == watchlist_item["id"] and item["media_type"] == watchlist_item["media_type"]),
+            None
+        )
+
+        if not matching_item:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No matches found for Watchlist Item.")
+
+    # Replace tags array new array
+        matching_item["tags"] = watchlist_item["tags"]
+
+        # Apply changes to watchlist
+        flag_modified(watchlist, "items")
+
+        db.add(watchlist)
+        db.commit()
+        
+        return matching_item
+
+    except Exception as e:
+        db.rollback()
+        raise e
+
 
 
 @router.delete('/{watchlist_id}/{media_type}/{item_id}')

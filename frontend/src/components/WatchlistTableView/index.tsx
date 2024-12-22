@@ -65,7 +65,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
 
   // Mutation Function
   const updateStatus = async ({ id, media_type, status, tags }: WatchlistItem) => {
-    return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}`, {
+    return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/item/status`, {
       id,
       media_type,
       status,
