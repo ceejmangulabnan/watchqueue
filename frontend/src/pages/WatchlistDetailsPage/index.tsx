@@ -5,6 +5,8 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { WatchlistData, WatchlistItem } from '@/types/WatchlistTypes'
 import { MovieDetails } from '@/types/MovieTypes'
 import { TvDetails } from '@/types/TvTypes'
+import { Grid3x3, Table } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import WatchlistItemView from '@/components/WatchlistItemView'
 import WatchlistTableView from '@/components/WatchlistTableView'
 
@@ -75,20 +77,29 @@ const WatchlistDetailsPage = () => {
       <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
         <h3 className="text-xl font-semibold py-4">{watchlistDetails?.title}</h3>
 
-        {/* Toggle buttons for switching views */}
-        <div className="flex gap-4 mb-6">
-          <button
-            className={`px-4 py-2 border ${view === 'item' ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}
-            onClick={() => setView('item')}
-          >
-            Item View
-          </button>
-          <button
-            className={`px-4 py-2 border ${view === 'table' ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}
-            onClick={() => setView('table')}
-          >
-            Table View
-          </button>
+        <div className='flex items-center gap-2 mb-4'>
+          {/* Toggle buttons for switching views */}
+          <div className="inline-flex items-center rounded-md border border-input bg-transparent shadow-sm">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setView('table')}
+              className={`rounded-r-none ${view === 'table' ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <Table className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setView('item')}
+              className={`rounded-l-none ${view === 'item' ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              <Grid3x3 className="h-4 w-4" />
+            </Button>
+          </div>
+          {
+            view === "table" ? <p>Table View</p> : <p>Grid View</p>
+          }
         </div>
         {(() => {
           switch (view) {

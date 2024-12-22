@@ -36,6 +36,28 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
     mutationFn: updateItemTags
   })
 
+  const handleRemoveItemTags = (tag: string) => {
+    // Remove tag from selectedTags
+    const updatedItemTags = selectedTags.filter(e => e !== tag)
+
+    setSelectedTags(updatedItemTags)
+
+    updateItemTagsMutation.mutateAsync({
+      // Watchlist Item
+      id: row.original.id,
+      media_type: row.original.mediaType,
+      status: row.original.status,
+      tags: updatedItemTags
+    }, {
+      onSuccess: () => {
+        // Trigger refetch of watchlist data
+        if (watchlistDetails) {
+          queryClient.invalidateQueries({ queryKey: ['watchlistDetails', Number(watchlistDetails.id)] })
+        }
+      }
+    })
+  }
+
   const handleAddTag = async (tag: string) => {
     // Check for duplicates, then add new selected item to selectedTags
     if (selectedTags.includes(tag)) return
@@ -81,13 +103,17 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
   }
 
   return (
-    <div className='flex items-center'>
-      <div className='w-full flex items-center gap-2'>
+    <div className='flex items-center wrap gap-2'>
+      <div className='flex items-center gap-2'>
         {
           selectedTags.map(tag => (
             <div className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
               <p className='flex'>{tag}</p>
-              <CircleX size={16} />
+              <CircleX
+                size={16}
+                onClick={() => handleRemoveItemTags(tag)}
+                className='opacity-70 hover:text-red-500 hover:opacity-100'
+              />
             </div>
           ))
         }
@@ -95,9 +121,8 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
       <DropdownMenu>
         <DropdownMenuTrigger>
           {
-            <Button className='rounded-full bg-white hover:bg-white shadow'>
-              <Plus color='#000000' size={16} />
-              <p className='text-foreground ml-2'>Add Tag</p>
+            <Button className='p-0 w-9 h-9 rounded-lg bg-gray-100/50 hover:bg-gray-200 shadow'>
+              <Plus color='#222222' size={16} />
             </Button>
           }
         </DropdownMenuTrigger>

@@ -81,7 +81,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
   const columns = useMemo(() => [
     columnHelper.accessor('id', {
       header: "ID",
-      cell: info => info.getValue()
+      cell: info => info.getValue(),
     }),
     columnHelper.accessor('title', {
       header: "Title",
@@ -89,7 +89,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
     }),
     columnHelper.accessor('mediaType', {
       header: "Media Type",
-      cell: info => info.getValue()
+      cell: info => info.getValue(),
     }),
     columnHelper.accessor("status", {
       header: "Status",
@@ -108,18 +108,28 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
           })
         }
 
+        const statusColors: Record<StatusType, string> = {
+          "completed": "bg-green-500 text-white",
+          "queued": "bg-blue-500 text-white",
+          "watching": "bg-yellow-600 text-white",
+          "on-hold": "bg-orange-500 text-white",
+          "dropped": "bg-red-500 text-white",
+        }
+
         return (
           <select
             value={selectedStatus}
             onChange={handleStatusChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 font-medium ${statusColors[selectedStatus]}`}
           >
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+            {
+              statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))
+            }
+          </select >
         )
 
       }
@@ -137,26 +147,27 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
         const mediaType = row.original.mediaType
         const data = row.original.itemDetails
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
-                <Ellipsis color='#000000' size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <WatchlistItemDropdownContent
-              inWatchlist={true}
-              currentWatchlist={watchlistDetails}
-              mediaType={mediaType}
-              itemDetails={data} // should be the mediaData
-              handleRemoveFromWatchlist={handleRemoveFromWatchlist}
-            />
-          </DropdownMenu>
+          <div className='w-full flex justify-end'>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild className='align-right'>
+                <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
+                  <Ellipsis color='#000000' size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <WatchlistItemDropdownContent
+                inWatchlist={true}
+                currentWatchlist={watchlistDetails}
+                mediaType={mediaType}
+                itemDetails={data} // should be the mediaData
+                handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+              />
+            </DropdownMenu>
+          </div>
+
         )
       }
     }),
   ], [data, watchlistDetails])
-
-
 
   // Create table 
   const table = useReactTable<TWatchlistItem>({
@@ -164,7 +175,6 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
-
 
   return !watchlistItemsDetails.pending ? (
     <Table>
