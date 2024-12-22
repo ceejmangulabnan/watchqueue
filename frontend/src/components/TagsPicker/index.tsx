@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { ChangeEvent, FormEvent, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { TWatchlistItem } from '@/components/WatchlistTableView'
 import { Row } from '@tanstack/react-table'
@@ -13,11 +13,13 @@ interface StatusPickerProps {
 }
 
 const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
-  const [selectedTags, setSelectedTags] = useState<Array<string>>(row.original.tags)
+  const [selectedTags, setSelectedTags] = useState<string[]>(row.original.tags)
+  const [newTag, setNewTag] = useState<string>('')
+
   const axiosPrivate = useAxiosPrivate()
 
-  const updateTags = () => {
-    return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/tags`, selectedTags)
+  const updateTags = (newTags: string[]) => {
+    return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/tags`, newTags)
   }
 
   const updateTagsMutation = useMutation({
@@ -31,20 +33,30 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
       setSelectedTags((prev) => [...prev, tag])
   }
 
+  // Show only unselected tags as the available options
   const filteredTags = watchlistDetails?.all_tags.filter(tag => !selectedTags.includes(tag))
 
-  const handleSubmitTag = async () => {
-    updateTagsMutation.mutateAsync
+  const handleSubmitTag = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    // Pass new tag in array.
+    const allTags = watchlistDetails?.all_tags
+    if (allTags)
+      updateTagsMutation.mutateAsync([...allTags, newTag])
+  }
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewTag(e.target.value)
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='h-full w-full'>
         {
-          !selectedTags.length ? <p>Add Tags</p>
+          !selectedTags.length ?
+            <p className='text-left'>Add Tags</p>
             :
             (
-              <div>
+              <div className='text-left'>
                 {
                   selectedTags.map(tag => (
                     <p>{tag}</p>
@@ -55,8 +67,15 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
         }
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-[15rem]'>
-        <form onSubmit={handleSubmitTag}>
-          <Input />
+        <form onSubmit={(e) => handleSubmitTag(e)}>
+          <Input value={newTag} onChange={handleInputChange} />
+          {
+            newTag
+              ? (
+                <button className='relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50' type='submit'>Create tag {`"${newTag}"?`}</button>
+              )
+              : null
+          }
         </form>
         {
           filteredTags?.map((tag) => (
