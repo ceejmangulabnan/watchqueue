@@ -1,14 +1,14 @@
 import { useMemo, useState, ReactNode, ChangeEvent } from 'react'
 import { WatchlistData, StatusType, WatchlistItem, statuses } from '@/types/WatchlistTypes'
 import { WatchlistItemDetailsQuery } from '@/pages/WatchlistDetailsPage'
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, SortingState, getSortedRowModel } from '@tanstack/react-table'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { MovieDetails } from '@/types/MovieTypes'
 import { TvDetails } from '@/types/TvTypes'
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from '@/components/ui/button'
-import { Ellipsis } from 'lucide-react'
+import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
 import { useMutation } from '@tanstack/react-query'
 import TagsPicker from '@/components/TagsPicker'
@@ -37,6 +37,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
   const axiosPrivate = useAxiosPrivate()
   const columnHelper = createColumnHelper<TWatchlistItem>()
   const data = watchlistItemsDetails.data
+  const [sorting, setSorting] = useState<SortingState>([])
 
   // Form table data to follow row shape
   const tableData: TWatchlistItem[] = useMemo(() => {
@@ -163,7 +164,6 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
               />
             </DropdownMenu>
           </div>
-
         )
       }
     }),
@@ -174,6 +174,11 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
     data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
   })
 
   return !watchlistItemsDetails.pending ? (
@@ -186,7 +191,28 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
               {
                 headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {(header.column.columnDef.header) as ReactNode}
+                    <div
+                      className='flex items-center gap-2'
+                      onClick={header.column.getToggleSortingHandler()}
+                      title={
+                        header.column.getCanSort()
+                          ? header.column.getNextSortingOrder() === 'asc'
+                            ? 'Sort ascending'
+                            : header.column.getNextSortingOrder() === 'desc'
+                              ? 'Sort descending'
+                              : 'Clear sort'
+                          : undefined
+                      }
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {{
+                        asc: <ArrowDownAZ />,
+                        desc: <ArrowDownZA />,
+                      }[header.column.getIsSorted() as string] ?? null}
+                    </div>
                   </TableHead>
                 ))
               }
