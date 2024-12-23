@@ -105,7 +105,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <img className='aspect-[3/4]' onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
+      <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie?.release_date.slice(0, 4) ?? "N/A"}</CardDescription>
