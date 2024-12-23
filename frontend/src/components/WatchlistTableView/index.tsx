@@ -1,18 +1,17 @@
-import { useMemo, useState, ReactNode, ChangeEvent } from 'react'
-import { WatchlistData, StatusType, WatchlistItem, statuses } from '@/types/WatchlistTypes'
-import { WatchlistItemDetailsQuery } from '@/pages/WatchlistDetailsPage'
+import { useMemo, useState, ChangeEvent } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable, SortingState, getSortedRowModel } from '@tanstack/react-table'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import { WatchlistItemDetailsQuery } from '@/pages/WatchlistDetailsPage'
+import { WatchlistData, StatusType, WatchlistItem, statuses } from '@/types/WatchlistTypes'
 import { MovieDetails } from '@/types/MovieTypes'
 import { TvDetails } from '@/types/TvTypes'
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from '@/components/ui/button'
-import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
-import { useMutation } from '@tanstack/react-query'
 import TagsPicker from '@/components/TagsPicker'
-
+import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 
 interface WatchlistItemViewProps {
   watchlistItemsDetails: {

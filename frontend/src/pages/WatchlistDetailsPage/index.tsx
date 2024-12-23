@@ -83,18 +83,18 @@ const WatchlistDetailsPage = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setView('table')}
-              className={`rounded-r-none ${view === 'table' ? 'bg-primary text-primary-foreground' : ''}`}
+              onClick={() => setView('item')}
+              className={`rounded-r-none ${view === 'item' ? 'bg-primary text-primary-foreground' : ''}`}
             >
-              <Table className="h-4 w-4" />
+              <Grid3x3 className="h-4 w-4" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setView('item')}
-              className={`rounded-l-none ${view === 'item' ? 'bg-primary text-primary-foreground' : ''}`}
+              onClick={() => setView('table')}
+              className={`rounded-l-none ${view === 'table' ? 'bg-primary text-primary-foreground' : ''}`}
             >
-              <Grid3x3 className="h-4 w-4" />
+              <Table className="h-4 w-4" />
             </Button>
           </div>
           {
