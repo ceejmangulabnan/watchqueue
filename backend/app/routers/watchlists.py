@@ -278,9 +278,9 @@ async def watchlist_cover_image(watchlist: watchlist_dependency):
         watchlist_item_details = []
         for items in watchlist.items[:4]:
             if items["media_type"] == "movie":
-                watchlist_item_details.append(f"{BASE_URL}/movie/{items["id"]}?api_key={API_KEY}")
+                watchlist_item_details.append(f"{BASE_URL}/movie/{items['id']}?api_key={API_KEY}")
             elif items["media_type"] == "tv":
-                watchlist_item_details.append(f"{BASE_URL}/tv/{items["id"]}?api_key={API_KEY}")
+                watchlist_item_details.append(f"{BASE_URL}/tv/{items['id']}?api_key={API_KEY}")
 
 
         # extract the poster_path, then fetch images concurrently
