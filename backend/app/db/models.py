@@ -2,7 +2,8 @@
 from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
-from typing import List, TypedDict
+from typing import List
+from typing_extensions import TypedDict
 
 
 # Declarative Base
