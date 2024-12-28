@@ -1,37 +1,11 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
-import useRefreshUser from '@/hooks/useRefreshUser'
 import NavLinks from '@/components/Navbar/NavLinks'
 import UserNav from '@/components/Navbar/UserNav'
 import SearchBar from '@/components/SearchBar'
 
 const Navbar = () => {
-  const axiosPrivate = useAxiosPrivate()
-  const { auth, setAuth } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const refreshUser = useRefreshUser()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const initAuth = async () => {
-      await refreshUser()
-      setLoading(false)
-    }
-
-    initAuth()
-  }, [])
-
-
-  const handleLogout = async () => {
-    const response = await axiosPrivate.post("/users/logout")
-    if (response.status == 200) {
-      setAuth({ ...auth, id: null, username: null, accessToken: null })
-      navigate(0)
-    }
-  }
-
+  const { auth, isAuthLoading, logout } = useAuth()
   const isAuthed = auth && !Object.values(auth).includes(null)
 
   return (
@@ -45,8 +19,8 @@ const Navbar = () => {
         </div>
         <SearchBar />
         <div className='flex items-center'>
-          <NavLinks loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} />
-          <UserNav loading={loading} isAuthed={isAuthed} handleLogout={handleLogout} auth={auth} />
+          <NavLinks loading={isAuthLoading} isAuthed={isAuthed} handleLogout={logout} />
+          <UserNav loading={isAuthLoading} isAuthed={isAuthed} handleLogout={logout} auth={auth} />
         </div>
       </div>
     </div>
