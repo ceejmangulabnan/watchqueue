@@ -6,16 +6,15 @@ import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
-import { useAuth } from '@/hooks/useAuth'
-import { WatchlistData } from '@/types/WatchlistTypes'
 import RecommendedMovies from '@/components/RecommendedMovies'
+import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import { useState } from 'react'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const axiosPrivate = useAxiosPrivate()
-  const { auth } = useAuth()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
+  const { userWatchlists } = useFetchWatchlists()
 
   const fetchMovieDetails = async () => {
     const response = await axiosPrivate.get(`/movies/${movieId}`)
@@ -29,12 +28,6 @@ const MovieDetailsPage = () => {
     queryFn: fetchMovieDetails,
   })
 
-  const fetchUserWatchlists = async () => {
-    const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistData[]
-  }
-
-  const { data: userWatchlists } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists })
 
   const handlePosterError = () => {
     setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
