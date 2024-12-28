@@ -23,7 +23,7 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
   const mediaTitle = () => movie ? movie.title : tv?.name
 
   const addToWatchlist = async ({ watchlistId, itemId }: { watchlistId: number, itemId: number }) => {
-    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { id: itemId, media_type: mediaType() })
+    const response = await axiosPrivate.post(`/watchlists/${watchlistId}/add`, { id: itemId, media_type: mediaType(), status: 'queued', tags: [] })
     return response.data
   }
 

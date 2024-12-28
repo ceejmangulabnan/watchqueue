@@ -1,7 +1,6 @@
-import { AuthContext } from "../contexts/AuthProvider"
+import { AuthContext } from '@/contexts/AuthProvider'
 import { useContext } from "react"
 
-// For checking if user is authenticated on the server
 export const useAuth = () => {
   const authContext = useContext(AuthContext)
 

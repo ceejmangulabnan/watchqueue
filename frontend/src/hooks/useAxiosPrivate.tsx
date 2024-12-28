@@ -4,7 +4,7 @@ import { axiosPrivate } from "../api/axios"
 import useRefreshToken from "./useRefreshToken"
 
 const useAxiosPrivate = () => {
-  const { auth } = useAuth()
+  const { auth, logout } = useAuth()
   const refresh = useRefreshToken()
 
   useEffect(() => {
@@ -24,11 +24,15 @@ const useAxiosPrivate = () => {
         // Access token is expired and the request hasn't been retried with a new access token
         if (error?.response?.status === 403 && !prevRequest?.sent) {
           prevRequest.sent = true
-          const newAccessToken = await refresh()
-          prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
-
-          // Retries request with new access token
-          return axiosPrivate(prevRequest)
+          try {
+            const newAccessToken = await refresh()
+            prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
+            return axiosPrivate(prevRequest)
+          } catch (refreshError) {
+            // If refresh fails, logout
+            logout()
+            return Promise.reject(refreshError)
+          }
         }
 
         return Promise.reject(error)
@@ -36,10 +40,10 @@ const useAxiosPrivate = () => {
       })
 
     return () => {
-      axiosPrivate.interceptors.request.eject(requestInterceptor);
-      axiosPrivate.interceptors.response.eject(responseInterceptor);
+      axiosPrivate.interceptors.request.eject(requestInterceptor)
+      axiosPrivate.interceptors.response.eject(responseInterceptor)
     }
-  }, [auth, refresh])
+  }, [auth, refresh, logout])
 
   return axiosPrivate
 }
