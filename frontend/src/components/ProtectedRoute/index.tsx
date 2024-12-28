@@ -12,17 +12,6 @@ const ProtectedRoute = () => {
     auth.username !== null &&
     auth.id !== null
 
-  // useLayoutEffect(() => {
-  //   const verifyUser = async () => {
-  //     if (!auth?.accessToken) {
-  //       await refreshUser()
-  //     }
-  //     setIsLoading(false)
-  //   }
-  //
-  //   verifyUser()
-  // }, [auth, refreshUser])
-
   if (isAuthLoading) {
     // TODO: Replace with proper loading screen / loading spinner
     return <div>Loading...</div>
