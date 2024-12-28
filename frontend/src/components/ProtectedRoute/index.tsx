@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate, Outlet } from "react-router-dom"
+
 const ProtectedRoute = () => {
   const { auth, isAuthLoading, logout } = useAuth()
   const navigate = useNavigate()
@@ -16,7 +17,6 @@ const ProtectedRoute = () => {
     // TODO: Replace with proper loading screen / loading spinner
     return <div>Loading...</div>
   }
-
 
   if (!isAuthenticated) {
     logout()
