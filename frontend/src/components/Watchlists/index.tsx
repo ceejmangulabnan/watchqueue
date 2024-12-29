@@ -3,16 +3,16 @@ import { Dialog, DialogTrigger, DialogTitle, DialogContent, DialogHeader } from 
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import useFetchWatchlists from "@/hooks/useFetchWatchlists"
 import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import WatchlistItem from "@/components/WatchlistItem"
 import { WatchlistData } from "@/types/WatchlistTypes"
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 
 const Watchlists = () => {
   const [watchlistTitle, setWatchlistTitle] = useState('')
   const axiosPrivate = useAxiosPrivate()
-  const { userWatchlists, refetchUserWatchlists } = useFetchWatchlists()
+  const { userWatchlists, refetchUserWatchlists } = useUserWatchlists()
   const [isOpen, setIsOpen] = useState(false)
 
 

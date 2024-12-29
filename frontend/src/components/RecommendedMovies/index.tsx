@@ -1,5 +1,5 @@
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useQuery } from '@tanstack/react-query'
+import axiosBase from '@/api/axios'
 import { MovieDetails, RecommendedMoviesData } from '@/types/MovieTypes'
 import MovieItem from '@/components/Movies/MovieItem'
 
@@ -8,10 +8,9 @@ interface RecommendedMoviesProps {
 }
 
 const RecommendedMovies = ({ movieDetails }: RecommendedMoviesProps) => {
-  const axiosPrivate = useAxiosPrivate()
 
   const fetchRecommendedMovies = async () => {
-    const response = await axiosPrivate.get(`/movies/${movieDetails.id}/recommendations`)
+    const response = await axiosBase.get(`/movies/${movieDetails.id}/recommendations`)
     return response.data as RecommendedMoviesData
   }
 

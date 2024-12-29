@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
 import TagsPicker from '@/components/TagsPicker'
 import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface WatchlistItemViewProps {
   watchlistItemsDetails: {
@@ -37,6 +38,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
   const columnHelper = createColumnHelper<TWatchlistItem>()
   const data = watchlistItemsDetails.data
   const [sorting, setSorting] = useState<SortingState>([])
+  const { userWatchlists, isUserWatchlistsLoading, refetchUserWatchlists } = useUserWatchlists()
 
   // Form table data to follow row shape
   const tableData: TWatchlistItem[] = useMemo(() => {
@@ -75,6 +77,9 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
 
   const updateStatusMutation = useMutation({
     mutationFn: updateStatus,
+    onSuccess: () => {
+      refetchUserWatchlists()
+    }
   })
 
   // Cache to avoid recreating on every render
@@ -155,6 +160,8 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
                 </Button>
               </DropdownMenuTrigger>
               <WatchlistItemDropdownContent
+                userWatchlists={userWatchlists}
+                isUserWatchlistsLoading={isUserWatchlistsLoading}
                 inWatchlist={true}
                 currentWatchlist={watchlistDetails}
                 mediaType={mediaType}

@@ -1,40 +1,11 @@
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { useQuery } from '@tanstack/react-query'
-import { MovieDataQuery } from '@/types/MovieTypes'
-import { TvDataQuery } from '@/types/TvTypes'
 import ScrollableList from '@/components/ScrollableList'
+import useMediaData from '@/hooks/useMediaData'
 
 const LandingPage = () => {
-  const axiosPrivate = useAxiosPrivate()
-
-  const fetchMoviePopular = async () => {
-    const response = await axiosPrivate.get('/movies/popular')
-    return response.data as MovieDataQuery
-  }
-
-  const { data: moviePopular, isLoading: isMoviePopularLoading } = useQuery({ queryKey: ['moviePopular'], queryFn: fetchMoviePopular })
-
-  const fetchMovieTopRated = async () => {
-    const response = await axiosPrivate.get('/movies/top_rated')
-    return response.data as MovieDataQuery
-  }
-
-  const { data: movieTopRated, isLoading: isMovieTopRatedLoading } = useQuery({ queryKey: ['movieTopRated'], queryFn: fetchMovieTopRated })
-
-  const fetchTvPopular = async () => {
-    const response = await axiosPrivate.get('/tv/popular')
-    return response.data as TvDataQuery
-  }
-
-  const { data: tvPopular, isLoading: isTvPopularLoading } = useQuery({ queryKey: ['tvPopular'], queryFn: fetchTvPopular })
-
-  const fetchTvTopRated = async () => {
-    const response = await axiosPrivate.get('/tv/top_rated')
-    return response.data as TvDataQuery
-  }
-
-  const { data: tvTopRated, isLoading: isTvTopRatedLoading } = useQuery({ queryKey: ['tvTopRated'], queryFn: fetchTvTopRated })
-
+  const { data: moviePopular, isLoading: isMoviePopularLoading } = useMediaData('/movies/popular', 'moviesPopular')
+  const { data: movieTopRated, isLoading: isMovieTopRatedLoading } = useMediaData('/movies/top_rated', 'moviesTopRated')
+  const { data: tvPopular, isLoading: isTvPopularLoading } = useMediaData('/tv/popular', 'tvPopular')
+  const { data: tvTopRated, isLoading: isTvTopRatedLoading } = useMediaData('/tv/top_rated', 'tvTopRated')
 
   return (
     <div className='mx-10 md:mx-20 my-10'>
@@ -54,6 +25,7 @@ const LandingPage = () => {
         <h3 className="text-base md:text-xl font-semibold py-4 ">Top Rated TV Shows</h3>
         {(tvTopRated && !isTvTopRatedLoading) &&
           <ScrollableList scrollableItems={tvTopRated} isDataLoading={isTvTopRatedLoading} />}
+
       </div>
     </div>
   )

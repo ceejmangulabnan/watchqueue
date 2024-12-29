@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { MovieDataQuery } from '@/types/MovieTypes'
 import { TvDataQuery } from '@/types/TvTypes'
@@ -15,14 +15,14 @@ const ScrollableList = ({ scrollableItems, isDataLoading }: ScrollableListProps)
   const [showLeftButton, setShowLeftButton] = useState(false)
   const [showRightButton, setShowRightButton] = useState(false)
 
-  const updateButtonVisibility = () => {
+  const updateButtonVisibility = useCallback(() => {
     if (movieContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = movieContainerRef.current
 
       setShowLeftButton(scrollLeft > 0)
       setShowRightButton(scrollWidth > clientWidth)
     }
-  }
+  }, [])
 
   useEffect(() => {
     const scrollContainer = movieContainerRef.current
@@ -34,7 +34,7 @@ const ScrollableList = ({ scrollableItems, isDataLoading }: ScrollableListProps)
         scrollContainer.removeEventListener("scroll", updateButtonVisibility)
       }
     }
-  }, [])
+  }, [updateButtonVisibility])
 
   // Check scroll container once data has finished loading to get accurate dimensions
   useEffect(() => {
@@ -42,19 +42,17 @@ const ScrollableList = ({ scrollableItems, isDataLoading }: ScrollableListProps)
       setTimeout(updateButtonVisibility, 0)
     }
 
-  }, [scrollableItems])
+  }, [isDataLoading, scrollableItems])
 
   const scrollLeft = () => {
     if (movieContainerRef.current) {
       movieContainerRef.current.scrollBy({ left: -300, behavior: "smooth" })
-      updateButtonVisibility()
     }
   }
 
   const scrollRight = () => {
     if (movieContainerRef.current) {
       movieContainerRef.current.scrollBy({ left: 300, behavior: "smooth" })
-      updateButtonVisibility()
     }
   }
 
