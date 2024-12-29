@@ -4,18 +4,17 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import RecommendedMovies from '@/components/RecommendedMovies'
-import { useState } from 'react'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import useMediaDetails from '@/hooks/useMediaDetails'
 import { Genre } from '@/types/TvTypes'
+import { MovieDetails } from '@/types/MovieTypes'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
-  const [posterLink, setPosterLink] = useState<string | undefined>('')
   const { userWatchlists } = useUserWatchlists()
-  const { data: movieDetails } = useMediaDetails(movieId, `/movies/${movieId}`, 'movieDetails')
+  const { data: movieDetails } = useMediaDetails<MovieDetails>(movieId, `/movies/${movieId}`, 'movieDetails')
 
-  setPosterLink(generatePosterLink(movieDetails.poster_path))
+  const posterLink = generatePosterLink(movieDetails?.poster_path)
 
   return movieDetails ? (
     <div className='mx-10 md:mx-20 my-10'>

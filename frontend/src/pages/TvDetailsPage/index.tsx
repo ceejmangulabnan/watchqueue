@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-import { useState } from 'react'
 import useMediaDetails from '@/hooks/useMediaDetails'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import { Button } from '@/components/ui/button'
@@ -11,13 +10,12 @@ import { FALLBACK_POSTER, generatePosterLink } from '@/utils'
 
 const TvDetailsPage = () => {
   const { tvId } = useParams()
-  const [posterLink, setPosterLink] = useState<string | undefined>('')
   const { userWatchlists } = useUserWatchlists()
-  const { data: tvDetails } = useMediaDetails(tvId, `/tv/${tvId}`, 'tvDetails')
+  const { data: tvDetails } = useMediaDetails<TvDetails>(tvId, `/tv/${tvId}`, 'tvDetails')
 
-  setPosterLink(generatePosterLink(tvDetails.poster_path))
+  const posterLink = generatePosterLink(tvDetails?.poster_path)
 
-  return tvDetails as TvDetails ? (
+  return tvDetails ? (
     <div className='mx-10 md:mx-20 my-10'>
       <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
         <div className='flex flex-col items-center sm:flex-row pb-8 sm:py-8'>
