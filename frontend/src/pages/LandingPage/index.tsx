@@ -1,38 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
-import axiosBase from '@/api/axios'
-import { MovieDataQuery } from '@/types/MovieTypes'
-import { TvDataQuery } from '@/types/TvTypes'
 import ScrollableList from '@/components/ScrollableList'
+import useMediaData from '@/hooks/useMediaData'
 
 const LandingPage = () => {
-  const fetchMoviePopular = async () => {
-    const response = await axiosBase.get('/movies/popular')
-    return response.data as MovieDataQuery
-  }
-
-  const { data: moviePopular, isLoading: isMoviePopularLoading } = useQuery({ queryKey: ['moviePopular'], queryFn: fetchMoviePopular })
-
-  const fetchMovieTopRated = async () => {
-    const response = await axiosBase.get('/movies/top_rated')
-    return response.data as MovieDataQuery
-  }
-
-  const { data: movieTopRated, isLoading: isMovieTopRatedLoading } = useQuery({ queryKey: ['movieTopRated'], queryFn: fetchMovieTopRated })
-
-  const fetchTvPopular = async () => {
-    const response = await axiosBase.get('/tv/popular')
-    return response.data as TvDataQuery
-  }
-
-  const { data: tvPopular, isLoading: isTvPopularLoading } = useQuery({ queryKey: ['tvPopular'], queryFn: fetchTvPopular })
-
-  const fetchTvTopRated = async () => {
-    const response = await axiosBase.get('/tv/top_rated')
-    return response.data as TvDataQuery
-  }
-
-  const { data: tvTopRated, isLoading: isTvTopRatedLoading } = useQuery({ queryKey: ['tvTopRated'], queryFn: fetchTvTopRated })
-
+  const { data: moviePopular, isLoading: isMoviePopularLoading } = useMediaData('/movies/popular', 'moviesPopular')
+  const { data: movieTopRated, isLoading: isMovieTopRatedLoading } = useMediaData('/movies/top_rated', 'moviesTopRated')
+  const { data: tvPopular, isLoading: isTvPopularLoading } = useMediaData('/tv/popular', 'tvPopular')
+  const { data: tvTopRated, isLoading: isTvTopRatedLoading } = useMediaData('/tv/top_rated', 'tvTopRated')
 
   return (
     <div className='mx-10 md:mx-20 my-10'>
