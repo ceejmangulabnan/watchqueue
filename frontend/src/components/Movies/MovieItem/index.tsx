@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,7 @@ import { WatchlistData } from '@/types/WatchlistTypes'
 import { MovieData, MovieDetails } from "@/types/MovieTypes"
 import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Ellipsis } from 'lucide-react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface MovieItemProps {
   movie: MovieData
@@ -19,15 +19,16 @@ interface MovieItemProps {
 }
 
 const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
+  const { userWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
   const navigate = useNavigate()
   const [posterLink, setPosterLink] = useState(() => generatePosterLink(movie.poster_path))
-  const { userWatchlists, isLoading } = useFetchWatchlists()
+
 
   const handlePosterError = () => {
     setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
   }
 
-  if (isLoading) {
+  if (isUserWatchlistsLoading) {
     <MediaItemSkeleton />
   }
 
@@ -42,7 +43,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
         {/* Dropdown Content */}
         {
           userWatchlists &&
-          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isLoading} itemDetails={movie as MovieDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
+          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isUserWatchlistsLoading} itemDetails={movie as MovieDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
         }
       </DropdownMenu>
 

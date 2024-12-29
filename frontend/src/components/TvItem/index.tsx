@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import { Card, CardTitle, CardFooter, CardDescription } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,7 @@ import { TvData, TvDetails } from '@/types/TvTypes'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { generatePosterLink } from '@/utils/generateImgLinks'
 import { Ellipsis } from 'lucide-react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface TvItemProps {
   tv: TvData
@@ -21,13 +21,13 @@ interface TvItemProps {
 const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: TvItemProps) => {
   const navigate = useNavigate()
   const [posterLink, setPosterLink] = useState(() => generatePosterLink(tv.poster_path))
-  const { userWatchlists, isLoading } = useFetchWatchlists()
+  const { userWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
 
   const handlePosterError = () => {
     setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
   }
 
-  if (isLoading) {
+  if (isUserWatchlistsLoading) {
     <MediaItemSkeleton />
   }
 
@@ -42,7 +42,7 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
         {/* Dropdown Content */}
         {
           userWatchlists &&
-          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isLoading} itemDetails={tv as TvDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
+          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isUserWatchlistsLoading} itemDetails={tv as TvDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
 
         }
       </DropdownMenu>
