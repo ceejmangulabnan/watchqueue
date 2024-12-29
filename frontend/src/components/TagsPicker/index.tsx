@@ -113,7 +113,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
       <div className='flex items-center gap-2'>
         {
           selectedTags.map(tag => (
-            <div className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
+            <div key={tag} className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
               <p className='flex'>{tag}</p>
               <CircleX
                 size={16}
@@ -125,7 +125,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
         }
       </div>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           {
             <Button className='p-0 w-9 h-9 rounded-lg bg-gray-100/50 hover:bg-gray-200 shadow'>
               <Plus color='#222222' size={16} />
@@ -153,7 +153,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
           <DropdownMenuSeparator />
           {
             filteredTags?.map((tag) => (
-              <DropdownMenuItem onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
+              <DropdownMenuItem key={tag} onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
             ))
           }
           <DropdownMenuSeparator />
