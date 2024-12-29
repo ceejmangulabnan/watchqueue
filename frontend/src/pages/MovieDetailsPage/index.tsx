@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axiosBase from '@/api/axios'
 import { MovieDetails } from '@/types/MovieTypes'
 import { generatePosterLink } from "@/utils/generateImgLinks"
 import { Button } from '@/components/ui/button'
@@ -12,12 +12,11 @@ import { useState } from 'react'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
-  const axiosPrivate = useAxiosPrivate()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
   const { userWatchlists } = useFetchWatchlists()
 
   const fetchMovieDetails = async () => {
-    const response = await axiosPrivate.get(`/movies/${movieId}`)
+    const response = await axiosBase.get(`/movies/${movieId}`)
     const data = await response.data as MovieDetails
     setPosterLink(generatePosterLink(data.poster_path))
     return data

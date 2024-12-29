@@ -1,6 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import axiosBase from '@/api/axios'
+import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from 'react-router-dom'
+import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -12,9 +16,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import useAxiosPrivate from "@/hooks/useAxiosPrivate"
-import { useAuth } from "@/hooks/useAuth"
-import { useNavigate } from 'react-router-dom'
 
 interface RegisterFormProps {
   toggleForm: () => void
@@ -45,8 +46,8 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
 
   const onSubmit = async (registerValues: z.infer<typeof registerFormSchema>) => {
     try {
-      await axiosPrivate.post('/users/register', registerValues)
-      const login = await axiosPrivate.post('/users/token', { username: registerValues.username, password: registerValues.password }, {
+      await axiosBase.post('/users/register', registerValues)
+      const login = await axiosBase.post('/users/token', { username: registerValues.username, password: registerValues.password }, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         }

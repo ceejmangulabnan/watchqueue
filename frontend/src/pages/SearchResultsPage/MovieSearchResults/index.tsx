@@ -1,16 +1,15 @@
-import MovieItem from '@/components/Movies/MovieItem'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { useQuery } from '@tanstack/react-query'
-import { MovieDataQuery } from '@/types/MovieTypes'
 import { useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import axiosBase from '@/api/axios'
+import MovieItem from '@/components/Movies/MovieItem'
+import { MovieDataQuery } from '@/types/MovieTypes'
 
 const MovieSearchResults = () => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('query')
-  const axiosPrivate = useAxiosPrivate()
 
   const fetchSearchMovie = async () => {
-    const response = await axiosPrivate.get(`/search/movie?query=${searchQuery}`)
+    const response = await axiosBase.get(`/search/movie?query=${searchQuery}`)
     return response.data as MovieDataQuery
   }
 

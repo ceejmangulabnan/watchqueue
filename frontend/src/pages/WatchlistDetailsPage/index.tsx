@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query'
+import axiosBase from '@/api/axios'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { WatchlistData, WatchlistItem } from '@/types/WatchlistTypes'
 import { MovieDetails } from '@/types/MovieTypes'
@@ -24,13 +25,13 @@ const WatchlistDetailsPage = () => {
 
 
   const fetchWatchlistDetails = async () => {
-    const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
+    const response = await axiosBase.get(`/watchlists/${watchlistId}`)
     return response.data as WatchlistData
   }
 
   const fetchWatchlistItemDetails = async (watchlistItem: WatchlistItem) => {
     if (watchlistItem.media_type === "movie") {
-      const response = await axiosPrivate.get(`/movies/${watchlistItem.id}`)
+      const response = await axiosBase.get(`/movies/${watchlistItem.id}`)
       const watchlistItemDetails: WatchlistItemDetailsQuery = {
         type: "movie",
         mediaData: response.data as MovieDetails
@@ -38,7 +39,7 @@ const WatchlistDetailsPage = () => {
       return watchlistItemDetails
 
     } else if (watchlistItem.media_type === "tv") {
-      const response = await axiosPrivate.get(`/tv/${watchlistItem.id}`)
+      const response = await axiosBase.get(`/tv/${watchlistItem.id}`)
       const watchlistItemDetails: WatchlistItemDetailsQuery = {
         type: "tv",
         mediaData: response.data as TvDetails

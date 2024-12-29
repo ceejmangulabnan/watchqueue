@@ -5,6 +5,7 @@ import { Card, CardTitle, CardFooter, CardDescription } from '@/components/ui/ca
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
+import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 import { TvData, TvDetails } from '@/types/TvTypes'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { generatePosterLink } from '@/utils/generateImgLinks'
@@ -24,6 +25,10 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
 
   const handlePosterError = () => {
     setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
+  }
+
+  if (isLoading) {
+    <MediaItemSkeleton />
   }
 
   return (

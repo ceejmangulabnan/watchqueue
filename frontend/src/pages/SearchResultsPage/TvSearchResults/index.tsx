@@ -1,16 +1,15 @@
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axiosBase from '@/api/axios'
 import { TvDataQuery } from '@/types/TvTypes'
 import TvItem from '@/components/TvItem'
 
 const TvSearchResults = () => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('query')
-  const axiosPrivate = useAxiosPrivate()
 
   const fetchSearchTv = async () => {
-    const response = await axiosPrivate.get(`/search/tv?query=${searchQuery}`)
+    const response = await axiosBase.get(`/search/tv?query=${searchQuery}`)
     return response.data as TvDataQuery
   }
 

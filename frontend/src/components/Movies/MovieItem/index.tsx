@@ -4,8 +4,8 @@ import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
+import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { MovieData, MovieDetails } from "@/types/MovieTypes"
 import { generatePosterLink } from "@/utils/generateImgLinks"
@@ -28,15 +28,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
   }
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-start">
-        <Skeleton className="h-[18rem] w-full" />
-        <div className="mt-4 space-y-2 h-20 w-full">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      </div>
-    )
+    <MediaItemSkeleton />
   }
 
   return (

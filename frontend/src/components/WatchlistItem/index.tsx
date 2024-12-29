@@ -13,15 +13,13 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
 
-  const { data: watchlistCover, isLoading, isError } = useQuery(
-    {
-      queryKey: ['watchlistCover', watchlist.id],
-      queryFn: async () => {
-        const response = await axiosPrivate.get(`${import.meta.env.VITE_BASE_URL}/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' })
-        return URL.createObjectURL(response.data)
-      }
-    },
-  )
+  const { data: watchlistCover, isLoading, isError } = useQuery({
+    queryKey: ['watchlistCover', watchlist.id],
+    queryFn: async () => {
+      const response = await axiosPrivate.get(`/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' })
+      return URL.createObjectURL(response.data)
+    }
+  })
 
   // Handle image loading failure (in case the image is invalid or not found)
   const handleImageError = () => {

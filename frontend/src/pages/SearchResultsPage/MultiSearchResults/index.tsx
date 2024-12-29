@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axiosBase from '@/api/axios'
 import TvItem from '@/components/TvItem'
 import MovieItem from '@/components/Movies/MovieItem'
 import PersonItem from '@/components/PersonItem'
@@ -10,10 +10,9 @@ import { MediaDataQuery } from '@/types/MediaTypes'
 const MultiSearchResults = () => {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('query')
-  const axiosPrivate = useAxiosPrivate()
 
   const fetchSearchMulti = async () => {
-    const response = await axiosPrivate.get(`/search/multi?query=${searchQuery}`)
+    const response = await axiosBase.get(`/search/multi?query=${searchQuery}`)
     return response.data as MediaDataQuery
   }
 

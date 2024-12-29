@@ -1,18 +1,17 @@
 import { useQuery } from "@tanstack/react-query"
+import axiosBase from '@/api/axios'
 import MovieItem from "@/components/Movies/MovieItem"
 import { MovieDataQuery } from "@/types/MovieTypes"
-import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import { useRef, useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const PopularMovies = () => {
-  const axiosPrivate = useAxiosPrivate()
   const movieContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftButton, setShowLeftButton] = useState(false)
   const [showRightButton, setShowRightButton] = useState(false)
 
   const fetchPopularMovies = async () => {
-    const response = await axiosPrivate.get('/movies/popular')
+    const response = await axiosBase.get('/movies/popular')
     return response.data as MovieDataQuery
   }
 

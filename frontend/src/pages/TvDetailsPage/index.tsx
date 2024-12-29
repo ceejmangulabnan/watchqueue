@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axiosBase from '@/api/axios'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { TvDetails } from '@/types/TvTypes'
@@ -10,15 +10,13 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/compon
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import RecommendedTv from '@/components/RecommendedTv'
 
-
 const TvDetailsPage = () => {
   const { tvId } = useParams()
-  const axiosPrivate = useAxiosPrivate()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
   const { userWatchlists } = useFetchWatchlists()
 
   const fetchTvDetails = async () => {
-    const response = await axiosPrivate.get(`/tv/${tvId}`)
+    const response = await axiosBase.get(`/tv/${tvId}`)
     setPosterLink(generatePosterLink(response.data.poster_path))
     return response.data as TvDetails
   }
