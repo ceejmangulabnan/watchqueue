@@ -10,7 +10,7 @@ const useWatchlistDetails = (watchlistId: string | undefined) => {
     return response.data as WatchlistData
   }
 
-  return useQuery({ queryKey: ['watchlistDetails', Number(watchlistId)], queryFn: fetchWatchlistDetails, enabled: !!watchlistId })
+  return useQuery({ queryKey: ['watchlistDetails', Number(watchlistId)], queryFn: fetchWatchlistDetails })
 }
 
 export default useWatchlistDetails

@@ -25,6 +25,7 @@ const LandingPage = () => {
         <h3 className="text-base md:text-xl font-semibold py-4 ">Top Rated TV Shows</h3>
         {(tvTopRated && !isTvTopRatedLoading) &&
           <ScrollableList scrollableItems={tvTopRated} isDataLoading={isTvTopRatedLoading} />}
+
       </div>
     </div>
   )

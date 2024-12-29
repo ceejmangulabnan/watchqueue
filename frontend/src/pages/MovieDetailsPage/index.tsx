@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { generatePosterLink, handlePosterError } from "@/utils"
+import { generatePosterLink, FALLBACK_POSTER } from "@/utils"
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
@@ -21,7 +21,14 @@ const MovieDetailsPage = () => {
     <div className='mx-10 md:mx-20 my-10'>
       <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
         <div className='flex flex-col items-center sm:flex-row pb-8 sm:py-8'>
-          <img className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg' src={posterLink} alt={movieDetails.title} onError={() => handlePosterError(setPosterLink)} />
+          <img
+            className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg'
+            src={posterLink}
+            alt={movieDetails.title}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = FALLBACK_POSTER
+            }}
+          />
 
           <div className='flex flex-col p-4 flex-1'>
             <div className='flex items-center flex-wrap'>

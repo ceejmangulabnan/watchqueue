@@ -7,7 +7,7 @@ import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistIt
 import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 import { TvData, TvDetails } from '@/types/TvTypes'
 import { WatchlistData } from '@/types/WatchlistTypes'
-import { generatePosterLink } from '@/utils/generateImgLinks'
+import { generatePosterLink, FALLBACK_POSTER } from '@/utils'
 import { Ellipsis } from 'lucide-react'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
@@ -20,12 +20,8 @@ interface TvItemProps {
 
 const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: TvItemProps) => {
   const navigate = useNavigate()
-  const [posterLink, setPosterLink] = useState(() => generatePosterLink(tv.poster_path))
   const { userWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
-
-  const handlePosterError = () => {
-    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
-  }
+  const posterLink = generatePosterLink(tv.poster_path)
 
   if (isUserWatchlistsLoading) {
     <MediaItemSkeleton />
@@ -42,12 +38,25 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
         {/* Dropdown Content */}
         {
           userWatchlists &&
-          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isUserWatchlistsLoading} itemDetails={tv as TvDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
-
+          <WatchlistItemDropdownContent
+            userWatchlists={userWatchlists}
+            isUserWatchlistsLoading={isUserWatchlistsLoading}
+            itemDetails={tv as TvDetails}
+            mediaType='movie'
+            inWatchlist={inWatchlist}
+            currentWatchlist={currentWatchlist}
+            handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+          />
         }
       </DropdownMenu>
 
-      <img onClick={() => navigate(`/tv/${tv.id}`)} src={posterLink} onError={handlePosterError} />
+      <img
+        src={posterLink}
+        onClick={() => navigate(`/tv/${tv.id}`)}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = FALLBACK_POSTER
+        }}
+      />
 
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{tv.name}</CardTitle>

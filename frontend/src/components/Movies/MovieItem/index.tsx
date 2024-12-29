@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -7,7 +6,7 @@ import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistIt
 import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { MovieData, MovieDetails } from "@/types/MovieTypes"
-import { generatePosterLink } from "@/utils/generateImgLinks"
+import { generatePosterLink, FALLBACK_POSTER } from "@/utils"
 import { Ellipsis } from 'lucide-react'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
@@ -21,12 +20,7 @@ interface MovieItemProps {
 const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
   const { userWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
   const navigate = useNavigate()
-  const [posterLink, setPosterLink] = useState(() => generatePosterLink(movie.poster_path))
-
-
-  const handlePosterError = () => {
-    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
-  }
+  const posterLink = generatePosterLink(movie.poster_path)
 
   if (isUserWatchlistsLoading) {
     <MediaItemSkeleton />
@@ -43,11 +37,25 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
         {/* Dropdown Content */}
         {
           userWatchlists &&
-          <WatchlistItemDropdownContent userWatchlists={userWatchlists} isUserWatchlistsLoading={isUserWatchlistsLoading} itemDetails={movie as MovieDetails} mediaType='movie' inWatchlist={inWatchlist} currentWatchlist={currentWatchlist} handleRemoveFromWatchlist={handleRemoveFromWatchlist} />
+          <WatchlistItemDropdownContent
+            userWatchlists={userWatchlists}
+            isUserWatchlistsLoading={isUserWatchlistsLoading}
+            itemDetails={movie as MovieDetails}
+            mediaType='movie'
+            inWatchlist={inWatchlist}
+            currentWatchlist={currentWatchlist}
+            handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+          />
         }
       </DropdownMenu>
 
-      <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
+      <img
+        src={posterLink}
+        onClick={() => navigate(`/movie/${movie.id}`)}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = FALLBACK_POSTER
+        }}
+      />
 
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
