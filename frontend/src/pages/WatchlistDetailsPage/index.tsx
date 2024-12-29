@@ -23,7 +23,6 @@ const WatchlistDetailsPage = () => {
   const queryClient = useQueryClient()
   const [view, setView] = useState('item')
 
-
   const fetchWatchlistDetails = async () => {
     const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
     return response.data as WatchlistData
@@ -70,6 +69,7 @@ const WatchlistDetailsPage = () => {
     const response = await axiosPrivate.delete(`/watchlists/${watchlistId}/${mediaType}/${itemId}`)
     if (response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ['watchlistDetails', watchlistId] })
+      queryClient.invalidateQueries({ queryKey: ['userWatchlists'] })
     }
   }
 

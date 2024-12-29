@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { CircleX, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface StatusPickerProps {
   row: Row<TWatchlistItem>
@@ -19,13 +20,17 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
   const [newTag, setNewTag] = useState<string>('')
   const queryClient = useQueryClient()
   const axiosPrivate = useAxiosPrivate()
+  const { refetchUserWatchlists } = useUserWatchlists()
 
   const updateTags = (newTags: string[]) => {
     return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/tags`, newTags)
   }
 
   const updateTagsMutation = useMutation({
-    mutationFn: updateTags
+    mutationFn: updateTags,
+    onSuccess: () => {
+      refetchUserWatchlists()
+    }
   })
 
   const updateItemTags = (updateWatchlistItemTags: WatchlistItem) => {
@@ -53,6 +58,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
         // Trigger refetch of watchlist data
         if (watchlistDetails) {
           queryClient.invalidateQueries({ queryKey: ['watchlistDetails', Number(watchlistDetails.id)] })
+          refetchUserWatchlists()
         }
       }
     })

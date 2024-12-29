@@ -1,6 +1,6 @@
 import { createContext, ReactNode } from "react"
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, RefetchOptions, QueryObserverResult } from '@tanstack/react-query'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -13,6 +13,7 @@ interface UserWatchlistProviderProps {
 interface UserWatchlistContextValue {
   userWatchlists: WatchlistData[] | undefined
   isUserWatchlistsLoading: boolean
+  refetchUserWatchlists: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<WatchlistData[], Error>>
 }
 
 const UserWatchlistProvider = ({ children }: UserWatchlistProviderProps) => {
@@ -24,13 +25,13 @@ const UserWatchlistProvider = ({ children }: UserWatchlistProviderProps) => {
     return response.data as WatchlistData[]
   }
 
-  const { data: userWatchlists, isLoading: isUserWatchlistsLoading } = useQuery({
+  const { data: userWatchlists, isLoading: isUserWatchlistsLoading, refetch: refetchUserWatchlists } = useQuery({
     queryKey: ['userWatchlists'],
     queryFn: fetchUserWatchlists
   })
 
   return (
-    <UserWatchlistContext.Provider value={{ userWatchlists, isUserWatchlistsLoading }}>
+    <UserWatchlistContext.Provider value={{ userWatchlists, isUserWatchlistsLoading, refetchUserWatchlists }}>
       {children}
     </UserWatchlistContext.Provider>
   )

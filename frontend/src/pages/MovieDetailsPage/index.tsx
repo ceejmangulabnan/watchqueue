@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import RecommendedMovies from '@/components/RecommendedMovies'
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import { useState } from 'react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
-  const { userWatchlists } = useFetchWatchlists()
+  const { userWatchlists } = useUserWatchlists()
 
   const fetchMovieDetails = async () => {
     const response = await axiosBase.get(`/movies/${movieId}`)

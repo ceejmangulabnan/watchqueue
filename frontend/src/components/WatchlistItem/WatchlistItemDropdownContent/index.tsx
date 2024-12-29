@@ -6,7 +6,7 @@ import { TvDetails } from '@/types/TvTypes'
 import { MovieDetails } from '@/types/MovieTypes'
 
 interface WatchlistItemDropdownContentProps {
-  userWatchlists: WatchlistData[]
+  userWatchlists: WatchlistData[] | undefined
   isUserWatchlistsLoading: boolean
   inWatchlist?: boolean | undefined
   currentWatchlist?: WatchlistData | undefined

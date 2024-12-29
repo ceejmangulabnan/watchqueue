@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { TvDetails } from '@/types/TvTypes'
 import { generatePosterLink } from "@/utils/generateImgLinks"
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
@@ -13,7 +13,7 @@ import RecommendedTv from '@/components/RecommendedTv'
 const TvDetailsPage = () => {
   const { tvId } = useParams()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
-  const { userWatchlists } = useFetchWatchlists()
+  const { userWatchlists } = useUserWatchlists()
 
   const fetchTvDetails = async () => {
     const response = await axiosBase.get(`/tv/${tvId}`)
