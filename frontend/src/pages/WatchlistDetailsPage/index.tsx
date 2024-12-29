@@ -25,7 +25,7 @@ const WatchlistDetailsPage = () => {
 
 
   const fetchWatchlistDetails = async () => {
-    const response = await axiosBase.get(`/watchlists/${watchlistId}`)
+    const response = await axiosPrivate.get(`/watchlists/${watchlistId}`)
     return response.data as WatchlistData
   }
 
