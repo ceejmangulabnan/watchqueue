@@ -1,42 +1,27 @@
 import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import axiosBase from '@/api/axios'
-import { MovieDetails } from '@/types/MovieTypes'
-import { generatePosterLink } from "@/utils/generateImgLinks"
+import { generatePosterLink, handlePosterError } from "@/utils"
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import RecommendedMovies from '@/components/RecommendedMovies'
 import { useState } from 'react'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
+import useMediaDetails from '@/hooks/useMediaDetails'
+import { Genre } from '@/types/TvTypes'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const [posterLink, setPosterLink] = useState<string | undefined>('')
   const { userWatchlists } = useUserWatchlists()
+  const { data: movieDetails } = useMediaDetails(movieId, `/movies/${movieId}`, 'movieDetails')
 
-  const fetchMovieDetails = async () => {
-    const response = await axiosBase.get(`/movies/${movieId}`)
-    const data = await response.data as MovieDetails
-    setPosterLink(generatePosterLink(data.poster_path))
-    return data
-  }
-
-  const { data: movieDetails } = useQuery({
-    queryKey: ["movieDetails", movieId],
-    queryFn: fetchMovieDetails,
-  })
-
-
-  const handlePosterError = () => {
-    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
-  }
+  setPosterLink(generatePosterLink(movieDetails.poster_path))
 
   return movieDetails ? (
     <div className='mx-10 md:mx-20 my-10'>
       <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
         <div className='flex flex-col items-center sm:flex-row pb-8 sm:py-8'>
-          <img className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg' src={posterLink} alt={movieDetails.title} onError={handlePosterError} />
+          <img className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg' src={posterLink} alt={movieDetails.title} onError={() => handlePosterError(setPosterLink)} />
 
           <div className='flex flex-col p-4 flex-1'>
             <div className='flex items-center flex-wrap'>
@@ -46,7 +31,7 @@ const MovieDetailsPage = () => {
             <div className='flex mt-2 flex-wrap text-sm md:text-base'>
               <p className='mr-2'>{movieDetails.runtime} mins</p>
               <div className='flex flex-wrap gap-x-2 font-semibold'>
-                {movieDetails.genres.map(genre => (
+                {movieDetails.genres.map((genre: Genre) => (
                   <p key={genre.id}>{genre.name}</p>
                 ))}
               </div>

@@ -25,7 +25,7 @@ interface Creator {
   profile_path: string | null // Nullable if no profile picture is available
 }
 
-interface Genre {
+export interface Genre {
   id: number
   name: string
 }
