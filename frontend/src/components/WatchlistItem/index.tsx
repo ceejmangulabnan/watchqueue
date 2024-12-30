@@ -64,6 +64,7 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
         <img
           src={watchlistCover || 'https://placehold.co/400x600?text=Poster+Unavailable&font=lato'}
           alt="Watchlist Cover"
+          loading='lazy'
           onError={handleImageError}  // Handle any image loading issues
         />
       )}

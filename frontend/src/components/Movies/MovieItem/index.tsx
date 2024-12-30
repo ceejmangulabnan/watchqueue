@@ -51,6 +51,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
 
       <img
         src={posterLink}
+        loading='lazy'
         onClick={() => navigate(`/movie/${movie.id}`)}
         onError={(e) => {
           (e.target as HTMLImageElement).src = FALLBACK_POSTER

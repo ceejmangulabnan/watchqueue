@@ -22,6 +22,7 @@ const MovieDetailsPage = () => {
         <div className='flex flex-col items-center sm:flex-row pb-8 sm:py-8'>
           <img
             className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg'
+            loading='lazy'
             src={posterLink}
             alt={movieDetails.title}
             onError={(e) => {
