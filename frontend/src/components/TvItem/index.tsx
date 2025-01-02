@@ -23,7 +23,7 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
   const posterLink = generatePosterLink(tv.poster_path)
 
   if (isUserWatchlistsLoading) {
-    <MediaItemSkeleton />
+    return <MediaItemSkeleton />
   }
 
   return (
