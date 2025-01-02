@@ -13,6 +13,7 @@ export interface WatchlistData {
 
 export interface WatchlistItemProps {
   watchlist: WatchlistData
+  isUserWatchlistsLoading: boolean
   handleDelete: (id: number) => Promise<void>
 }
 

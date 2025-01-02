@@ -7,12 +7,13 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import WatchlistItem from "@/components/WatchlistItem"
 import { WatchlistData } from "@/types/WatchlistTypes"
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
+import LoadingSpinner from '@/components/ui/spinner'
 
 
 const Watchlists = () => {
   const [watchlistTitle, setWatchlistTitle] = useState('')
   const axiosPrivate = useAxiosPrivate()
-  const { userWatchlists, refetchUserWatchlists } = useUserWatchlists()
+  const { userWatchlists, refetchUserWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
   const [isOpen, setIsOpen] = useState(false)
 
 
@@ -64,19 +65,14 @@ const Watchlists = () => {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
         {
-          userWatchlists?.length
-            ? (
-              userWatchlists?.map((watchlist: WatchlistData) => (
-                <WatchlistItem
-                  key={watchlist.id}
-                  watchlist={watchlist}
-                  handleDelete={handleDelete}
-                />
-              ))
-            )
-            : (
-              <div>No watchlists</div>
-            )
+          userWatchlists?.map((watchlist: WatchlistData) => (
+            <WatchlistItem
+              key={watchlist.id}
+              watchlist={watchlist}
+              isUserWatchlistsLoading={isUserWatchlistsLoading}
+              handleDelete={handleDelete}
+            />
+          ))
         }
       </div>
     </div>

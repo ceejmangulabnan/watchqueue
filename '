@@ -9,7 +9,7 @@ import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useQuery } from '@tanstack/react-query'
 import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 
-const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
+const WatchlistItem = ({ watchlist, handleDelete, isUserWatchlistsLoading }: WatchlistItemProps) => {
   const navigate = useNavigate()
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
@@ -70,8 +70,8 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
         />
       )}
       <CardFooter className="flex-col items-start p-4">
-        <CardTitle className='text-sm md:text-base'>{watchlist.title}</CardTitle>
-        <CardDescription className='text-xs md:text-sm lg:text-md'>{watchlist.items.length} items</CardDescription>
+        <CardTitle className='text-sm md:text-base font-medium'>{watchlist.title}</CardTitle>
+        <CardDescription>{watchlist.items.length} Items</CardDescription>
       </CardFooter>
     </Card>
   )
