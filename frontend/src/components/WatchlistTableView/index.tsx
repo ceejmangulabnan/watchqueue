@@ -13,6 +13,7 @@ import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistIt
 import TagsPicker from '@/components/TagsPicker'
 import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
+import { Link } from 'react-router-dom'
 
 interface WatchlistItemViewProps {
   watchlistItemsDetails: {
@@ -33,7 +34,11 @@ export type TWatchlistItem = {
   itemDetails: MovieDetails | TvDetails
 }
 
-const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRemoveFromWatchlist }: WatchlistItemViewProps) => {
+const WatchlistTableView = ({
+  watchlistItemsDetails,
+  watchlistDetails,
+  handleRemoveFromWatchlist
+}: WatchlistItemViewProps) => {
   const axiosPrivate = useAxiosPrivate()
   const columnHelper = createColumnHelper<TWatchlistItem>()
   const data = watchlistItemsDetails.data
@@ -186,6 +191,23 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
       sorting,
     },
   })
+
+  // Show if watchlist is empty
+  if (!watchlistItemsDetails.pending && watchlistItemsDetails.data.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center space-y-8">
+        <div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">Watchlist is empty</h3>
+          <p className="text-foreground">Add movies or TV shows to your watchlist to see them here.</p>
+        </div>
+        <Button variant={'outline'}>
+          <Link to='/'>
+            Continue Browsing
+          </Link>
+        </Button>
+      </div>
+    )
+  }
 
   return !watchlistItemsDetails.pending ? (
     <Table>
