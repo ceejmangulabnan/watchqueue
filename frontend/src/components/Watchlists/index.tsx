@@ -7,8 +7,6 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import WatchlistItem from "@/components/WatchlistItem"
 import { WatchlistData } from "@/types/WatchlistTypes"
 import { useUserWatchlists } from '@/hooks/useUserWatchlists'
-import LoadingSpinner from '@/components/ui/spinner'
-
 
 const Watchlists = () => {
   const [watchlistTitle, setWatchlistTitle] = useState('')
