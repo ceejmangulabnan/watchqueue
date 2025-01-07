@@ -1,39 +1,33 @@
 import { useParams } from 'react-router-dom'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { TvDetails } from '@/types/TvTypes'
-import { generatePosterLink } from "@/utils/generateImgLinks"
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
+import useMediaDetails from '@/hooks/useMediaDetails'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import RecommendedTv from '@/components/RecommendedTv'
-
+import { Genre, TvDetails } from '@/types/TvTypes'
+import { FALLBACK_POSTER, generatePosterLink } from '@/utils'
 
 const TvDetailsPage = () => {
   const { tvId } = useParams()
-  const axiosPrivate = useAxiosPrivate()
-  const [posterLink, setPosterLink] = useState<string | undefined>('')
-  const { userWatchlists } = useFetchWatchlists()
+  const { userWatchlists } = useUserWatchlists()
+  const { data: tvDetails } = useMediaDetails<TvDetails>(tvId, `/tv/${tvId}`, 'tvDetails')
 
-  const fetchTvDetails = async () => {
-    const response = await axiosPrivate.get(`/tv/${tvId}`)
-    setPosterLink(generatePosterLink(response.data.poster_path))
-    return response.data as TvDetails
-  }
-
-  const { data: tvDetails } = useQuery({ queryKey: ['tvDetails', tvId], queryFn: fetchTvDetails })
-
-  const handlePosterError = () => {
-    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
-  }
+  const posterLink = generatePosterLink(tvDetails?.poster_path)
 
   return tvDetails ? (
     <div className='mx-10 md:mx-20 my-10'>
       <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
         <div className='flex flex-col items-center sm:flex-row pb-8 sm:py-8'>
-          <img className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg' src={posterLink} alt={tvDetails.name} onError={handlePosterError} />
+          <img
+            className='aspect-[2/3] sm:mr-8 sm:max-h-[350px] md:max-h-[400px] rounded-lg'
+            loading='lazy'
+            src={posterLink}
+            alt={tvDetails.name}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = FALLBACK_POSTER
+            }}
+          />
 
           <div className='flex flex-col p-4 flex-1'>
             <div className='flex items-center flex-wrap'>
@@ -43,7 +37,7 @@ const TvDetailsPage = () => {
             <div className='flex mt-2 flex-wrap text-sm md:text-base'>
               <p className='mr-2'>{tvDetails.seasons.length} Seasons</p>
               <div className='flex flex-wrap gap-x-2 font-semibold'>
-                {tvDetails.genres.map(genre => (
+                {tvDetails.genres.map((genre: Genre) => (
                   <p key={genre.id}>{genre.name}</p>
                 ))}
               </div>

@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
 import TagsPicker from '@/components/TagsPicker'
 import { Ellipsis, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
+import { Link } from 'react-router-dom'
 
 interface WatchlistItemViewProps {
   watchlistItemsDetails: {
@@ -32,11 +34,16 @@ export type TWatchlistItem = {
   itemDetails: MovieDetails | TvDetails
 }
 
-const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRemoveFromWatchlist }: WatchlistItemViewProps) => {
+const WatchlistTableView = ({
+  watchlistItemsDetails,
+  watchlistDetails,
+  handleRemoveFromWatchlist
+}: WatchlistItemViewProps) => {
   const axiosPrivate = useAxiosPrivate()
   const columnHelper = createColumnHelper<TWatchlistItem>()
   const data = watchlistItemsDetails.data
   const [sorting, setSorting] = useState<SortingState>([])
+  const { userWatchlists, isUserWatchlistsLoading, refetchUserWatchlists } = useUserWatchlists()
 
   // Form table data to follow row shape
   const tableData: TWatchlistItem[] = useMemo(() => {
@@ -75,6 +82,9 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
 
   const updateStatusMutation = useMutation({
     mutationFn: updateStatus,
+    onSuccess: () => {
+      refetchUserWatchlists()
+    }
   })
 
   // Cache to avoid recreating on every render
@@ -124,7 +134,7 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
           >
             {
               statuses.map((status) => (
-                <option key={status} value={status}>
+                <option key={status} value={status} className='bg-background text-foreground'>
                   {status}
                 </option>
               ))
@@ -150,11 +160,13 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
           <div className='w-full flex justify-end'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild className='align-right'>
-                <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
-                  <Ellipsis color='#000000' size={16} />
+                <Button variant={'default'} className='p-0 w-6 h-6 rounded-full bg-background shadow'>
+                  <Ellipsis className='text-foreground' size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <WatchlistItemDropdownContent
+                userWatchlists={userWatchlists}
+                isUserWatchlistsLoading={isUserWatchlistsLoading}
                 inWatchlist={true}
                 currentWatchlist={watchlistDetails}
                 mediaType={mediaType}
@@ -179,6 +191,23 @@ const WatchlistTableView = ({ watchlistItemsDetails, watchlistDetails, handleRem
       sorting,
     },
   })
+
+  // Show if watchlist is empty
+  if (!watchlistItemsDetails.pending && watchlistItemsDetails.data.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center space-y-8">
+        <div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">Watchlist is empty</h3>
+          <p className="text-foreground">Add movies or TV shows to your watchlist to see them here.</p>
+        </div>
+        <Button variant={'outline'}>
+          <Link to='/'>
+            Continue Browsing
+          </Link>
+        </Button>
+      </div>
+    )
+  }
 
   return !watchlistItemsDetails.pending ? (
     <Table>

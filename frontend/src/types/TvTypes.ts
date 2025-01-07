@@ -9,7 +9,7 @@ export interface TvData {
   original_name: string
   overview: string
   popularity: number
-  poster_path: string | null // Can be null if no poster is available
+  poster_path: string | undefined // Can be null if no poster is available
   first_air_date: string // ISO date string
   name: string
   vote_average: number
@@ -25,7 +25,7 @@ interface Creator {
   profile_path: string | null // Nullable if no profile picture is available
 }
 
-interface Genre {
+export interface Genre {
   id: number
   name: string
 }

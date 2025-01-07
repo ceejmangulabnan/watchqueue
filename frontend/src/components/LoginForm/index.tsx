@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import axiosBase from '@/api/axios'
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -39,7 +40,7 @@ const LoginForm = ({ toggleForm }: LoginFormProps) => {
 
   const onSubmit = async (loginValues: z.infer<typeof loginFormSchema>) => {
     try {
-      const response = await axiosPrivate.post('/users/token', loginValues, {
+      const response = await axiosBase.post('/users/token', loginValues, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         }

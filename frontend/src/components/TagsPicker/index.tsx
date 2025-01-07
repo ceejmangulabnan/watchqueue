@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { CircleX, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface StatusPickerProps {
   row: Row<TWatchlistItem>
@@ -19,13 +20,17 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
   const [newTag, setNewTag] = useState<string>('')
   const queryClient = useQueryClient()
   const axiosPrivate = useAxiosPrivate()
+  const { refetchUserWatchlists } = useUserWatchlists()
 
   const updateTags = (newTags: string[]) => {
     return axiosPrivate.put(`/watchlists/${watchlistDetails?.id}/tags`, newTags)
   }
 
   const updateTagsMutation = useMutation({
-    mutationFn: updateTags
+    mutationFn: updateTags,
+    onSuccess: () => {
+      refetchUserWatchlists()
+    }
   })
 
   const updateItemTags = (updateWatchlistItemTags: WatchlistItem) => {
@@ -53,6 +58,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
         // Trigger refetch of watchlist data
         if (watchlistDetails) {
           queryClient.invalidateQueries({ queryKey: ['watchlistDetails', Number(watchlistDetails.id)] })
+          refetchUserWatchlists()
         }
       }
     })
@@ -107,7 +113,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
       <div className='flex items-center gap-2'>
         {
           selectedTags.map(tag => (
-            <div className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
+            <div key={tag} className='cursor-pointer flex items-center p-2 bg-gray-300/40 dark:dark:bg-gray-300/10 text-foreground hover:scale-105 transition-all ease-in-out rounded-md gap-2'>
               <p className='flex'>{tag}</p>
               <CircleX
                 size={16}
@@ -119,7 +125,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
         }
       </div>
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           {
             <Button className='p-0 w-9 h-9 rounded-lg bg-gray-100/50 hover:bg-gray-200 shadow'>
               <Plus color='#222222' size={16} />
@@ -147,7 +153,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
           <DropdownMenuSeparator />
           {
             filteredTags?.map((tag) => (
-              <DropdownMenuItem onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
+              <DropdownMenuItem key={tag} onClick={() => handleAddTag(tag)}>{tag}</DropdownMenuItem>
             ))
           }
           <DropdownMenuSeparator />

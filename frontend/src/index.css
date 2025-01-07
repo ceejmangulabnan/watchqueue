@@ -9,6 +9,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Define scrollbar for chrome */
+.chrome-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: hsl(var(--background)); 
+}
+
+/* Add a thumb */
+.chrome-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--foreground))
+}
+
 * {
   box-sizing: border-box;
 }

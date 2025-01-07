@@ -1,17 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { generatePosterLink } from "@/utils/generateImgLinks"
-import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuItem, DropdownMenuPortal, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
-import { useAuth } from '@/hooks/useAuth'
-import { WatchlistData } from '@/types/WatchlistTypes'
-import { MovieData } from "@/types/MovieTypes"
-import { Ellipsis, CirclePlus, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
-import { useState } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardDescription, CardTitle, CardFooter } from "@/components/ui/card"
+import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import WatchlistItemDropdownContent from '@/components/WatchlistItem/WatchlistItemDropdownContent'
+import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
+import { WatchlistData } from '@/types/WatchlistTypes'
+import { MovieData, MovieDetails } from "@/types/MovieTypes"
+import { generatePosterLink, FALLBACK_POSTER } from "@/utils"
+import { Ellipsis } from 'lucide-react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 
 interface MovieItemProps {
   movie: MovieData
@@ -21,32 +18,12 @@ interface MovieItemProps {
 }
 
 const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }: MovieItemProps) => {
-  const axiosPrivate = useAxiosPrivate()
-  const { auth } = useAuth()
+  const { userWatchlists, isUserWatchlistsLoading } = useUserWatchlists()
   const navigate = useNavigate()
-  const [posterLink, setPosterLink] = useState(() => generatePosterLink(movie.poster_path))
+  const posterLink = generatePosterLink(movie.poster_path)
 
-  const fetchUserWatchlists = async () => {
-    const response = await axiosPrivate.get(`/watchlists/user/${auth.id}`)
-    return response.data as WatchlistData[]
-  }
-
-  const { data: userWatchlists, isLoading } = useQuery({ queryKey: ['userWatchlists'], queryFn: fetchUserWatchlists, enabled: !!auth.id })
-
-  const handlePosterError = () => {
-    setPosterLink("https://placehold.co/400x600?text=Poster+Unavailable&font=lato")
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-start">
-        <Skeleton className="h-[18rem] w-full" />
-        <div className="mt-4 space-y-2 h-20 w-full">
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-        </div>
-      </div>
-    )
+  if (isUserWatchlistsLoading) {
+    return <MediaItemSkeleton />
   }
 
   return (
@@ -57,55 +34,30 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
             <Ellipsis color='#000000' size={16} />
           </Button>
         </DropdownMenuTrigger>
-
-        <DropdownMenuContent className='w-[14rem]' side={"right"}>
-          {
-            inWatchlist
-              ? (
-                <DropdownMenuGroup>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
-                      <CirclePlus className='mr-2' />
-                      Add to Watchlist
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent>
-                        {
-                          userWatchlists &&
-                          <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
-                        }
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                  <DropdownMenuItem className='flex' onClick={() => handleRemoveFromWatchlist!(currentWatchlist!.id, "movie", movie.id)}>
-                    <Trash2 className='mr-2' />
-                    Remove from Watchlist
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              )
-              : (
-                <DropdownMenuGroup>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
-                      <CirclePlus className='mr-2' />
-                      Add to Watchlist
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent>
-                        {
-                          userWatchlists &&
-                          <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movie} />
-                        }
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                </DropdownMenuGroup>
-              )
-          }
-        </DropdownMenuContent>
+        {/* Dropdown Content */}
+        {
+          userWatchlists &&
+          <WatchlistItemDropdownContent
+            userWatchlists={userWatchlists}
+            isUserWatchlistsLoading={isUserWatchlistsLoading}
+            itemDetails={movie as MovieDetails}
+            mediaType='movie'
+            inWatchlist={inWatchlist}
+            currentWatchlist={currentWatchlist}
+            handleRemoveFromWatchlist={handleRemoveFromWatchlist}
+          />
+        }
       </DropdownMenu>
 
-      <img onClick={() => navigate(`/movie/${movie.id}`)} src={posterLink} onError={handlePosterError} />
+      <img
+        src={posterLink}
+        loading='lazy'
+        onClick={() => navigate(`/movie/${movie.id}`)}
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = FALLBACK_POSTER
+        }}
+      />
+
       <CardFooter className="flex-col items-start p-4">
         <CardTitle className='text-sm md:text-md truncate w-full'>{movie.title}</CardTitle>
         <CardDescription className='text-xs md:text-sm lg:text-md'>{movie?.release_date.slice(0, 4) ?? "N/A"}</CardDescription>

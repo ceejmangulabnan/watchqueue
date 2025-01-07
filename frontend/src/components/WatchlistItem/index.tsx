@@ -1,27 +1,26 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuGroup } from '@/components/ui/dropdown-menu'
 import { WatchlistItemProps } from '@/types/WatchlistTypes'
-import { Card, CardFooter, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardFooter, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Ellipsis, Pencil, Trash2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useQuery } from '@tanstack/react-query'
+import MediaItemSkeleton from '@/components/Skeletons/MediaItemSkeleton'
 
 const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
   const navigate = useNavigate()
   const { auth } = useAuth()
   const axiosPrivate = useAxiosPrivate()
 
-  const { data: watchlistCover, isLoading, isError } = useQuery(
-    {
-      queryKey: ['watchlistCover', watchlist.id],
-      queryFn: async () => {
-        const response = await axiosPrivate.get(`${import.meta.env.VITE_BASE_URL}/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' })
-        return URL.createObjectURL(response.data)
-      }
-    },
-  )
+  const { data: watchlistCover, isLoading, isError } = useQuery({
+    queryKey: ['watchlistCover', watchlist.id],
+    queryFn: async () => {
+      const response = await axiosPrivate.get(`/watchlists/${watchlist.id}/cover_image`, { responseType: 'blob' })
+      return URL.createObjectURL(response.data)
+    }
+  })
 
   // Handle image loading failure (in case the image is invalid or not found)
   const handleImageError = () => {
@@ -30,6 +29,10 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
 
   const handleClick = () => {
     navigate(`/${auth.username}/watchlist/${watchlist.id}`)
+  }
+
+  if (isLoading) {
+    return <MediaItemSkeleton />
   }
 
   return (
@@ -54,11 +57,7 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
       {/* Handle loading, error, and the image */}
-      {isLoading ? (
-        <div className="w-full h-full bg-gray-200 flex justify-center items-center">
-          <span>Loading...</span> {/* Optionally show a loading indicator */}
-        </div>
-      ) : isError ? (
+      {isError ? (
         <div className="w-full h-full bg-gray-200 flex justify-center items-center">
           <span>Failed to load cover image</span> {/* Optionally show an error message */}
         </div>
@@ -66,11 +65,13 @@ const WatchlistItem = ({ watchlist, handleDelete }: WatchlistItemProps) => {
         <img
           src={watchlistCover || 'https://placehold.co/400x600?text=Poster+Unavailable&font=lato'}
           alt="Watchlist Cover"
+          loading='lazy'
           onError={handleImageError}  // Handle any image loading issues
         />
       )}
       <CardFooter className="flex-col items-start p-4">
-        <CardTitle className='text-sm md:text-base font-medium'>{watchlist.title}</CardTitle>
+        <CardTitle className='text-sm md:text-base'>{watchlist.title}</CardTitle>
+        <CardDescription className='text-xs md:text-sm lg:text-md'>{watchlist.items.length} items</CardDescription>
       </CardFooter>
     </Card>
   )

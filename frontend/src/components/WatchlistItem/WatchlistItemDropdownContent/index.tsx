@@ -1,21 +1,21 @@
 import { DropdownMenuContent, DropdownMenuGroup, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuPortal, DropdownMenuItem, DropdownMenuSubContent } from '@/components/ui/dropdown-menu'
 import { CirclePlus, Trash2 } from 'lucide-react'
 import { WatchlistData } from '@/types/WatchlistTypes'
-import useFetchWatchlists from '@/hooks/useFetchWatchlists'
 import UserWatchlistsDropdown from '@/components/WatchlistItem/UserWatchlistsDropdown'
 import { TvDetails } from '@/types/TvTypes'
 import { MovieDetails } from '@/types/MovieTypes'
 
 interface WatchlistItemDropdownContentProps {
-  inWatchlist: boolean
-  currentWatchlist: WatchlistData | undefined
+  userWatchlists: WatchlistData[] | undefined
+  isUserWatchlistsLoading: boolean
+  inWatchlist?: boolean | undefined
+  currentWatchlist?: WatchlistData | undefined
   mediaType: 'movie' | 'tv'
   itemDetails: MovieDetails | TvDetails
-  handleRemoveFromWatchlist: (watchlistId: number, mediaType: string, itemId: number) => Promise<void>
+  handleRemoveFromWatchlist?: (watchlistId: number, mediaType: string, itemId: number) => Promise<void>
 }
 
-const WatchlistItemDropdownContent = ({ inWatchlist, currentWatchlist, mediaType, itemDetails, handleRemoveFromWatchlist }: WatchlistItemDropdownContentProps) => {
-  const { userWatchlists, isLoading } = useFetchWatchlists()
+const WatchlistItemDropdownContent = ({ userWatchlists, isUserWatchlistsLoading, inWatchlist, currentWatchlist, mediaType, itemDetails, handleRemoveFromWatchlist }: WatchlistItemDropdownContentProps) => {
   return (
     <DropdownMenuContent className='w-[14rem]' side={"right"}>
       {
@@ -23,7 +23,7 @@ const WatchlistItemDropdownContent = ({ inWatchlist, currentWatchlist, mediaType
           ? (
             <DropdownMenuGroup>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                <DropdownMenuSubTrigger disabled={!userWatchlists || isUserWatchlistsLoading || userWatchlists.length === 0} className='flex'>
                   <CirclePlus className='mr-2' />
                   Add to Watchlist
                 </DropdownMenuSubTrigger>
@@ -48,7 +48,7 @@ const WatchlistItemDropdownContent = ({ inWatchlist, currentWatchlist, mediaType
           : (
             <DropdownMenuGroup>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger disabled={!userWatchlists || isLoading || userWatchlists.length === 0} className='flex'>
+                <DropdownMenuSubTrigger disabled={!userWatchlists || isUserWatchlistsLoading || userWatchlists.length === 0} className='flex'>
                   <CirclePlus className='mr-2' />
                   Add to Watchlist
                 </DropdownMenuSubTrigger>

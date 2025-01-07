@@ -1,4 +1,4 @@
-import useAxiosPrivate from '@/hooks/useAxiosPrivate'
+import axiosBase from '@/api/axios'
 import { TvDetails, RecommendedTvData } from '@/types/TvTypes'
 import { useQuery } from '@tanstack/react-query'
 import TvItem from '@/components/TvItem'
@@ -8,10 +8,9 @@ interface RecommendedTvProps {
 }
 
 const RecommendedTv = ({ tvDetails }: RecommendedTvProps) => {
-  const axiosPrivate = useAxiosPrivate()
 
   const fetchRecommendedTv = async () => {
-    const response = await axiosPrivate.get(`/tv/${tvDetails.id}/recommendations`)
+    const response = await axiosBase.get(`/tv/${tvDetails.id}/recommendations`)
     return response.data as RecommendedTvData
   }
 
