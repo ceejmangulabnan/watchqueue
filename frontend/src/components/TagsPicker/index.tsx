@@ -113,7 +113,7 @@ const TagsPicker = ({ row, watchlistDetails }: StatusPickerProps) => {
       <div className='flex items-center gap-2'>
         {
           selectedTags.map(tag => (
-            <div key={tag} className='flex items-center p-2 hover:bg-gray-400/25 bg-gray-100 rounded-md gap-2'>
+            <div key={tag} className='cursor-pointer flex items-center p-2 bg-gray-300/40 dark:dark:bg-gray-300/10 text-foreground hover:scale-105 transition-all ease-in-out rounded-md gap-2'>
               <p className='flex'>{tag}</p>
               <CircleX
                 size={16}

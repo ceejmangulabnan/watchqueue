@@ -134,7 +134,7 @@ const WatchlistTableView = ({
           >
             {
               statuses.map((status) => (
-                <option key={status} value={status}>
+                <option key={status} value={status} className='bg-background text-foreground'>
                   {status}
                 </option>
               ))
@@ -160,8 +160,8 @@ const WatchlistTableView = ({
           <div className='w-full flex justify-end'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild className='align-right'>
-                <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
-                  <Ellipsis color='#000000' size={16} />
+                <Button variant={'default'} className='p-0 w-6 h-6 rounded-full bg-background shadow'>
+                  <Ellipsis className='text-foreground' size={16} />
                 </Button>
               </DropdownMenuTrigger>
               <WatchlistItemDropdownContent
