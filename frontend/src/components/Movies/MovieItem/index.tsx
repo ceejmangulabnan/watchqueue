@@ -23,7 +23,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
   const posterLink = generatePosterLink(movie.poster_path)
 
   if (isUserWatchlistsLoading) {
-    <MediaItemSkeleton />
+    return <MediaItemSkeleton />
   }
 
   return (
@@ -51,6 +51,7 @@ const MovieItem = ({ movie, currentWatchlist, inWatchlist, handleRemoveFromWatch
 
       <img
         src={posterLink}
+        loading='lazy'
         onClick={() => navigate(`/movie/${movie.id}`)}
         onError={(e) => {
           (e.target as HTMLImageElement).src = FALLBACK_POSTER

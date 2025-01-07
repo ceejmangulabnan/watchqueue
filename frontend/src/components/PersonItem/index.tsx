@@ -17,6 +17,7 @@ const PersonItem = ({ person }: PersonItemProps) => {
     <Card className='overflow-hidden'>
       <img
         src={posterLink}
+        loading='lazy'
         onClick={() => navigate(`/person/${person.id}/${encodeURIComponent(person.name)}`)}
         onError={(e) => {
           (e.target as HTMLImageElement).src = FALLBACK_POSTER

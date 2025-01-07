@@ -23,7 +23,7 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
   const posterLink = generatePosterLink(tv.poster_path)
 
   if (isUserWatchlistsLoading) {
-    <MediaItemSkeleton />
+    return <MediaItemSkeleton />
   }
 
   return (
@@ -51,6 +51,7 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
 
       <img
         src={posterLink}
+        loading='lazy'
         onClick={() => navigate(`/tv/${tv.id}`)}
         onError={(e) => {
           (e.target as HTMLImageElement).src = FALLBACK_POSTER

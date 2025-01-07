@@ -15,6 +15,7 @@ import SearchResultsPage from '@/pages/SearchResultsPage'
 import MovieSearchResults from '@/pages/SearchResultsPage/MovieSearchResults'
 import MultiSearchResults from '@/pages/SearchResultsPage/MultiSearchResults'
 import TvSearchResults from '@/pages/SearchResultsPage/TvSearchResults'
+import ThemeProvider from '@/contexts/ThemeProvider'
 
 const queryClient = new QueryClient()
 
@@ -23,25 +24,27 @@ const App = () => {
     <div className="app mt-20 font-fira">
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AuthProvider>
-            <UserWatchlistProvider>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path=":username/watchlist/:watchlistId" element={<WatchlistDetailsPage />} />
-                  <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
-                  <Route path="/tv/:tvId" element={<TvDetailsPage />}></Route>
-                </Route>
-                <Route path="/search" element={<SearchResultsPage />}>
-                  <Route path="multi" element={<MultiSearchResults />} />
-                  <Route path="movie" element={<MovieSearchResults />} />
-                  <Route path="tv" element={<TvSearchResults />} />
-                </Route>
-              </Routes>
-            </UserWatchlistProvider>
-          </AuthProvider>
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <AuthProvider>
+              <UserWatchlistProvider>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path=":username/watchlist/:watchlistId" element={<WatchlistDetailsPage />} />
+                    <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
+                    <Route path="/tv/:tvId" element={<TvDetailsPage />}></Route>
+                  </Route>
+                  <Route path="/search" element={<SearchResultsPage />}>
+                    <Route path="multi" element={<MultiSearchResults />} />
+                    <Route path="movie" element={<MovieSearchResults />} />
+                    <Route path="tv" element={<TvSearchResults />} />
+                  </Route>
+                </Routes>
+              </UserWatchlistProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </BrowserRouter>
         <ReactQueryDevtools />
       </QueryClientProvider>
