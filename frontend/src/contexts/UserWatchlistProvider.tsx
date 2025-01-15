@@ -27,7 +27,8 @@ const UserWatchlistProvider = ({ children }: UserWatchlistProviderProps) => {
 
   const { data: userWatchlists, isLoading: isUserWatchlistsLoading, refetch: refetchUserWatchlists } = useQuery({
     queryKey: ['userWatchlists'],
-    queryFn: fetchUserWatchlists
+    queryFn: fetchUserWatchlists,
+    enabled: auth && !Object.values(auth).includes(null)
   })
 
   return (
