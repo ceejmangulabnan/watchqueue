@@ -27,7 +27,7 @@ const TvItem = ({ tv, currentWatchlist, inWatchlist, handleRemoveFromWatchlist }
   }
 
   return (
-    <Card className="overflow-hidden relative">
+    <Card className="overflow-hidden relative hover:scale-105 transition-all ease-in">
       <DropdownMenu>
         <DropdownMenuTrigger asChild className='absolute right-2 top-2'>
           <Button className='p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow'>
