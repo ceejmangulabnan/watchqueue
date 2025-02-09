@@ -61,18 +61,32 @@ const Watchlists = () => {
 
         </Dialog>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-        {
-          userWatchlists?.map((watchlist: WatchlistData) => (
-            <WatchlistItem
-              key={watchlist.id}
-              watchlist={watchlist}
-              isUserWatchlistsLoading={isUserWatchlistsLoading}
-              handleDelete={handleDelete}
-            />
-          ))
-        }
-      </div>
+      {
+        !userWatchlists?.length ? (
+          <div className="">
+            <div className="flex items-center justify-center h-[calc(80vh-64px)]">
+              <div className="text-center">
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">No watchlists found</h1>
+                <p className="text-gray-600 dark:text-gray-300">Create a new one to get started!</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+            {
+              userWatchlists?.map((watchlist: WatchlistData) => (
+                <WatchlistItem
+                  key={watchlist.id}
+                  watchlist={watchlist}
+                  isUserWatchlistsLoading={isUserWatchlistsLoading}
+                  handleDelete={handleDelete}
+                />
+              ))
+            }
+          </div>
+        )
+      }
     </div>
   )
 }
