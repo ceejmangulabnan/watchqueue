@@ -1,9 +1,15 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { Dialog, DialogTrigger, DialogHeader, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
 import { WatchlistData } from '@/types/WatchlistTypes'
 import { useToast } from '@/hooks/use-toast'
 import useAxiosPrivate from '@/hooks/useAxiosPrivate'
 import { useMutation } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import { MovieData, MovieDetails } from '@/types/MovieTypes'
 import { TvDetails, TvData } from '@/types/TvTypes'
 import { AxiosError } from 'axios'
@@ -18,6 +24,9 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
   const { toast } = useToast()
   const axiosPrivate = useAxiosPrivate()
   const queryClient = useQueryClient()
+  const [watchlistTitle, setWatchlistTitle] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+  const { refetchUserWatchlists } = useUserWatchlists()
 
   const mediaType = () => movie ? "movie" : "tv"
   const mediaTitle = () => movie ? movie.title : tv?.name
@@ -63,15 +72,54 @@ const UserWatchlistsDropdown = ({ userWatchlists, movie, tv }: UserWatchlistsDro
     }
   }
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    try {
+      const response = await axiosPrivate.post('/watchlists/create', { "title": watchlistTitle })
+      if (response.status === 200) {
+        refetchUserWatchlists()
+        setIsOpen(false)
+      }
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWatchlistTitle(e.target.value)
+  }
+
   return (
     <div className='text-sm md:text-base'>
       {
-        userWatchlists &&
-        userWatchlists.map(watchlist => (
-          <DropdownMenuItem className='text-sm md:text-base max-w-[150px]' key={watchlist.id} onClick={() => handleAddToWatchlist(watchlist.id)}>
-            {watchlist.title}
-          </DropdownMenuItem>
-        ))
+        !userWatchlists.length ? (
+          <div>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button variant={"secondary"} className='text-sm md:text-base'>Create Watchlist</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Watchlist</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className='flex flex-col gap-y-3 mt-4'>
+                  <Label htmlFor="watchlist-title">Watchlist Title</Label>
+                  <Input id="watchlist-title" value={watchlistTitle} onChange={handleChange} placeholder='Watchlist Title' />
+                  <Button type="submit" className='w-full'>Create</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        ) : (
+          userWatchlists &&
+          userWatchlists.map(watchlist => (
+            <DropdownMenuItem className='text-sm md:text-base max-w-[150px]' key={watchlist.id} onClick={() => handleAddToWatchlist(watchlist.id)}>
+              {watchlist.title}
+            </DropdownMenuItem>
+          ))
+
+        )
       }
     </div>
   )
