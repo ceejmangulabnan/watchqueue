@@ -8,12 +8,18 @@ import { useUserWatchlists } from '@/hooks/useUserWatchlists'
 import useMediaDetails from '@/hooks/useMediaDetails'
 import { Genre } from '@/types/TvTypes'
 import { MovieDetails } from '@/types/MovieTypes'
+import { useAuth } from '@/hooks/useAuth'
+import LoginRegisterToggle from '@/components/LoginRegisterToggle'
+import { useState } from 'react'
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams()
   const { userWatchlists } = useUserWatchlists()
+  const { auth } = useAuth()
+  const [isOpen, setIsOpen] = useState(false)
   const { data: movieDetails } = useMediaDetails<MovieDetails>(movieId, `/movies/${movieId}`, 'movieDetails')
 
+  const isAuthed = auth && !Object.values(auth).includes(null)
   const posterLink = generatePosterLink(movieDetails?.poster_path)
 
   return movieDetails ? (
@@ -48,14 +54,28 @@ const MovieDetailsPage = () => {
                 <p className={`mt-2 md:mt-4 tracking-wider  text-sm md:text-lg italic font-medium ${movieDetails.tagline ? '' : 'hidden'}`}>"{movieDetails.tagline}"</p>
                 <p className='mt-2 text-sm md:text-lg max-w-[600px]'>{movieDetails.overview}</p>
               </div>
-              <DropdownMenu>
+              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
-                  <Button className='max-w-[150px] md:max-w-[200px] text-sm md:text-lg '>Add to Watchlist</Button>
+                  <Button className='max-w-[150px] md:max-w-[200px] text-sm md:text-lg'>Add to Watchlist</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side={"right"}>
                   {
-                    userWatchlists &&
-                    <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movieDetails} />
+                    isAuthed ? (
+                      userWatchlists &&
+                      <UserWatchlistsDropdown userWatchlists={userWatchlists} movie={movieDetails} />
+                    )
+                      : (
+                        <div className='p-4'>
+                          <h1 className='font-bold text-lg'>Add to watchlist</h1>
+                          <p className='py-2'>
+                            Please log in to create and add movies to watchlists.
+                          </p>
+                          <div className='w-full flex justify-end gap-4'>
+                            <Button variant={"outline"} onClick={() => setIsOpen(false)}>Not now</Button>
+                            <LoginRegisterToggle />
+                          </div>
+                        </div>
+                      )
                   }
                 </DropdownMenuContent>
               </DropdownMenu>

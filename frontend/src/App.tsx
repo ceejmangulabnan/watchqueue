@@ -33,14 +33,14 @@ const App = () => {
                   <Route element={<ProtectedRoute />}>
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path=":username/watchlist/:watchlistId" element={<WatchlistDetailsPage />} />
-                    <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
-                    <Route path="/tv/:tvId" element={<TvDetailsPage />}></Route>
                   </Route>
                   <Route path="/search" element={<SearchResultsPage />}>
                     <Route path="multi" element={<MultiSearchResults />} />
                     <Route path="movie" element={<MovieSearchResults />} />
                     <Route path="tv" element={<TvSearchResults />} />
                   </Route>
+                  <Route path="/movie/:movieId" element={<MovieDetailsPage />}></Route>
+                  <Route path="/tv/:tvId" element={<TvDetailsPage />}></Route>
                 </Routes>
               </UserWatchlistProvider>
             </AuthProvider>
