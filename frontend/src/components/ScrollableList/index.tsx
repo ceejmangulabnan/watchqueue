@@ -57,7 +57,7 @@ const ScrollableList = ({ scrollableItems, isDataLoading }: ScrollableListProps)
   }
 
   return (
-    <div className='flex space-x-4 h-[380px]'>
+    <div className='flex space-x-4 h-[300px] md:h-[380px]'>
       <div className='relative w-full h-full'>
         {/* Left Gradient Overlay */}
         <div
@@ -102,14 +102,14 @@ const ScrollableList = ({ scrollableItems, isDataLoading }: ScrollableListProps)
         {/* Scrollable Items Container */}
         <div
           ref={movieContainerRef}
-          className="flex items-center space-x-4 overflow-x-scroll scroll-smooth h-[380px] 
+          className="flex items-center space-x-4 overflow-x-scroll scroll-smooth h-[280px] md:h-[380px] 
           scrollbar scrollbar-h-30 scrollbar-thumb-rounded-md scrollbar-thumb-foreground/50 hover:scrollbar-thumb-foreground/100
           chrome-scrollbar
           "
         >
           {scrollableItems?.results.map((item) => (
             <div
-              className="flex-shrink-0 w-[180px]"
+              className="flex-shrink-0 w-[120px] md:w-[180px]"
               key={item.id}
             >
               {
