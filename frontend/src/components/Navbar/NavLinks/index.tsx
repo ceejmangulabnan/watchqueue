@@ -10,7 +10,7 @@ interface NavLinksProps {
 
 const NavLinks = ({ loading, isAuthed }: NavLinksProps) => {
   return (
-    <nav className='md:flex text-sm md:text-base ml-6'>
+    <nav className='hidden md:flex text-sm md:text-base ml-6'>
       {loading ? (
         // Render skeleton while fetching updated auth state
         <ul className='flex items-center gap-3'>
