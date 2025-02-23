@@ -19,13 +19,13 @@ const SearchBar = () => {
     if (searchQuery.trim()) {
       switch (searchCategory) {
         case "All":
-          navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
         case "Movies":
-          navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
         case "TV":
-          navigate(`/search/tv?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/tv?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
       }
     }
