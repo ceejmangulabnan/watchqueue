@@ -19,7 +19,7 @@ const RecommendedTv = ({ tvDetails }: RecommendedTvProps) => {
   return (
     <div>
       <h3 className='text-xl font-semibold py-4'>Recommended TV Shows</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8  gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 2xl:grid-cols-8 gap-4">
         {recommendedTv && (
           recommendedTv.results.slice(0, 8).map(tv => (
             <TvItem key={tv.id} tv={tv} />
