@@ -1,43 +1,44 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@/components/ui/pagination"
+import { Button } from '@/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const SearchResultsPagination = ({ totalPages }: { totalPages: number | undefined }) => {
   const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get("query");
+  const searchQuery = searchParams.get("query")
   const pageParams = Number(searchParams.get("page")) || 1; // Default to page 1
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const handlePageChange = (newPage: number) => {
-    navigate(`/search/multi?query=${searchQuery}&page=${newPage}`);
-  };
-  const pageNumbers = [];
-  const range = 2; // Number of pages to show before and after current page
+  const pageNumbers = []
+  const range = 2
 
   for (let i = Math.max(1, pageParams - range); i <= Math.min(totalPages ?? 0, pageParams + range); i++) {
-    pageNumbers.push(i);
+    pageNumbers.push(i)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    navigate(`/search/multi?query=${searchQuery}&page=${newPage}`)
   }
 
   return (
     <div className='my-6'>
       <Pagination>
         <PaginationContent>
-          <PaginationItem
-            className={pageParams <= 1 ? 'hidden' : ''}
-            onClick={() => handlePageChange(pageParams - 1)}>
-            <Button>
-              <PaginationPrevious />
-
+          <PaginationItem>
+            <Button
+              variant={'ghost'}
+              disabled={pageParams <= 1 ? true : false}
+              onClick={() => handlePageChange(pageParams - 1)}
+            >
+              <ChevronLeft size={16} />
+              Previous
             </Button>
           </PaginationItem>
 
-
-          {/* Page Numbers */}
           {pageNumbers.map((num) => (
             <PaginationItem
               key={num}
@@ -48,13 +49,17 @@ const SearchResultsPagination = ({ totalPages }: { totalPages: number | undefine
               {num}
             </PaginationItem>
           ))}
+
           <PaginationItem onClick={() => handlePageChange(pageParams + 1)}>
-            <PaginationNext />
+            <Button variant={'ghost'}>
+              Next
+              <ChevronRight size={16} />
+            </Button>
           </PaginationItem>
         </PaginationContent>
       </Pagination>
     </div>
-  );
-};
+  )
+}
 
 export default SearchResultsPagination;
