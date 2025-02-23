@@ -1,5 +1,5 @@
 # Models for Database Tables
-from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
 from typing import List
@@ -35,7 +35,7 @@ class Watchlists(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    items: Mapped[list[WatchlistItem]] = mapped_column(JSONB, nullable=False, server_default="jsonb '[]'")
+    items: Mapped[list[WatchlistItem]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
     statuses: Mapped[list[str]] = mapped_column(
         ARRAY(String),

@@ -63,7 +63,7 @@ const PopularMovies = () => {
   return (
     <div className='mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]'>
       <h3 className="text-base md:text-xl font-semibold py-4 ">Popular Movies</h3>
-      <div className='flex space-x-4 h-[350px]'>
+      <div className='flex space-x-4 h-[200px]'>
         <div className='relative w-full'>
           {/* Left Gradient Overlay */}
           <div

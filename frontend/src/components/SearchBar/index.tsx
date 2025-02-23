@@ -19,13 +19,13 @@ const SearchBar = () => {
     if (searchQuery.trim()) {
       switch (searchCategory) {
         case "All":
-          navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/multi?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
         case "Movies":
-          navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/movie?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
         case "TV":
-          navigate(`/search/tv?query=${encodeURIComponent(searchQuery)}`)
+          navigate(`/search/tv?query=${encodeURIComponent(searchQuery)}&page=1`)
           break
       }
     }
@@ -34,7 +34,7 @@ const SearchBar = () => {
   return (
     <div className='flex-1 min-w-[100px] max-w-[600px]'>
       <form onSubmit={handleSubmit}>
-        <div className='flex items-center shadow-sm border border-input rounded-sm overflow-hidden'>
+        <div className='flex items-center shadow-sm border border-input rounded-sm overflow-hidden text-sm md:text-medium'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"} className='border-none shadow-none w-28 justify-between rounded-none'>{searchCategory}

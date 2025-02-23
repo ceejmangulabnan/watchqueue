@@ -16,6 +16,7 @@ import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/di
 import useAxiosPrivate from "@/hooks/useAxiosPrivate"
 import { useAuth } from "@/hooks/useAuth"
 import { useNavigate } from 'react-router-dom'
+import { useToast } from '@/hooks/use-toast'
 
 interface LoginFormProps {
   toggleForm: () => void
@@ -25,6 +26,7 @@ const LoginForm = ({ toggleForm }: LoginFormProps) => {
   const axiosPrivate = useAxiosPrivate()
   const { auth, setAuth } = useAuth()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const loginFormSchema = z.object({
     username: z.string().min(4).regex(/^[a-zA-Z0-9]{4,}$/, 'Username must be at least 4 characters long without special characters'),
     password: z.string().min(8).regex(/^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/, 'Password must include at least 1 uppercase and lowercase letter, 1 number, and 1 special character')
@@ -48,12 +50,24 @@ const LoginForm = ({ toggleForm }: LoginFormProps) => {
       const userData = await axiosPrivate.get('/users/me')
 
       setAuth({ ...auth, accessToken: response.data.access_token, id: userData.data.id, username: userData.data.username })
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${userData.data.username}!`,
+        variant: "success"
+      })
 
     } catch (error) {
       console.error(error)
-    } finally {
+      toast({
+        title: "Login Failed",
+        description: "Incorrect username or password. Please try again.",
+        variant: "destructive"
+      })
+
       loginForm.reset()
-      navigate(0)
+      // navigate(0)
+    } finally {
+
     }
   }
 

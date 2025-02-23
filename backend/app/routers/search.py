@@ -23,6 +23,6 @@ async def search_show(query: str):
 
 
 @router.get("/multi")
-async def search_multi(query: str):
-    response = requests.get(f"{BASE_URL}/search/multi?query={query}&api_key={API_KEY}")
+async def search_multi(query: str, page: int):
+    response = requests.get(f"{BASE_URL}/search/multi?query={query}&page={page}&api_key={API_KEY}")
     return response.json()

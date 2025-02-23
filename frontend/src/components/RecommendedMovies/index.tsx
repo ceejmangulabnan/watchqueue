@@ -19,7 +19,7 @@ const RecommendedMovies = ({ movieDetails }: RecommendedMoviesProps) => {
   return (
     <div>
       <h3 className='text-xl font-semibold py-4'>Recommended Movies</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8  gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 2xl:grid-cols-8 gap-4">
         {recommendedMovies && (
           recommendedMovies.results.slice(0, 8).map(movie => (
             <MovieItem key={movie.id} movie={movie} />

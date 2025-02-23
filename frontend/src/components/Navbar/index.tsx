@@ -4,6 +4,7 @@ import NavLinks from '@/components/Navbar/NavLinks'
 import UserNav from '@/components/Navbar/UserNav'
 import SearchBar from '@/components/SearchBar'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import MobileNavLinks from '@/components/Navbar/MobileNavLinks'
 
 const Navbar = () => {
   const { auth, isAuthLoading, logout } = useAuth()
@@ -22,7 +23,10 @@ const Navbar = () => {
         <div className='flex items-center gap-2'>
           <NavLinks loading={isAuthLoading} isAuthed={isAuthed} handleLogout={logout} />
           <UserNav loading={isAuthLoading} isAuthed={isAuthed} handleLogout={logout} auth={auth} />
-          <ThemeToggle />
+          <div className='hidden md:block'>
+            <ThemeToggle />
+          </div>
+          <MobileNavLinks loading={isAuthLoading} isAuthed={isAuthed} handleLogout={logout} />
         </div>
       </div>
     </div>
