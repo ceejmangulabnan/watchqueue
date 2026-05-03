@@ -12,7 +12,6 @@ import os
 import re
 from sqlalchemy import select
 
-
 # Import env variables
 load_dotenv()
 PROD = os.getenv("PROD", False)
