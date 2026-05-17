@@ -3,29 +3,27 @@ import { AxiosError } from 'axios'
 import axios from '@/api/axios'
 
 const useRefreshToken = () => {
-  const { setAuth } = useAuth()
+    const { setAuth } = useAuth()
 
-  const refresh = async () => {
-    try {
-      const response = await axios.get('/users/refresh', {
-        withCredentials: true
-      })
+    const refresh = async () => {
+        try {
+            const response = await axios.get('/users/refresh', {
+                withCredentials: true,
+            })
 
-      setAuth(auth => {
-        return { ...auth, accessToken: response.data.access_token }
-      })
+            setAuth((auth) => {
+                return { ...auth, accessToken: response.data.access_token }
+            })
 
-      return response.data.access_token
-
-    } catch (error) {
-      if (error instanceof AxiosError && error.status === 401) {
-        return null
-      }
+            return response.data.access_token
+        } catch (error) {
+            if (error instanceof AxiosError && error.status === 401) {
+                return null
+            }
+        }
     }
 
-  }
-
-  return refresh
+    return refresh
 }
 
 export default useRefreshToken
