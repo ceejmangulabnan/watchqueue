@@ -1,4 +1,5 @@
 # Models for Database Tables
+from typing import TypedDict
 from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
@@ -20,6 +21,14 @@ class Users(Base):
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     token_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
+# Watchlist Item stored as JSONB dict
+class WatchlistItemData(TypedDict):
+    media_type: str
+    id: int
+    status: str
+    tags: list[str]
+
+
 # Watchlist Table
 class Watchlists(Base):
     __tablename__ = "watchlists"
@@ -27,7 +36,7 @@ class Watchlists(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement="auto")
     title: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    items: Mapped[list[dict]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
+    items: Mapped[list[WatchlistItemData]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
     is_private: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     statuses: Mapped[list[str]] = mapped_column(
         ARRAY(String),

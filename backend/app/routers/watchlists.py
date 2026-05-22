@@ -1,14 +1,13 @@
-from typing import Annotated
+from typing import Annotated, cast
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy import delete, select
 from sqlalchemy.orm.attributes import flag_modified
 from starlette import status
 
-from db.models import Watchlists
+from db.models import Watchlists, WatchlistItemData
 from db.database import db_dependency
 from schemas.watchlist import CreateWatchlist, WatchlistItem, UpdateItemStatus, UpdateItemTags
-from services.tmdb import tmdb
 from dependencies import user_dependency
 
 router = APIRouter(prefix="/watchlists")
@@ -101,7 +100,7 @@ async def add_to_watchlist(
             detail="Item already exists in the watchlist",
         )
 
-    watchlist.items.append(watchlist_item.model_dump())
+    watchlist.items.append(cast(WatchlistItemData, watchlist_item.model_dump()))
     flag_modified(watchlist, "items")
     db.add(watchlist)
     db.commit()

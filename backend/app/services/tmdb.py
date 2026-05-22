@@ -1,4 +1,7 @@
 import httpx
+from fastapi import HTTPException
+from starlette import status
+
 from config import settings
 
 
@@ -14,6 +17,11 @@ class TMDBClient:
 
     async def get(self, path: str, **kwargs):
         response = await self.client.get(path, **kwargs)
+        if response.is_error:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"TMDB API error: {response.status_code}",
+            )
         return response.json()
 
     async def search_movies(self, query: str):

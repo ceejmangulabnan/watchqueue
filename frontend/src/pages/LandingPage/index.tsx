@@ -3,9 +3,9 @@ import useMediaData from '@/hooks/useMediaData'
 
 const LandingPage = () => {
     const { data: moviePopular, isLoading: isMoviePopularLoading } =
-        useMediaData('/movies/popular', 'moviesPopular')
+        useMediaData('/movie/popular', 'moviesPopular')
     const { data: movieTopRated, isLoading: isMovieTopRatedLoading } =
-        useMediaData('/movies/top_rated', 'moviesTopRated')
+        useMediaData('/movie/top_rated', 'moviesTopRated')
     const { data: tvPopular, isLoading: isTvPopularLoading } = useMediaData(
         '/tv/popular',
         'tvPopular'

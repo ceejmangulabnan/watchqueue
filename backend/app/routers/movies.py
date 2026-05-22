@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 from services.tmdb import tmdb
 
-router = APIRouter(prefix="/movies")
-
+router = APIRouter(prefix="/movie")
 
 @router.get("/popular")
 async def get_movie_popular():
