@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class CreateUser(BaseModel):
@@ -16,6 +17,13 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class TokenPayload(BaseModel):
+    sub: str      # username
+    id: int       # user_id
+    version: int
+    jti: Optional[str] = None
 
 
 class LoginRequest(BaseModel):

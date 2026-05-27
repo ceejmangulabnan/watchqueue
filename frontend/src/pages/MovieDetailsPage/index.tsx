@@ -23,7 +23,7 @@ const MovieDetailsPage = () => {
     const [isOpen, setIsOpen] = useState(false)
     const { data: movieDetails } = useMediaDetails<MovieDetails>(
         movieId,
-        `/movies/${movieId}`,
+        `/movie/${movieId}`,
         'movieDetails'
     )
 

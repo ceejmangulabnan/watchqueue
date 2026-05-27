@@ -11,7 +11,7 @@ const PopularMovies = () => {
     const [showRightButton, setShowRightButton] = useState(false)
 
     const fetchPopularMovies = async () => {
-        const response = await axiosBase.get('/movies/popular')
+        const response = await axiosBase.get('/movie/popular')
         return response.data as MovieDataQuery
     }
 

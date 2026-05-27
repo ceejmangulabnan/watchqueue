@@ -8,7 +8,7 @@ from sqlalchemy import select
 from db.models import Users
 from db.database import db_dependency
 from config import settings
-from schemas.user import CreateUser, Token
+from schemas.user import CreateUser, Token, TokenPayload
 from services.auth import (
     validate_new_user_credentials,
     authenticate_user_login,
@@ -16,7 +16,6 @@ from services.auth import (
     create_refresh_token,
     decode_refresh_token,
     get_user_by_id,
-    invalidate_user_tokens,
     get_password_hash,
     store_refresh_token,
     get_refresh_token_by_jti,
@@ -30,6 +29,25 @@ logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/users")
+
+
+def _set_refresh_cookie(response: Response, token: str) -> None:
+    kwargs = {
+        "key": "refresh_token",
+        "value": token,
+        "httponly": True,
+        "max_age": settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+    }
+    if settings.APP_ENV != "local":
+        kwargs.update({"secure": True, "samesite": "none"})
+    response.set_cookie(**kwargs)
+
+
+def _clear_refresh_cookie(response: Response) -> None:
+    kwargs = {"key": "refresh_token", "value": "", "max_age": 0}
+    if settings.APP_ENV != "local":
+        kwargs.update({"secure": True, "samesite": "none"})
+    response.set_cookie(**kwargs)
 
 @router.get("/")
 async def hello_users():
@@ -96,105 +114,93 @@ async def login_for_access_token(
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
     store_refresh_token(db, jti, user.id, expires_at)
 
-    cookie_kwargs = {
-        "key": "refresh_token",
-        "value": refresh_token,
-        "httponly": True,
-        "max_age": settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    }
-    if settings.APP_ENV != 'local':
-        cookie_kwargs.update({"secure": True, "samesite": "none"})
-
-    response.set_cookie(**cookie_kwargs)
+    _set_refresh_cookie(response, refresh_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.get("/refresh", response_model=Token)
 async def refresh_access_token(request: Request, response: Response, db: db_dependency):
-
     try:
         refresh_token = request.cookies.get("refresh_token")
         if refresh_token is None:
-            logger.info("Users Router: No refresh token found.")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Refresh token not found",
             )
 
-        payload = decode_refresh_token(refresh_token)
-        if payload is None:
-            logger.info("Users Router: Failed to decode refresh token.")
+        payload_dict = decode_refresh_token(refresh_token)
+        if payload_dict is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
             )
 
-        username = payload.get("sub")
-        user_id = payload.get("id")
-        token_version = payload.get("version")
-        jti = payload.get("jti")
-
-        if not all([username, user_id, token_version, jti]):
-            logger.info("Users Router: Refresh token payload is invalid.")
+        try:
+            payload = TokenPayload(**payload_dict)
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token payload",
             )
 
-        # Check DB for token status
-        db_token = get_refresh_token_by_jti(db, jti)
-
-        # Theft detection: if token is already revoked, it's a reuse attempt
-        if db_token and db_token.revoked:
-            logger.warning(f"SECURITY ALERT: Refresh token reuse detected for user {user_id}. Revoking all sessions.")
-            revoke_all_user_tokens(db, user_id)
+        if payload.jti is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token reuse detected",
+                detail="Invalid token payload",
             )
 
-        if not db_token or db_token.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        now = datetime.now(timezone.utc)
+
+        db_token = get_refresh_token_by_jti(db, payload.jti)
+
+        if db_token and db_token.revoked:
+            leeway = timedelta(seconds=10)
+            revoked_at = db_token.revoked_at.replace(tzinfo=timezone.utc) if db_token.revoked_at else None
+
+            if revoked_at and (now - revoked_at) > leeway:
+                revoke_all_user_tokens(db, payload.id)
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token reuse detected",
+                )
+
+        if not db_token or db_token.expires_at.replace(tzinfo=timezone.utc) < now:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token expired or not found",
             )
 
-        user = get_user_by_id(user_id, db)
-        if not user or user.token_version != token_version:
+        user = get_user_by_id(payload.id, db)
+        if not user or user.token_version != payload.version:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Session invalidated",
             )
 
-        # Rotation: Revoke old JTI and issue a new one
-        revoke_refresh_token(db, jti)
+        # Always rotate: revoke old JTI, issue new refresh token
+        revoke_refresh_token(db, payload.jti)
         new_jti = str(uuid.uuid4())
+        new_refresh_token = create_refresh_token(
+            user.username, user.id, user.token_version, new_jti,
+        )
+        store_refresh_token(db, new_jti, user.id, now + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES))
+
+        new_access_token = create_access_token(
+            user.username, user.id, user.token_version,
+        )
+
+        _set_refresh_cookie(response, new_refresh_token)
+        return {"access_token": new_access_token, "token_type": "bearer"}
 
     except HTTPException:
+        _clear_refresh_cookie(response)
         raise
-
-    new_access_token = create_access_token(
-        user.username, user.id, user.token_version,
-    )
-    new_refresh_token = create_refresh_token(
-        user.username, user.id, user.token_version, new_jti
-    )
-
-    # Store new refresh token
-    new_expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-    store_refresh_token(db, new_jti, user.id, new_expires_at)
-
-    cookie_kwargs = {
-        "key": "refresh_token",
-        "value": new_refresh_token,
-        "httponly": True,
-        "max_age": settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    }
-    if settings.APP_ENV != 'local':
-        cookie_kwargs.update({"secure": True, "samesite": "none"})
-
-    response.set_cookie(**cookie_kwargs)
-    return {"access_token": new_access_token, "token_type": "bearer"}
+    except Exception as e:
+        logger.error(f"Users Router: Unexpected error during token refresh: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )
 
 
 @router.get("/me")
@@ -206,17 +212,16 @@ async def get_me(user: user_dependency):
 async def logout(request: Request, response: Response, db: db_dependency):
     refresh_token = request.cookies.get("refresh_token")
     if refresh_token:
-        payload = decode_refresh_token(refresh_token)
-        if payload:
-            jti = payload.get("jti")
-            if jti:
-                # Only revoke this specific session
-                revoke_refresh_token(db, jti)
+        payload_dict = decode_refresh_token(refresh_token)
+        if payload_dict:
+            try:
+                payload = TokenPayload(**payload_dict)
+                if payload.jti:
+                    # Only revoke this specific session
+                    revoke_refresh_token(db, payload.jti)
+            except Exception:
+                pass
 
-    cookie_kwargs = {"key": "refresh_token", "value": "", "max_age": 0}
-    if settings.APP_ENV != 'local':
-        cookie_kwargs.update({"secure": True, "samesite": "none"})
-
-    response.set_cookie(**cookie_kwargs)
+    _clear_refresh_cookie(response)
     return {"message": "Logged out successfully"}
 

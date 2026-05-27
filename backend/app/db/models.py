@@ -1,6 +1,7 @@
+from __future__ import annotations
 # Models for Database Tables
 from datetime import datetime, timezone
-from typing import TypedDict
+from typing import TypedDict, Optional
 from sqlalchemy import ARRAY, Boolean, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
@@ -31,6 +32,7 @@ class RefreshTokens(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     revoked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    revoked_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, 
         nullable=False, 

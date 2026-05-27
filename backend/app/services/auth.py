@@ -1,6 +1,5 @@
-import uuid
 from datetime import timedelta, datetime, timezone
-from typing import Optional
+from typing import Optional, Any
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy import select, update
@@ -74,7 +73,7 @@ def create_refresh_token(username: str, user_id: int, token_version: int, jti: s
     return jwt.encode(encode, settings.REFRESH_JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
-def decode_refresh_token(token: str) -> Optional[dict]:
+def decode_refresh_token(token: str) -> Optional[dict[str, Any]]:
     try:
         payload = jwt.decode(token, settings.REFRESH_JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
         return payload
@@ -115,18 +114,23 @@ def get_refresh_token_by_jti(db: db_dependency, jti: str) -> Optional[RefreshTok
 
 
 def revoke_refresh_token(db: db_dependency, jti: str) -> None:
-    stmt = update(RefreshTokens).where(RefreshTokens.jti == jti).values(revoked=True)
+    stmt = update(RefreshTokens).where(RefreshTokens.jti == jti).values(
+        revoked=True, 
+        revoked_at=datetime.now(timezone.utc)
+    )
     db.execute(stmt)
     db.commit()
 
 
+# Revoke User tokens to force logout on all devices
 def revoke_all_user_tokens(db: db_dependency, user_id: int) -> None:
-    # This is the "security nuke"
     user = get_user_by_id(user_id, db)
     if user:
         user.token_version += 1
-        # Also mark all their known refresh tokens as revoked for good measure
-        stmt = update(RefreshTokens).where(RefreshTokens.user_id == user_id).values(revoked=True)
+        stmt = update(RefreshTokens).where(RefreshTokens.user_id == user_id).values(
+            revoked=True,
+            revoked_at=datetime.now(timezone.utc)
+        )
         db.execute(stmt)
         db.commit()
 
@@ -143,6 +147,4 @@ def create_user(username: str, password: str, email: str, db: db_dependency) -> 
     return user
 
 
-def invalidate_user_tokens(user_id: int, db: db_dependency) -> None:
-    revoke_all_user_tokens(db, user_id)
 

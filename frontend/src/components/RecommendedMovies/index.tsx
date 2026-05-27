@@ -10,7 +10,7 @@ interface RecommendedMoviesProps {
 const RecommendedMovies = ({ movieDetails }: RecommendedMoviesProps) => {
     const fetchRecommendedMovies = async () => {
         const response = await axiosBase.get(
-            `/movies/${movieDetails.id}/recommendations`
+            `/movie/${movieDetails.id}/recommendations`
         )
         return response.data as RecommendedMoviesData
     }

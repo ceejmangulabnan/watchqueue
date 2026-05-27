@@ -217,17 +217,17 @@ async def watchlist_cover_image(watchlist: watchlist_dependency):
     for item in watchlist.items[:4]:
         if item["media_type"] == "movie":
             watchlist_item_details.append(
-                f"{settings.BASE_URL}/movie/{item['id']}?api_key={settings.API_KEY}"
+                f"{settings.BASE_URL}/movie/{item['id']}"
             )
         elif item["media_type"] == "tv":
             watchlist_item_details.append(
-                f"{settings.BASE_URL}/tv/{item['id']}?api_key={settings.API_KEY}"
+                f"{settings.BASE_URL}/tv/{item['id']}"
             )
 
     async with aiohttp.ClientSession() as session:
         poster_paths = []
         for url in watchlist_item_details:
-            async with session.get(url) as response:
+            async with session.get(url, headers={"Authorization": f"Bearer {settings.API_KEY}"}) as response:
                 data = await response.json()
                 poster_path = data.get("poster_path")
                 if poster_path:
