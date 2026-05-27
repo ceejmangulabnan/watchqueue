@@ -1,6 +1,7 @@
 # Models for Database Tables
+from datetime import datetime, timezone
 from typing import TypedDict
-from sqlalchemy import ARRAY, Boolean, ForeignKey, Integer, String, text
+from sqlalchemy import ARRAY, Boolean, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -20,6 +21,21 @@ class Users(Base):
     email: Mapped[str] = mapped_column(String, nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     token_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+# Refresh Tokens Table for rotation and multi-device sessions
+class RefreshTokens(Base):
+    __tablename__ = "refresh_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement="auto")
+    jti: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, 
+        nullable=False, 
+        default=lambda: datetime.now(timezone.utc)
+    )
 
 # Watchlist Item stored as JSONB dict
 class WatchlistItemData(TypedDict):
