@@ -20,6 +20,8 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 interface RegisterFormProps {
     toggleForm: () => void
@@ -29,6 +31,8 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
     const axiosPrivate = useAxiosPrivate()
     const { auth, setAuth } = useAuth()
     const navigate = useNavigate()
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const registerFormSchema = z
         .object({
             username: z
@@ -127,7 +131,11 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
                         <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="Username" {...field} />
+                                <Input
+                                    required
+                                    placeholder="Username"
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -140,11 +148,25 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
-                                    placeholder="Password"
-                                    {...field}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        required
+                                        type={
+                                            showPassword ? 'text' : 'password'
+                                        }
+                                        placeholder="Password"
+                                        {...field}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                                        onClick={() =>
+                                            setShowPassword((prev) => !prev)
+                                        }
+                                    >
+                                        {showPassword ? <EyeOff /> : <Eye />}
+                                    </button>
+                                </div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -157,11 +179,33 @@ const RegisterForm = ({ toggleForm }: RegisterFormProps) => {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    {...field}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        required
+                                        type={
+                                            showConfirmPassword
+                                                ? 'text'
+                                                : 'password'
+                                        }
+                                        placeholder="Confirm Password"
+                                        {...field}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                                        onClick={() =>
+                                            setShowConfirmPassword(
+                                                (prev) => !prev
+                                            )
+                                        }
+                                    >
+                                        {showConfirmPassword ? (
+                                            <EyeOff />
+                                        ) : (
+                                            <Eye />
+                                        )}
+                                    </button>
+                                </div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>

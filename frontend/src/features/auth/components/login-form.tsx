@@ -19,8 +19,9 @@ import {
 } from '@/components/ui/dialog'
 import useAxiosPrivate from '@/features/auth/hooks/use-axios-private'
 import { useAuth } from '@/features/auth/hooks/use-auth'
-import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 
 interface LoginFormProps {
     toggleForm: () => void
@@ -29,8 +30,8 @@ interface LoginFormProps {
 const LoginForm = ({ toggleForm }: LoginFormProps) => {
     const axiosPrivate = useAxiosPrivate()
     const { auth, setAuth } = useAuth()
-    const navigate = useNavigate()
     const { toast } = useToast()
+    const [showPassword, setShowPassword] = useState(false)
     const loginFormSchema = z.object({
         username: z
             .string()
@@ -125,11 +126,24 @@ const LoginForm = ({ toggleForm }: LoginFormProps) => {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
-                                    placeholder="Password"
-                                    {...field}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        type={
+                                            showPassword ? 'text' : 'password'
+                                        }
+                                        placeholder="Password"
+                                        {...field}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+                                        onClick={() =>
+                                            setShowPassword((prev) => !prev)
+                                        }
+                                    >
+                                        {showPassword ? <Eye /> : <EyeOff />}
+                                    </button>
+                                </div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
