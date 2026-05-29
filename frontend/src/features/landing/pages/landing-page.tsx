@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import ScrollableList from '@/features/common/components/scrollable-list'
 import useMediaData from '@/hooks/useMediaData'
 
@@ -16,6 +17,10 @@ const LandingPage = () => {
     )
 
     return (
+        <>
+        <Helmet>
+            <title>WatchQueue</title>
+        </Helmet>
         <div className="mx-10 md:mx-20 my-10">
             <div className="mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]">
                 <h3 className="text-base md:text-xl font-semibold pt-4">
@@ -59,6 +64,7 @@ const LandingPage = () => {
                 )}
             </div>
         </div>
+        </>
     )
 }
 

@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import MovieItem from '@/features/movies/components/movie-item'
 import { MovieDataQuery } from '@/features/movies/types/movie-types'
@@ -16,6 +17,10 @@ const MovieSearchResults = () => {
     )
 
     return (
+        <>
+        <Helmet>
+            <title>Movie Results: {searchQuery} - WatchQueue</title>
+        </Helmet>
         <div className="my-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8">
                 {movieSearchResults &&
@@ -27,6 +32,7 @@ const MovieSearchResults = () => {
                 totalPages={movieSearchResults?.total_pages}
             />
         </div>
+        </>
     )
 }
 

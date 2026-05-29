@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import TvItem from '@/features/tv/components/tv-item'
 import MovieItem from '@/features/movies/components/movie-item'
@@ -20,6 +21,10 @@ const MultiSearchResults = () => {
 
     console.log(multiSearchResults)
     return (
+        <>
+        <Helmet>
+            <title>All Results: {searchQuery} - WatchQueue</title>
+        </Helmet>
         <div className="my-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8">
                 {multiSearchResults &&
@@ -37,6 +42,7 @@ const MultiSearchResults = () => {
                 totalPages={multiSearchResults?.total_pages}
             />
         </div>
+        </>
     )
 }
 

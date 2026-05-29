@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router-dom'
 import useMediaDetails from '@/hooks/useMediaDetails'
 import { useUserWatchlists } from '@/features/watchlist/hooks/use-user-watchlists'
@@ -24,6 +25,10 @@ const TvDetailsPage = () => {
     const posterLink = generatePosterLink(tvDetails?.poster_path)
 
     return tvDetails ? (
+        <>
+        <Helmet>
+            <title>{tvDetails.name} - WatchQueue</title>
+        </Helmet>
         <div className="mx-10 md:mx-20 my-10">
             <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
                 <div className="flex flex-col items-center sm:flex-row pb-8 sm:py-8">
@@ -91,6 +96,7 @@ const TvDetailsPage = () => {
                 <RecommendedTv tvDetails={tvDetails} />
             </div>
         </div>
+        </>
     ) : null
 }
 

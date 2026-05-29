@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { Outlet } from 'react-router-dom'
 import { useSearchParams } from 'react-router-dom'
 
@@ -5,6 +6,10 @@ const SearchResultsPage = () => {
     const [searchParams] = useSearchParams()
     const searchQuery = searchParams.get('query')
     return (
+        <>
+        <Helmet>
+            <title>{searchQuery ? `Search: ${searchQuery} - WatchQueue` : 'Search - WatchQueue'}</title>
+        </Helmet>
         <div className="mx-10 md:mx-20 my-10">
             <div className="mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]">
                 <h3 className="text-xl font-semibold">
@@ -16,6 +21,7 @@ const SearchResultsPage = () => {
                 <Outlet />
             </div>
         </div>
+        </>
     )
 }
 

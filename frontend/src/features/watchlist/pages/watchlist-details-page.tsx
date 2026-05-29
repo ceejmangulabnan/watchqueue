@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -41,6 +42,10 @@ const WatchlistDetailsPage = () => {
     }
 
     return (
+        <>
+        <Helmet>
+            <title>{watchlistDetails?.title ? `${watchlistDetails.title} - WatchQueue` : 'Watchlist - WatchQueue'}</title>
+        </Helmet>
         <div className="mx-10 md:mx-20 my-10">
             <div className="mx-auto xl:max-w-[1400px] 2xl:max-w-[1600px]">
                 <div className="flex  justify-between">
@@ -64,6 +69,7 @@ const WatchlistDetailsPage = () => {
                 )}
             </div>
         </div>
+        </>
     )
 }
 

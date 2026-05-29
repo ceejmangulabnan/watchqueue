@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { useParams } from 'react-router-dom'
 import { generatePosterLink, FALLBACK_POSTER } from '@/utils'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,10 @@ const MovieDetailsPage = () => {
     const posterLink = generatePosterLink(movieDetails?.poster_path)
 
     return movieDetails ? (
+        <>
+        <Helmet>
+            <title>{movieDetails.title} - WatchQueue</title>
+        </Helmet>
         <div className="mx-10 md:mx-20 my-10">
             <div className="mx-auto py-8 xl:max-w-[1400px] 2xl:max-w-[1600px]">
                 <div className="flex flex-col items-center sm:flex-row pb-8 sm:py-8">
@@ -120,6 +125,7 @@ const MovieDetailsPage = () => {
                 <RecommendedMovies movieDetails={movieDetails} />
             </div>
         </div>
+        </>
     ) : null
 }
 

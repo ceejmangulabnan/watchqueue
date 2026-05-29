@@ -53,6 +53,8 @@ export default {
                 },
             },
             fontFamily: {
+                'jetbrains-mono': ['JetBrains Mono', 'mono'],
+                'bebas-neue': ['Bebas Neue', 'sans-serif'],
                 fira: ['Fira Sans', 'sans-serif'],
                 lato: ['Lato', 'sans-serif'],
                 merriweather: ['Merriweather', 'serif'],
