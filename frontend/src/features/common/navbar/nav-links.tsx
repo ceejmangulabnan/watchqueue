@@ -1,41 +1,36 @@
 import { Link } from 'react-router-dom'
 import { Skeleton } from '@/components/ui/skeleton'
-import LoginRegisterToggle from '@/features/auth/components/login-register-toggle'
 
 interface NavLinksProps {
     loading: boolean
-    isAuthed: boolean
     handleLogout: () => Promise<void>
 }
 
-const NavLinks = ({ loading, isAuthed }: NavLinksProps) => {
+const navLinks = [
+    { to: '/browse/movies', label: 'Movies' },
+    { to: '/browse/tv', label: 'TV' },
+    { to: '/watchlists', label: 'Watchlists' },
+]
+
+const NavLinks = ({ loading }: NavLinksProps) => {
     return (
-        <nav className="hidden md:flex text-sm md:text-base ml-6">
-            {loading ? (
-                // Render skeleton while fetching updated auth state
-                <ul className="flex items-center gap-3">
+        <nav className="hidden md:flex text-sm md:text-base">
+            <ul className="flex items-center gap-6 text-sm font-bold ml-4">
+                {loading && (
                     <li>
-                        <Skeleton className="h-9 w-16" />
+                        <Skeleton className="h-9 w-16"></Skeleton>
                     </li>
-                </ul>
-            ) : isAuthed ? (
-                // If user is authenticated, show logged-in navigation
-                <ul className="flex items-center gap-3">
-                    <li>
-                        <Link to="/">Home</Link>
-                    </li>
-                </ul>
-            ) : (
-                // If not authed, show login button
-                <ul className="flex items-center justify-between gap-3">
-                    <li>
-                        <Link to="/">Home</Link>
-                    </li>
-                    <li>
-                        <LoginRegisterToggle />
-                    </li>
-                </ul>
-            )}
+                )}
+                {navLinks.map(({ to, label }) => (
+                    <Link
+                        key={to}
+                        to={to}
+                        className="hover:underline underline-offset-2"
+                    >
+                        {label}
+                    </Link>
+                ))}
+            </ul>
         </nav>
     )
 }

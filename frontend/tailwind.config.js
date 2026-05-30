@@ -51,8 +51,21 @@ export default {
                     4: 'hsl(var(--chart-4))',
                     5: 'hsl(var(--chart-5))',
                 },
+                sidebar: {
+                    DEFAULT: 'hsl(var(--sidebar-background))',
+                    foreground: 'hsl(var(--sidebar-foreground))',
+                    primary: 'hsl(var(--sidebar-primary))',
+                    'primary-foreground':
+                        'hsl(var(--sidebar-primary-foreground))',
+                    accent: 'hsl(var(--sidebar-accent))',
+                    'accent-foreground':
+                        'hsl(var(--sidebar-accent-foreground))',
+                    border: 'hsl(var(--sidebar-border))',
+                    ring: 'hsl(var(--sidebar-ring))',
+                },
             },
             fontFamily: {
+                inter: ['Inter', 'sans-serif'],
                 'jetbrains-mono': ['JetBrains Mono', 'mono'],
                 'bebas-neue': ['Bebas Neue', 'sans-serif'],
                 fira: ['Fira Sans', 'sans-serif'],

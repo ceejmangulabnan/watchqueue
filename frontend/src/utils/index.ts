@@ -1,7 +1,11 @@
 const IMG_URL = import.meta.env.VITE_IMG_URL
 
-export const generatePosterLink = (imgPath: string | undefined) => {
-    const posterLink = `${IMG_URL}/w342${imgPath}`
+export const generatePosterLink = (
+    imgPath: string | undefined,
+    size: string = 'w342'
+    // backdrop: boolean = false
+) => {
+    const posterLink = `${IMG_URL}/${size}${imgPath}`
     return posterLink
 }
 
