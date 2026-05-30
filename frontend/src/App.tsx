@@ -8,7 +8,6 @@ import AuthProvider from '@/features/auth/context/auth-provider'
 import UserWatchlistProvider from '@/features/watchlist/context/user-watchlist-provider'
 import ProtectedRoute from '@/features/auth/protected-route'
 import { Toaster } from '@/components/ui/toaster'
-import Navbar from '@/features/common/navbar'
 import WatchlistDetailsPage from '@/features/watchlist/pages/watchlist-details-page'
 import MovieDetailsPage from '@/features/movies/pages/movie-details-page'
 import TvDetailsPage from '@/features/tv/pages/tv-details-page'
@@ -17,64 +16,92 @@ import MovieSearchResults from '@/features/search/pages/movie-search-results'
 import MultiSearchResults from '@/features/search/pages/multi-search-results'
 import TvSearchResults from '@/features/search/pages/tv-search-results'
 import ThemeProvider from '@/features/common/context/theme-provider'
+import { SidebarInset, SidebarProvider } from './components/ui/sidebar'
+import AppSidebar from './features/common/navbar/app-sidebar'
+import Navbar from './features/common/navbar'
 
 const queryClient = new QueryClient()
 
 const App = () => {
     return (
-        <div className="app mt-20 font-fira">
+        <div className="app font-fira">
             <QueryClientProvider client={queryClient}>
                 <HelmetProvider>
-                <BrowserRouter>
-                    <ThemeProvider
-                        defaultTheme="light"
-                        storageKey="vite-ui-theme"
-                    >
-                        <AuthProvider>
-                            <UserWatchlistProvider>
-                                <Navbar />
-                                <Routes>
-                                    <Route path="/" element={<LandingPage />} />
-                                    <Route element={<ProtectedRoute />}>
-                                        <Route
-                                            path="/profile"
-                                            element={<ProfilePage />}
-                                        />
-                                        <Route
-                                            path=":username/watchlist/:watchlistId"
-                                            element={<WatchlistDetailsPage />}
-                                        />
-                                    </Route>
-                                    <Route
-                                        path="/search"
-                                        element={<SearchResultsPage />}
-                                    >
-                                        <Route
-                                            path="multi"
-                                            element={<MultiSearchResults />}
-                                        />
-                                        <Route
-                                            path="movie"
-                                            element={<MovieSearchResults />}
-                                        />
-                                        <Route
-                                            path="tv"
-                                            element={<TvSearchResults />}
-                                        />
-                                    </Route>
-                                    <Route
-                                        path="/movie/:movieId"
-                                        element={<MovieDetailsPage />}
-                                    ></Route>
-                                    <Route
-                                        path="/tv/:tvId"
-                                        element={<TvDetailsPage />}
-                                    ></Route>
-                                </Routes>
-                            </UserWatchlistProvider>
-                        </AuthProvider>
-                    </ThemeProvider>
-                </BrowserRouter>
+                    <BrowserRouter>
+                        <ThemeProvider
+                            defaultTheme="light"
+                            storageKey="vite-ui-theme"
+                        >
+                            <AuthProvider>
+                                <UserWatchlistProvider>
+                                    <SidebarProvider>
+                                        <AppSidebar />
+                                        <SidebarInset>
+                                            <Navbar />
+
+                                            <Routes>
+                                                <Route
+                                                    path="/"
+                                                    element={<LandingPage />}
+                                                />
+                                                <Route
+                                                    element={<ProtectedRoute />}
+                                                >
+                                                    <Route
+                                                        path="/profile"
+                                                        element={
+                                                            <ProfilePage />
+                                                        }
+                                                    />
+                                                    <Route
+                                                        path=":username/watchlist/:watchlistId"
+                                                        element={
+                                                            <WatchlistDetailsPage />
+                                                        }
+                                                    />
+                                                </Route>
+                                                <Route
+                                                    path="/search"
+                                                    element={
+                                                        <SearchResultsPage />
+                                                    }
+                                                >
+                                                    <Route
+                                                        path="multi"
+                                                        element={
+                                                            <MultiSearchResults />
+                                                        }
+                                                    />
+                                                    <Route
+                                                        path="movie"
+                                                        element={
+                                                            <MovieSearchResults />
+                                                        }
+                                                    />
+                                                    <Route
+                                                        path="tv"
+                                                        element={
+                                                            <TvSearchResults />
+                                                        }
+                                                    />
+                                                </Route>
+                                                <Route
+                                                    path="/movie/:movieId"
+                                                    element={
+                                                        <MovieDetailsPage />
+                                                    }
+                                                ></Route>
+                                                <Route
+                                                    path="/tv/:tvId"
+                                                    element={<TvDetailsPage />}
+                                                ></Route>
+                                            </Routes>
+                                        </SidebarInset>
+                                    </SidebarProvider>
+                                </UserWatchlistProvider>
+                            </AuthProvider>
+                        </ThemeProvider>
+                    </BrowserRouter>
                 </HelmetProvider>
                 <ReactQueryDevtools />
             </QueryClientProvider>
