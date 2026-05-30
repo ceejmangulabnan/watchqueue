@@ -1,3 +1,4 @@
+from typing import Literal
 import httpx
 from fastapi import HTTPException
 from starlette import status
@@ -56,6 +57,9 @@ class TMDBClient:
 
     async def get_tv_recommendations(self, tv_id: int):
         return await self.get(f"/tv/{tv_id}/recommendations")
+
+    async def get_trending_all(self, time_window: Literal['day', 'week']):
+        return await self.get(f"/trending/all/{time_window}")
 
 
 tmdb = TMDBClient()
