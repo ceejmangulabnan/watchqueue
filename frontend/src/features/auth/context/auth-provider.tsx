@@ -28,6 +28,7 @@ interface AuthContextValue {
     setAuth: React.Dispatch<React.SetStateAction<Auth>>
     isAuthLoading: boolean
     logout: () => Promise<void>
+    isAuthed: boolean
 }
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -38,6 +39,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     })
     const [isAuthLoading, setIsAuthLoading] = useState(true)
     const navigate = useNavigate()
+    const isAuthed =
+        auth.accessToken !== null &&
+        auth.username !== null &&
+        auth.id !== null
 
     const initializeAuth = useCallback(async () => {
         try {
@@ -93,7 +98,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }, [navigate])
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth, isAuthLoading, logout }}>
+        <AuthContext.Provider
+            value={{ auth, setAuth, isAuthLoading, logout, isAuthed }}
+        >
             {children}
         </AuthContext.Provider>
     )
