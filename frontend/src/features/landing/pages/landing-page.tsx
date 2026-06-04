@@ -6,7 +6,6 @@ import { Info, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { MovieData } from '@/features/movies/types/movie-types'
 import { TvData } from '@/features/tv/types/tv-types'
-import PopularMovies from '@/features/movies/components/popular-movies'
 
 const LandingPage = () => {
     const { data: topTrending, isLoading: isTopTrendingLoading } = useMediaData(
@@ -87,9 +86,6 @@ const LandingPage = () => {
                         </div>
                     </>
                 )}
-            </section>
-            <section>
-                <PopularMovies />
             </section>
         </>
     )

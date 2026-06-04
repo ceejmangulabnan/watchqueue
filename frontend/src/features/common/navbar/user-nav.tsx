@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import LoginRegisterToggle from '@/features/auth/components/login-register-toggle'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     SidebarMenu,
@@ -28,9 +28,6 @@ interface UserNavProps {
 const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const navigate = useNavigate()
-    useEffect(() => {
-        setIsOpen(false)
-    }, [auth])
 
     const generateAvatarFallback = () => {
         if (isAuthed) {
