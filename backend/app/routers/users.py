@@ -1,59 +1,61 @@
-from datetime import timedelta, datetime, timezone
+import uuid
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from fastapi import APIRouter, Depends, Response, Request, status, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
-from db.models import Users
-from db.database import db_dependency
-from dotenv import load_dotenv
-from passlib.context import CryptContext
-from jose import jwt, JWTError
-import os
-import re
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 
-# Import env variables
-load_dotenv()
-PROD = os.getenv("PROD", False)
-ACCESS_JWT_SECRET = str(os.getenv("ACCESS_JWT_SECRET"))
-REFRESH_JWT_SECRET = str(os.getenv("REFRESH_JWT_SECRET"))
-JWT_ALGORITHM = str(os.getenv("JWT_ALGORITHM"))
+from db.models import Users
+from db.database import db_dependency
+from config import settings
+from schemas.user import CreateUser, Token, TokenPayload
+from services.auth import (
+    validate_new_user_credentials,
+    authenticate_user_login,
+    create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
+    get_user_by_id,
+    get_password_hash,
+    store_refresh_token,
+    get_refresh_token_by_jti,
+    revoke_refresh_token,
+    revoke_all_user_tokens,
+)
+from dependencies import user_dependency
+import logging
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-# 7 days
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(prefix="/users")
 
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
+def _set_refresh_cookie(response: Response, token: str) -> None:
+    kwargs = {
+        "key": "refresh_token",
+        "value": token,
+        "httponly": True,
+        "max_age": settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+    }
+    if settings.APP_ENV != "local":
+        kwargs.update({"secure": True, "samesite": "none"})
+    response.set_cookie(**kwargs)
+
+
+def _clear_refresh_cookie(response: Response) -> None:
+    kwargs = {"key": "refresh_token", "value": "", "max_age": 0}
+    if settings.APP_ENV != "local":
+        kwargs.update({"secure": True, "samesite": "none"})
+    response.set_cookie(**kwargs)
 
 @router.get("/")
 async def hello_users():
-    return f"Hello {str(PROD)}"
-
-
-class CreateUser(BaseModel):
-    username: str
-    password: str
-    confirmPassword: str
-    email: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+    return f"Hello {settings.APP_ENV}"
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(create_user_request: CreateUser, db: db_dependency):
-    """
-    Adds new user to the database
-    """
-
-    new_user_is_valid = validate_new_user_credentials(create_user_request)
     duplicate_username_query = select(Users).where(
         Users.username == create_user_request.username
     )
@@ -62,236 +64,164 @@ async def register_user(create_user_request: CreateUser, db: db_dependency):
 
     if duplicate_username:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Username is not available"
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username is not available",
         )
 
-    if new_user_is_valid:
-        new_user = Users(
-            username=create_user_request.username,
-            password=get_password_hash(create_user_request.password),
-            email=create_user_request.email,
-        )
-
-        db.add(new_user)
-        db.commit()
-    else:
+    if not validate_new_user_credentials(create_user_request):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Credentials did not match expected format",
         )
 
-
-def validate_new_user_credentials(credentials: CreateUser):
-    """
-    Uses RegEx to validate if the new user credentials passed adhere to set RegEx patterns
-    """
-    # Min 4 chars alphanumeric
-    username_pattern = re.compile("^[a-zA-Z0-9]{4,}$")
-    username_valid = username_pattern.fullmatch(credentials.username)
-
-    # Min 8 Chars, 1 uppercase, 1 lowercase, 1 symbol, and 1 number
-    password_pattern = re.compile(
-        "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$"
+    user = Users(
+        username=create_user_request.username,
+        password=get_password_hash(create_user_request.password),
+        email=create_user_request.email,
     )
-    password_valid = password_pattern.fullmatch(credentials.password)
-
-    # email pattern is x@x.x where x is any char
-    email_pattern = re.compile("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")
-    email_valid = email_pattern.fullmatch(credentials.email)
-
-    if credentials.password != credentials.confirmPassword:
-        return False
-
-    if username_valid is None or password_valid is None or email_valid is None:
-        return False
-
-    return True
+    db.add(user)
+    db.commit()
+    return {"message": "User created successfully"}
 
 
-def get_password_hash(password):
-    return bcrypt_context.hash(password)
-
-
-def verify_password(password, hashed_password):
-    return bcrypt_context.verify(password, hashed_password)
-
-
-def authenticate_user(username: str, password: str, db: db_dependency):
-    user_query = select(Users).where(Users.username == username)
-    result = db.execute(user_query)
-    user = result.scalar()
-
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
-
-
-# Create token for user on login
 @router.post("/token", response_model=Token, status_code=status.HTTP_200_OK)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dependency,
     response: Response,
 ):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = authenticate_user_login(form_data.username, form_data.password, db)
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate user",
         )
+
+    # Generate session-specific JTI
+    jti = str(uuid.uuid4())
 
     access_token = create_access_token(
-        user.username, user.id, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        user.username, user.id, user.token_version,
+        expires_delta=None,
     )
-
     refresh_token = create_refresh_token(
-        user.username, user.id, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+        user.username, user.id, user.token_version, jti,
+        expires_delta=None,
     )
 
-    if PROD:
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            # max_age is in seconds so multiply by 60
-            max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-        )
-    else:
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            # max_age is in seconds so multiply by 60
-            max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-        )
+    # Store refresh token in DB
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    store_refresh_token(db, jti, user.id, expires_at)
 
+    _set_refresh_cookie(response, refresh_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def create_refresh_token(username: str, user_id: int, expires_delta: timedelta):
-    encode = {"sub": username, "id": user_id}
-    expires = datetime.now(timezone.utc) + expires_delta
-    encode.update({"exp": expires})
-    return jwt.encode(encode, REFRESH_JWT_SECRET, algorithm=JWT_ALGORITHM)
-
-
-def create_access_token(username: str, user_id: int, expires_delta: timedelta):
-    encode = {"sub": username, "id": user_id}
-    expires = datetime.now(timezone.utc) + expires_delta
-    encode.update({"exp": expires})
-    return jwt.encode(encode, ACCESS_JWT_SECRET, algorithm=JWT_ALGORITHM)
-
-
-async def get_access_token_cookie(request: Request):
-    access_token = request.cookies.get("access_token")
-    if access_token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token not found"
-        )
-    return access_token
-
-
-token = Annotated[str, Depends(oauth2_scheme)]
-
-
-# Dependency for routes that need an authenticated user to access
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+@router.get("/refresh", response_model=Token)
+async def refresh_access_token(request: Request, response: Response, db: db_dependency):
     try:
-        payload = jwt.decode(token, ACCESS_JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        username = payload.get("sub")
-        user_id = payload.get("id")
-        if username is None or user_id is None:
+        refresh_token = request.cookies.get("refresh_token")
+        if refresh_token is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate user",
+                detail="Refresh token not found",
             )
-        return {"username": username, "id": user_id}
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access Token Expired",
-        )
 
-
-@router.get("/refresh", response_model=Token)
-async def get_refresh_from_cookie(request: Request):
-    """
-    Generates new access token if refresh token from HTTPonly cookie is not expired
-    """
-
-    refresh_token = request.cookies.get("refresh_token")
-
-    if refresh_token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh Token not found"
-        )
-
-    try:
-        payload = jwt.decode(
-            refresh_token, REFRESH_JWT_SECRET, algorithms=[JWT_ALGORITHM]
-        )
-        username = payload.get("sub")
-        user_id = payload.get("id")
-
-        if username is None or user_id is None:
+        payload_dict = decode_refresh_token(refresh_token)
+        if payload_dict is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token",
             )
 
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
+        try:
+            payload = TokenPayload(**payload_dict)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+            )
+
+        if payload.jti is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+            )
+
+        now = datetime.now(timezone.utc)
+
+        db_token = get_refresh_token_by_jti(db, payload.jti)
+
+        if db_token and db_token.revoked:
+            leeway = timedelta(seconds=10)
+            revoked_at = db_token.revoked_at.replace(tzinfo=timezone.utc) if db_token.revoked_at else None
+
+            if revoked_at and (now - revoked_at) > leeway:
+                revoke_all_user_tokens(db, payload.id)
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token reuse detected",
+                )
+
+        if not db_token or db_token.expires_at.replace(tzinfo=timezone.utc) < now:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token expired or not found",
+            )
+
+        user = get_user_by_id(payload.id, db)
+        if not user or user.token_version != payload.version:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Session invalidated",
+            )
+
+        # Always rotate: revoke old JTI, issue new refresh token
+        revoke_refresh_token(db, payload.jti)
+        new_jti = str(uuid.uuid4())
+        new_refresh_token = create_refresh_token(
+            user.username, user.id, user.token_version, new_jti,
+        )
+        store_refresh_token(db, new_jti, user.id, now + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES))
+
+        new_access_token = create_access_token(
+            user.username, user.id, user.token_version,
         )
 
-    new_access_token = create_access_token(
-        username=username,
-        user_id=user_id,
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-    )
+        _set_refresh_cookie(response, new_refresh_token)
+        return {"access_token": new_access_token, "token_type": "bearer"}
 
-    return {"access_token": new_access_token, "token_type": "bearer"}
-
-
-user_dependency = Annotated[dict, Depends(get_current_user)]
+    except HTTPException:
+        _clear_refresh_cookie(response)
+        raise
+    except Exception as e:
+        logger.error(f"Users Router: Unexpected error during token refresh: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )
 
 
 @router.get("/me")
 async def get_me(user: user_dependency):
-    if user:
-        return user
+    return user
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(request: Request, response: Response):
-    """
-    Sets token value to empty string on logout
-    """
+async def logout(request: Request, response: Response, db: db_dependency):
     refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        payload_dict = decode_refresh_token(refresh_token)
+        if payload_dict:
+            try:
+                payload = TokenPayload(**payload_dict)
+                if payload.jti:
+                    # Only revoke this specific session
+                    revoke_refresh_token(db, payload.jti)
+            except Exception:
+                pass
 
-    if refresh_token is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    if PROD:
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            max_age=0,
-        )
-    else:
-        response.set_cookie(
-            key="refresh_token",
-            value=refresh_token,
-            httponly=True,
-            max_age=0,
-        )
-
+    _clear_refresh_cookie(response)
     return {"message": "Logged out successfully"}
+
