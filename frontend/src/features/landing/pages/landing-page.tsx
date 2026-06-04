@@ -6,6 +6,7 @@ import { Info, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { MovieData } from '@/features/movies/types/movie-types'
 import { TvData } from '@/features/tv/types/tv-types'
+import PopularMovies from '@/features/movies/components/popular-movies'
 
 const LandingPage = () => {
     const { data: topTrending, isLoading: isTopTrendingLoading } = useMediaData(
@@ -58,6 +59,7 @@ const LandingPage = () => {
                             <div className="flex gap-3">
                                 <Button asChild>
                                     <Link
+                                        className="flex gap-2 items-center"
                                         to={
                                             isMovie
                                                 ? `/movie/${hero.id}`
@@ -70,6 +72,7 @@ const LandingPage = () => {
                                 </Button>
                                 <Button variant="secondary" asChild>
                                     <Link
+                                        className="flex gap-2 items-center"
                                         to={
                                             isMovie
                                                 ? `/movie/${hero.id}`
@@ -85,7 +88,9 @@ const LandingPage = () => {
                     </>
                 )}
             </section>
-            <section></section>
+            <section>
+                <PopularMovies />
+            </section>
         </>
     )
 }
