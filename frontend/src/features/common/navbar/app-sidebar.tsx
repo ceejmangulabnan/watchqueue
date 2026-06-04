@@ -11,8 +11,11 @@ import {
 import { Compass, Home, Popcorn } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { ThemeToggle } from '../components/theme-toggle'
+import { useAuth } from '@/features/auth/hooks/use-auth'
+import UserNav from './user-nav'
 
 const AppSidebar = () => {
+    const { auth, isAuthed, isAuthLoading, logout } = useAuth()
     const { pathname } = useLocation()
 
     const navLinks = [
@@ -35,7 +38,7 @@ const AppSidebar = () => {
                     watchlist tracking
                 </span>
             </SidebarHeader>
-            <SidebarContent className="font-mono">
+            <SidebarContent className="font-mono tracking-tight">
                 <SidebarGroup className="p-0">
                     <SidebarMenu>
                         {navLinks.map(({ to, label, icon: Icon }) => (
@@ -60,8 +63,14 @@ const AppSidebar = () => {
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
-                <ThemeToggle></ThemeToggle>
+            <SidebarFooter className="font-mono p-0 gap-0">
+                <UserNav
+                    loading={isAuthLoading}
+                    isAuthed={isAuthed}
+                    handleLogout={logout}
+                    auth={auth}
+                />
+                <ThemeToggle />
             </SidebarFooter>
         </Sidebar>
     )

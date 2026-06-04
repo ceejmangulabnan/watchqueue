@@ -2,7 +2,6 @@ import { useState } from 'react'
 import LoginForm from '@/features/auth/components/login-form'
 import RegisterForm from '@/features/auth/components/register-form'
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { LogIn } from 'lucide-react'
 
 // Handles the switching between the login and register forms
@@ -23,20 +22,12 @@ const LoginRegisterToggle = () => {
         <div>
             <Dialog>
                 <DialogTrigger asChild>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            className="hidden md:block"
-                            onClick={loginButtonToggle}
-                        >
-                            Login
-                        </Button>
-                        <li
-                            onClick={loginButtonToggle}
-                            className="flex md:hidden gap-2"
-                        >
-                            <LogIn />
-                            Login
-                        </li>
+                    <div
+                        onClick={loginButtonToggle}
+                        className="tracking-tight flex gap-4 items-center py-2 px-4 rounded-none font-mono text-sm cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    >
+                        <LogIn size={24} />
+                        Login
                     </div>
                 </DialogTrigger>
                 <DialogContent>

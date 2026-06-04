@@ -1,10 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Skeleton } from '@/components/ui/skeleton'
-
-interface NavLinksProps {
-    loading: boolean
-    handleLogout: () => Promise<void>
-}
 
 const navLinks = [
     { to: '/browse/movies', label: 'Movies' },
@@ -12,15 +6,10 @@ const navLinks = [
     { to: '/watchlists', label: 'Watchlists' },
 ]
 
-const NavLinks = ({ loading }: NavLinksProps) => {
+const NavLinks = () => {
     return (
         <nav className="hidden md:flex text-sm md:text-base">
             <ul className="flex items-center gap-6 text-sm font-bold ml-4">
-                {loading && (
-                    <li>
-                        <Skeleton className="h-9 w-16"></Skeleton>
-                    </li>
-                )}
                 {navLinks.map(({ to, label }) => (
                     <Link
                         key={to}
