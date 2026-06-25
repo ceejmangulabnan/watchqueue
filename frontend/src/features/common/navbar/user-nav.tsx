@@ -12,12 +12,12 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import LoginRegisterToggle from '@/features/auth/components/login-register-toggle'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar'
+
 interface UserNavProps {
     loading: boolean
     isAuthed: boolean
@@ -27,7 +27,6 @@ interface UserNavProps {
 
 const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
     const [isOpen, setIsOpen] = useState(false)
-    const navigate = useNavigate()
 
     const generateAvatarFallback = () => {
         if (isAuthed) {
@@ -51,7 +50,6 @@ const UserNav = ({ loading, isAuthed, handleLogout, auth }: UserNavProps) => {
                                 <div className="flex gap-2 items-center">
                                     <Avatar
                                         className={`${isAuthed ? 'flex' : 'hidden'} cursor-pointer`}
-                                        onClick={() => navigate('/profile')}
                                     >
                                         <AvatarImage></AvatarImage>
                                         <AvatarFallback>

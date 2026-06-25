@@ -47,6 +47,11 @@ async def root():
     return {"message": "Hello World"}
 
 
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "timestamp": f"{datetime.now()}"}
+
+
 @app.get("/log")
 async def log():
     return {"uptime_robot": f"{datetime.now()}"}
