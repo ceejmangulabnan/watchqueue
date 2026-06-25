@@ -19,6 +19,7 @@ import ThemeProvider from '@/features/common/context/theme-provider'
 import { SidebarInset, SidebarProvider } from './components/ui/sidebar'
 import AppSidebar from './features/common/navbar/app-sidebar'
 import Navbar from './features/common/navbar'
+import Footer from './features/common/components/footer'
 
 const queryClient = new QueryClient()
 
@@ -39,7 +40,8 @@ const App = () => {
                                         <SidebarInset>
                                             <Navbar />
 
-                                            <Routes>
+                                            <div className="flex-1">
+                                                <Routes>
                                                 <Route
                                                     path="/"
                                                     element={<LandingPage />}
@@ -96,6 +98,8 @@ const App = () => {
                                                     element={<TvDetailsPage />}
                                                 ></Route>
                                             </Routes>
+                                            </div>
+                                            <Footer />
                                         </SidebarInset>
                                     </SidebarProvider>
                                 </UserWatchlistProvider>

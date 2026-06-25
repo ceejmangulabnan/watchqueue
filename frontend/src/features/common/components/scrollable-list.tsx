@@ -75,7 +75,7 @@ const ScrollableList = ({
                 <div
                     className={`absolute left-0 top-0 bottom-0 w-16 z-10 
             pointer-events-none transition-opacity duration-300 ease-in-out 
-            bg-gradient-to-r from-background to-background/0
+            bg-gradient-to-r from-background to-transparent
             ${showLeftButton ? 'opacity-100' : 'opacity-0'}`}
                 />
 
@@ -83,7 +83,7 @@ const ScrollableList = ({
                 <div
                     className={`absolute right-0 top-0 bottom-0 w-16 z-10 
             pointer-events-none transition-opacity duration-300 ease-in-out 
-            bg-gradient-to-l from-background to-background/0
+            bg-gradient-to-l from-background to-transparent
             ${showRightButton ? 'opacity-100' : 'opacity-0'}`}
                 />
 
