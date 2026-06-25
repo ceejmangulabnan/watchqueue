@@ -6,6 +6,8 @@ import { Info, Play } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { MovieData } from '@/features/movies/types/movie-types'
 import { TvData } from '@/features/tv/types/tv-types'
+import PopularMovies from '@/features/movies/components/popular-movies'
+import TopRatedMovies from '@/features/movies/components/top-rated-movies'
 
 const LandingPage = () => {
     const { data: topTrending, isLoading: isTopTrendingLoading } = useMediaData(
@@ -44,7 +46,7 @@ const LandingPage = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
 
                         <div className="relative z-10 h-full flex flex-col justify-end pb-24 px-10 md:px-20 max-w-4xl">
-                            <h1 className="text-4xl md:text-6xl font-bold font-inter mb-2">
+                            <h1 className="text-6xl md:text-7xl font-bold font-bebas-neue mb-2 -ml-1">
                                 {heroTitle}
                             </h1>
                             {heroRelease && (
@@ -86,6 +88,10 @@ const LandingPage = () => {
                         </div>
                     </>
                 )}
+            </section>
+            <section className="mt-10 px-8 space-y-8 md:space-y-20">
+                <PopularMovies />
+                <TopRatedMovies />
             </section>
         </>
     )

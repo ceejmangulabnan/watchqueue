@@ -90,29 +90,27 @@ const ScrollableList = ({
                 {/* Left Scroll Button */}
                 <button
                     onClick={scrollLeft}
-                    className={`absolute left-2 top-1/2 transform -translate-y-1/2 z-20 bg-foreground/50 rounded-full p-2 
-            hover:bg-foreground/70 transition-all duration-300 ease-in-out
+                    className={`absolute left-2 top-1/2 transform -translate-y-1/2 z-20 bg-foreground/50 rounded-full p-1 md:p-2 hover:bg-foreground/70 transition-all duration-300 ease-in-out
             ${
                 showLeftButton
                     ? 'opacity-100 scale-100 pointer-events-auto'
                     : 'opacity-0 scale-75 pointer-events-none'
             }`}
                 >
-                    <ChevronLeft className="text-background" />
+                    <ChevronLeft className="size-4 md:size-6 text-background" />
                 </button>
 
                 {/* Right Scroll Button */}
                 <button
                     onClick={scrollRight}
-                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 z-20 bg-foreground/50 rounded-full p-2 
-            hover:bg-foreground/70 transition-all duration-300 ease-in-out
+                    className={`absolute right-2 top-1/2 transform -translate-y-1/2 z-20 bg-foreground/50 rounded-full p-1 md:p-2 hover:bg-foreground/70 transition-all duration-300 ease-in-out
             ${
                 showRightButton
                     ? 'opacity-100 scale-100 pointer-events-auto'
                     : 'opacity-0 scale-75 pointer-events-none'
             }`}
                 >
-                    <ChevronRight className="text-background" />
+                    <ChevronRight className="size-4 md:size-6 text-background" />
                 </button>
 
                 {/* Scrollable Items Container */}

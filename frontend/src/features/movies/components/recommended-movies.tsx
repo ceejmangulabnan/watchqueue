@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import axiosBase from '@/api/axios'
-import { MovieDetails, RecommendedMoviesData } from '@/features/movies/types/movie-types'
+import {
+    MovieDetails,
+    RecommendedMoviesData,
+} from '@/features/movies/types/movie-types'
 import MovieItem from '@/features/movies/components/movie-item'
 
 interface RecommendedMoviesProps {

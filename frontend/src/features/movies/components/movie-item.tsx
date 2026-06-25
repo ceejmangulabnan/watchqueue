@@ -44,9 +44,12 @@ const MovieItem = ({
     }
 
     return (
-        <Card className="overflow-hidden relative hover:scale-105 transition-all ease-in">
+        <Card className="overflow-hidden relative rounded-none border-none">
             <DropdownMenu>
-                <DropdownMenuTrigger asChild className="absolute right-2 top-2">
+                <DropdownMenuTrigger
+                    asChild
+                    className="absolute right-2 top-2 z-50"
+                >
                     <Button className="p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow">
                         <Ellipsis color="#000000" size={16} />
                     </Button>
@@ -65,16 +68,19 @@ const MovieItem = ({
                 )}
             </DropdownMenu>
 
-            <img
-                src={posterLink}
-                loading="lazy"
-                onClick={() => navigate(`/movie/${movie.id}`)}
-                onError={(e) => {
-                    ;(e.target as HTMLImageElement).src = FALLBACK_POSTER
-                }}
-            />
+            <div className="overflow-hidden rounded-md">
+                <img
+                    src={posterLink}
+                    loading="lazy"
+                    onClick={() => navigate(`/movie/${movie.id}`)}
+                    className="object-cover w-full hover:scale-105 transition-transform ease-in"
+                    onError={(e) => {
+                        ;(e.target as HTMLImageElement).src = FALLBACK_POSTER
+                    }}
+                />
+            </div>
 
-            <CardFooter className="flex-col items-start p-4">
+            <CardFooter className="flex-col items-start p-0 py-4">
                 <CardTitle className="text-sm md:text-md truncate w-full">
                     {movie.title}
                 </CardTitle>
