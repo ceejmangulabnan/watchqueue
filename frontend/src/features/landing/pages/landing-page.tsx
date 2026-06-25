@@ -8,6 +8,8 @@ import { MovieData } from '@/features/movies/types/movie-types'
 import { TvData } from '@/features/tv/types/tv-types'
 import PopularMovies from '@/features/movies/components/popular-movies'
 import TopRatedMovies from '@/features/movies/components/top-rated-movies'
+import PopularTv from '@/features/tv/components/popular-tv'
+import TopRatedTv from '@/features/tv/components/top-rated-tv'
 
 const LandingPage = () => {
     const { data: topTrending, isLoading: isTopTrendingLoading } = useMediaData(
@@ -91,7 +93,9 @@ const LandingPage = () => {
             </section>
             <section className="mt-10 px-8 space-y-8 md:space-y-20">
                 <PopularMovies />
+                <PopularTv />
                 <TopRatedMovies />
+                <TopRatedTv />
             </section>
         </>
     )

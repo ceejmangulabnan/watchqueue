@@ -80,7 +80,7 @@ const MovieItem = ({
                 />
             </div>
 
-            <CardFooter className="flex-col items-start p-0 py-4">
+            <CardFooter className="flex-col items-start p-0 pt-4">
                 <CardTitle className="text-sm md:text-md truncate w-full">
                     {movie.title}
                 </CardTitle>
