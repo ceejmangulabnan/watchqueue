@@ -44,7 +44,10 @@ const MovieItem = ({
     }
 
     return (
-        <Card className="overflow-hidden relative rounded-none border-none">
+        <Card
+            className="overflow-hidden relative rounded-none border-none group/movie-item"
+            onClick={() => navigate(`/movie/${movie.id}`)}
+        >
             <DropdownMenu>
                 <DropdownMenuTrigger
                     asChild
@@ -72,7 +75,6 @@ const MovieItem = ({
                 <img
                     src={posterLink}
                     loading="lazy"
-                    onClick={() => navigate(`/movie/${movie.id}`)}
                     className="object-cover w-full hover:scale-105 transition-transform ease-in"
                     onError={(e) => {
                         ;(e.target as HTMLImageElement).src = FALLBACK_POSTER
@@ -81,7 +83,7 @@ const MovieItem = ({
             </div>
 
             <CardFooter className="flex-col items-start p-0 pt-4">
-                <CardTitle className="text-sm md:text-md truncate w-full">
+                <CardTitle className="text-sm md:text-md truncate w-full group-hover/movie-item:text-red-500 group-hover/movie-item:ease-in group-hover/movie-item:transition-all cursor-pointer">
                     {movie.title}
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm lg:text-md">

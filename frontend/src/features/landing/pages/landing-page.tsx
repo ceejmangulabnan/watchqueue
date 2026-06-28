@@ -26,6 +26,7 @@ const LandingPage = () => {
         ? (hero as MovieData).release_date?.slice(0, 4)
         : (hero as TvData).first_air_date?.slice(0, 4)
     const heroOverview = hero?.overview ?? ''
+    const heroRating = hero?.vote_average
 
     return (
         <>
@@ -48,7 +49,7 @@ const LandingPage = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-background/80 to-transparent" />
 
                         <div className="relative z-10 h-full flex flex-col justify-end pb-24 px-10 md:px-20 max-w-4xl">
-                            <h1 className="text-6xl md:text-7xl font-bold font-bebas-neue mb-2 -ml-1">
+                            <h1 className="text-6xl md:text-7xl font-black font-inter tracking-tight mb-2 -ml-1">
                                 {heroTitle}
                             </h1>
                             {heroRelease && (
@@ -56,6 +57,7 @@ const LandingPage = () => {
                                     {heroRelease}
                                 </p>
                             )}
+                            {heroRating}
                             <p className="text-sm md:text-base line-clamp-3 mb-6 max-w-2xl text-muted-foreground">
                                 {heroOverview}
                             </p>

@@ -44,7 +44,7 @@ const TvItem = ({
     }
 
     return (
-        <Card className="overflow-hidden relative rounded-none border-none">
+        <Card className="overflow-hidden relative rounded-none border-none group/tv-item">
             <DropdownMenu>
                 <DropdownMenuTrigger
                     asChild
@@ -80,7 +80,7 @@ const TvItem = ({
                 />
             </div>
             <CardFooter className="flex-col items-start p-0 pt-4">
-                <CardTitle className="text-sm md:text-md truncate w-full">
+                <CardTitle className="text-sm md:text-md truncate w-full group-hover/tv-item:text-red-500 group-hover/tv-item:ease-in group-hover/tv-item:transition-all cursor-pointer">
                     {tv.name}
                 </CardTitle>
                 <CardDescription className="text-xs md:text-sm lg:text-md">
