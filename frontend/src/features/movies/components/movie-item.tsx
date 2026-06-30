@@ -51,7 +51,7 @@ const MovieItem = ({
             <DropdownMenu>
                 <DropdownMenuTrigger
                     asChild
-                    className="absolute right-2 top-2 z-50"
+                    className="absolute right-2 top-2 z-40"
                 >
                     <Button className="p-0 w-6 h-6 rounded-full bg-white hover:bg-white shadow">
                         <Ellipsis color="#000000" size={16} />
